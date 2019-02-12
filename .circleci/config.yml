@@ -1,0 +1,158 @@
+version: 2
+
+jobs:
+  build:
+    working_directory: /go/src/github.com/mackerelio/mackerel-container-agent
+
+    docker:
+      - image: circleci/golang
+
+    environment:
+      TEST_RESULTS: /tmp/test-results
+
+    steps:
+      - checkout
+
+      - run: mkdir -p $TEST_RESULTS
+
+      - restore_cache:
+          keys:
+            - v1-pkg-cache
+
+      - run:
+          name: Get CI dependency
+          command: go get github.com/jstemmer/go-junit-report
+
+      - run:
+          name: Build
+          command: make
+
+      - run:
+          name: Run lint
+          command: |
+            make lint
+
+      - run:
+          name: Run unit tests
+          command: |
+            trap "go-junit-report <${TEST_RESULTS}/go-test.out > ${TEST_RESULTS}/go-test-report.xml" EXIT
+            make test | tee ${TEST_RESULTS}/go-test.out
+
+      - save_cache:
+          key: v1-pkg-cache
+          paths:
+            - "/go/pkg"
+
+      - store_artifacts:
+          path: /tmp/test-results
+          destination: raw-test-output
+
+      - store_artifacts:
+          path: ./build
+          destination: build
+
+      - store_test_results:
+          path: /tmp/test-results
+
+      - persist_to_workspace:
+          root: .
+          paths:
+            - Dockerfile
+            - build/*
+            - Makefile
+
+  build_alpha_image:
+    working_directory: /tmp/workspace
+
+    docker:
+      - image: circleci/golang
+
+    environment:
+      TAG_SUFFIX: "-alpha"
+
+    steps:
+      - attach_workspace:
+          at: /tmp/workspace
+
+      - setup_remote_docker:
+          docker_layer_caching: true
+
+      - run:
+          name: Login to DockerHub
+          command: docker login --username $DOCKER_USER --password $DOCKER_PASSWORD
+
+      - run:
+          name: Build Docker Image
+          command: |
+            TAG=$(echo ${CIRCLE_BRANCH} | sed -E 's/.*-([0-9.]+)$/\1/'
+            docker build -t $DOCKER_REPOSITORY:${TAG:?'parse failed'}${TAG_SUFFIX} .
+
+      - run:
+          name: Push Docker Image
+          command: |
+            TAG=$(echo ${CIRCLE_BRANCH} | sed -E 's/.*-([0-9.]+)$/\1/'
+            docker push $DOCKER_REPOSITORY:${TAG:?'parse failed'}${TAG_SUFFIX}
+
+  build_image:
+    working_directory: /tmp/workspace
+
+    docker:
+      - image: circleci/golang
+
+    steps:
+      - attach_workspace:
+          at: /tmp/workspace
+
+      - setup_remote_docker:
+          docker_layer_caching: true
+
+      - run:
+          name: Login to DockerHub
+          command: docker login --username $DOCKER_USER --password $DOCKER_PASSWORD
+
+      - run:
+          name: Build Docker Image
+          command: >
+            docker build
+            -t $DOCKER_REPOSITORY:latest
+            -t $DOCKER_REPOSITORY:${CIRCLE_TAG}
+            .
+
+      - run:
+          name: Push Docker Image
+          command: |
+            docker push $DOCKER_REPOSITORY:latest
+            docker push $DOCKER_REPOSITORY:${CIRCLE_TAG}
+
+workflows:
+  version: 2
+
+  build_and_image:
+    jobs:
+      - build:
+          filters:
+            branches:
+              only: /.*/
+            tags:
+              only: /.*/
+
+      - build_alpha_image:
+          requires:
+            - build
+          filters:
+            branches:
+              only: /^bump-version-[0-9.]+$/
+
+      - build_image:
+          requires:
+            - build
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v[0-9.]+(?:-[0-9a-z]+)?$/
+
+# Following environment variables should be set in CircleCI.
+# - DOCKER_REPOSITORY
+# - DOCKER_USER
+# - DOCKER_PASSWORD

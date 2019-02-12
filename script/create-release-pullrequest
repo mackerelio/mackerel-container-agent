@@ -1,0 +1,31 @@
+#!/usr/bin/env perl
+
+=head DESCRIPTION
+
+releng script for mackerel-container-agent
+
+=head SYNOPSIS
+
+    % script/create-release-pullrequest
+
+=head DEPENDENCY
+
+`git`, `hub` command are required.
+
+=cut
+
+use 5.014;
+use strict;
+use warnings;
+use utf8;
+
+use Mackerel::ReleaseUtils qw/create_release_pull_request/;
+
+{
+    no strict qw/refs/;
+    no warnings qw/redefine/;
+    # monkey patch
+    *{'Mackerel::ReleaseUtils::update_versions'} = sub {};
+}
+
+create_release_pull_request 'mackerel-container-agent';

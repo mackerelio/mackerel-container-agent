@@ -1,0 +1,19 @@
+{
+  "Arn": "arn:aws:ecs:us-east-1:999999999999:task/e01d58a8-151b-40e8-bc01-22647b9ecfec",
+  "Containers": [
+    {
+      "DockerId": "79c796ed2a7f864f485c76f83f3165488097279d296a7c05bd5201a1c69b2920",
+      "DockerName": "ecs-nginx-efs-2-nginx-9ac0808dd0afa495f001",
+      "Name": "nginx"
+    },
+    {
+      "DockerId": "7e088b28bde202f19243853b0d20998a005984efa3d4b6c18e771fd149f86648",
+      "DockerName": "ecs-mackerel-container-agent-7-mackerel-container-agent-96b2f7c0c7c2ccff9101",
+      "Name": "mackerel-container-agent"
+    }
+  ],
+  "DesiredStatus": "RUNNING",
+  "Family": "nginx-develop",
+  "KnownStatus": "RUNNING",
+  "Version": "2"
+}

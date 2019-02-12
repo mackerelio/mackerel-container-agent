@@ -1,0 +1,11 @@
+- Merge PRs to master
+- Create release PR
+    - Run `make release`.
+    - "mackerel-container-agent:<RELEASE-VERSION>-alpha" Docker image is automatically pushed.
+- Check release PR
+  - Check CHANGELOG.
+  - Test "mackerel-container-agent:<RELEASE-VERSION>-alpha" Docker image.
+- Merge  release PR
+- Tag <RELEASE-VERSION>
+  - Run `git tag v<RELEASE-VERSION>` and `git push --tags`.
+  - "mackerel-container-agent:<RELEASE-VERSION>" Docker image is automatically pushed
