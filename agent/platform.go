@@ -53,11 +53,11 @@ func NewPlatform(ctx context.Context, ignoreContainer *regexp.Regexp) (platform.
 		if err != nil {
 			return nil, err
 		}
-		name, err := getEnvValue("MACKEREL_KUBERNETES_POD_NAME")
+		podName, err := getEnvValue("MACKEREL_KUBERNETES_POD_NAME")
 		if err != nil {
 			return nil, err
 		}
-		return kubernetes.NewKubernetesPlatform(host, port, useReadOnlyPort, namespace, name, ignoreContainer)
+		return kubernetes.NewKubernetesPlatform(host, port, useReadOnlyPort, namespace, podName, ignoreContainer)
 
 	default:
 		return nil, errors.New("platform not specified")

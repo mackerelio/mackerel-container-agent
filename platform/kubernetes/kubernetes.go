@@ -33,7 +33,7 @@ type kubernetesPlatform struct {
 }
 
 // NewKubernetesPlatform creates a new Platform
-func NewKubernetesPlatform(kubeletHost, kubeletPort string, useReadOnlyPort bool, namespace, name string, ignoreContainer *regexp.Regexp) (platform.Platform, error) {
+func NewKubernetesPlatform(kubeletHost, kubeletPort string, useReadOnlyPort bool, namespace, podName string, ignoreContainer *regexp.Regexp) (platform.Platform, error) {
 	var rslv *resolver
 	var caCert, token []byte
 
@@ -63,7 +63,7 @@ func NewKubernetesPlatform(kubeletHost, kubeletPort string, useReadOnlyPort bool
 
 	httpClient := createHTTPClient(caCert, rslv)
 
-	c, err := kubelet.NewClient(httpClient, string(token), baseURL, namespace, name, ignoreContainer)
+	c, err := kubelet.NewClient(httpClient, string(token), baseURL, namespace, podName, ignoreContainer)
 	if err != nil {
 		return nil, err
 	}
