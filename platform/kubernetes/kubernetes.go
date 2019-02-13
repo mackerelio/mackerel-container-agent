@@ -33,7 +33,7 @@ type kubernetesPlatform struct {
 }
 
 // NewKubernetesPlatform creates a new Platform
-func NewKubernetesPlatform(kubeletHost, kubeletPort string, useReadOnlyPort bool, namespace, podName string, ignoreContainer *regexp.Regexp) (platform.Platform, error) {
+func NewKubernetesPlatform(kubeletHost, kubeletPort string, useReadOnlyPort, insecureTLS bool, namespace, podName string, ignoreContainer *regexp.Regexp) (platform.Platform, error) {
 	var rslv *resolver
 	var caCert, token []byte
 
@@ -61,7 +61,7 @@ func NewKubernetesPlatform(kubeletHost, kubeletPort string, useReadOnlyPort bool
 		}
 	}
 
-	httpClient := createHTTPClient(caCert, rslv)
+	httpClient := createHTTPClient(caCert, rslv, insecureTLS)
 
 	c, err := kubelet.NewClient(httpClient, string(token), baseURL, namespace, podName, ignoreContainer)
 	if err != nil {
@@ -108,7 +108,7 @@ type resolver struct {
 	host, port, address string
 }
 
-func createHTTPClient(caCert []byte, resolver *resolver) *http.Client {
+func createHTTPClient(caCert []byte, resolver *resolver, insecureTLS bool) *http.Client {
 	// Copy from the definition of http.DefaultTransport.DialContext.
 	dialer := &net.Dialer{
 		Timeout:   30 * time.Second,
@@ -130,10 +130,14 @@ func createHTTPClient(caCert []byte, resolver *resolver) *http.Client {
 		Transport: transport,
 	}
 
+	transport.TLSClientConfig = &tls.Config{
+		InsecureSkipVerify: insecureTLS,
+	}
+
 	if len(caCert) > 0 {
 		certPool := x509.NewCertPool()
 		certPool.AppendCertsFromPEM(caCert)
-		transport.TLSClientConfig = &tls.Config{RootCAs: certPool}
+		transport.TLSClientConfig.RootCAs = certPool
 	}
 
 	if resolver != nil {
