@@ -2,6 +2,7 @@ package instance
 
 import (
 	"context"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -68,6 +69,11 @@ func (c *client) newRequest(endpoint string) (*http.Request, error) {
 }
 
 func readBody(resp *http.Response) ([]byte, error) {
-	defer resp.Body.Close()
+	if resp.Body != nil {
+		defer resp.Body.Close()
+	}
+	if resp.StatusCode != http.StatusOK {
+		return []byte{}, fmt.Errorf("incorrect status code %d", resp.StatusCode)
+	}
 	return ioutil.ReadAll(resp.Body)
 }
