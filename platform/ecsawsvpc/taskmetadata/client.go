@@ -3,6 +3,7 @@ package taskmetadata
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/url"
 	"path"
@@ -116,5 +117,8 @@ func (c *client) newRequest(endpoint string) (*http.Request, error) {
 
 func decodeBody(resp *http.Response, out interface{}) error {
 	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("got status code %d", resp.StatusCode)
+	}
 	return json.NewDecoder(resp.Body).Decode(out)
 }
