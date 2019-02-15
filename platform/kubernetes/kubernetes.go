@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net"
 	"net/http"
+	"net/url"
 	"regexp"
 	"strings"
 	"time"
@@ -20,9 +21,8 @@ import (
 )
 
 var (
-	logger        = logging.GetLogger("kubernetes")
-	timeout       = 3 * time.Second
-	kubenetesName = "kubernetes"
+	logger  = logging.GetLogger("kubernetes")
+	timeout = 3 * time.Second
 
 	caCertificateFile = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
 	tokenFile         = "/var/run/secrets/kubernetes.io/serviceaccount/token"
@@ -33,20 +33,16 @@ type kubernetesPlatform struct {
 }
 
 // NewKubernetesPlatform creates a new Platform
-func NewKubernetesPlatform(kubeletHost, kubeletPort string, useReadOnlyPort bool, namespace, name string, ignoreContainer *regexp.Regexp) (platform.Platform, error) {
-	var rslv *resolver
+func NewKubernetesPlatform(kubeletHost, kubeletPort string, useReadOnlyPort, insecureTLS bool, namespace, podName string, ignoreContainer *regexp.Regexp) (platform.Platform, error) {
 	var caCert, token []byte
 
-	baseURL := "http://" + net.JoinHostPort(kubeletHost, kubeletPort)
+	baseURL := &url.URL{
+		Scheme: "http",
+		Host:   net.JoinHostPort(kubeletHost, kubeletPort),
+	}
 
 	if !useReadOnlyPort {
-		baseURL = "https://" + net.JoinHostPort(kubenetesName, kubeletPort)
-
-		rslv = &resolver{
-			host:    kubenetesName,
-			port:    kubeletPort,
-			address: kubeletHost,
-		}
+		baseURL.Scheme = "https"
 
 		var err error
 
@@ -61,9 +57,16 @@ func NewKubernetesPlatform(kubeletHost, kubeletPort string, useReadOnlyPort bool
 		}
 	}
 
-	httpClient := createHTTPClient(caCert, rslv)
+	httpClient := createHTTPClient(caCert, insecureTLS)
 
-	c, err := kubelet.NewClient(httpClient, string(token), baseURL, namespace, name, ignoreContainer)
+	c, err := kubelet.NewClient(
+		httpClient,
+		string(token),
+		baseURL.String(),
+		namespace,
+		podName,
+		ignoreContainer,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -104,11 +107,7 @@ func (p *kubernetesPlatform) StatusRunning(ctx context.Context) bool {
 	return strings.EqualFold("running", meta.Status.Phase)
 }
 
-type resolver struct {
-	host, port, address string
-}
-
-func createHTTPClient(caCert []byte, resolver *resolver) *http.Client {
+func createHTTPClient(caCert []byte, insecureTLS bool) *http.Client {
 	// Copy from the definition of http.DefaultTransport.DialContext.
 	dialer := &net.Dialer{
 		Timeout:   30 * time.Second,
@@ -125,33 +124,19 @@ func createHTTPClient(caCert []byte, resolver *resolver) *http.Client {
 		TLSHandshakeTimeout:   10 * time.Second,
 		ExpectContinueTimeout: 1 * time.Second,
 	}
-	client := &http.Client{
-		Timeout:   timeout,
-		Transport: transport,
+
+	transport.TLSClientConfig = &tls.Config{
+		InsecureSkipVerify: insecureTLS,
 	}
 
 	if len(caCert) > 0 {
 		certPool := x509.NewCertPool()
 		certPool.AppendCertsFromPEM(caCert)
-		transport.TLSClientConfig = &tls.Config{RootCAs: certPool}
+		transport.TLSClientConfig.RootCAs = certPool
 	}
 
-	if resolver != nil {
-		hostPort := net.JoinHostPort(resolver.host, resolver.port)
-		resolved := net.JoinHostPort(resolver.address, resolver.port)
-		transport.DialContext = func(ctx context.Context, network, addr string) (net.Conn, error) {
-			if addr == hostPort {
-				addr = resolved
-			}
-			return dialer.DialContext(ctx, network, addr)
-		}
-		transport.Dial = func(network, addr string) (net.Conn, error) {
-			if addr == hostPort {
-				addr = resolved
-			}
-			return dialer.Dial(network, addr)
-		}
+	return &http.Client{
+		Timeout:   timeout,
+		Transport: transport,
 	}
-
-	return client
 }

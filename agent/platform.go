@@ -34,6 +34,7 @@ func NewPlatform(ctx context.Context, ignoreContainer *regexp.Regexp) (platform.
 
 	case platform.Kubernetes:
 		useReadOnlyPort := true
+		insecureTLS := false
 		host, err := getEnvValue("MACKEREL_KUBERNETES_KUBELET_HOST")
 		if err != nil {
 			return nil, err
@@ -48,16 +49,20 @@ func NewPlatform(ctx context.Context, ignoreContainer *regexp.Regexp) (platform.
 			if err != nil {
 				port = kubelet.DefaultPort
 			}
+			_, err := getEnvValue("MACKEREL_KUBERNETES_KUBELET_INSECURE_TLS")
+			if err == nil {
+				insecureTLS = true
+			}
 		}
 		namespace, err := getEnvValue("MACKEREL_KUBERNETES_NAMESPACE")
 		if err != nil {
 			return nil, err
 		}
-		name, err := getEnvValue("MACKEREL_KUBERNETES_POD_NAME")
+		podName, err := getEnvValue("MACKEREL_KUBERNETES_POD_NAME")
 		if err != nil {
 			return nil, err
 		}
-		return kubernetes.NewKubernetesPlatform(host, port, useReadOnlyPort, namespace, name, ignoreContainer)
+		return kubernetes.NewKubernetesPlatform(host, port, useReadOnlyPort, insecureTLS, namespace, podName, ignoreContainer)
 
 	default:
 		return nil, errors.New("platform not specified")

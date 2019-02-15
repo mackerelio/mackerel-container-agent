@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/pem"
-	"io/ioutil"
 	"net"
 	"net/http"
 	"net/http/httptest"
@@ -48,37 +47,33 @@ func TestStatusRunning(t *testing.T) {
 }
 
 func TestCreateHTTPClient(t *testing.T) {
-	host := "example.com"
-	body := "hello world"
-	var addr, port string
-
-	ts := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		expected := net.JoinHostPort(host, port)
-		if r.Host != expected {
-			t.Errorf("requested host expected %q, but %q", expected, r.Host)
-		}
-		w.Write([]byte(body))
-	}))
-
-	addr, port, _ = net.SplitHostPort(ts.Listener.Addr().String())
-	rslv := &resolver{
-		host:    host,
-		address: addr,
-		port:    port,
-	}
+	ts := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {}))
+	host, port, _ := net.SplitHostPort(ts.Listener.Addr().String())
 
 	caCert := &bytes.Buffer{}
 	pem.Encode(caCert, &pem.Block{Type: "CERTIFICATE", Bytes: ts.Certificate().Raw})
 
-	client := createHTTPClient(caCert.Bytes(), rslv)
-	resp, err := client.Get("https://" + net.JoinHostPort(host, port))
-	if err != nil {
-		t.Errorf("Get() should not raise error: %v", err)
+	tests := []struct {
+		caCert      []byte
+		insecureTLS bool
+		expect      bool
+	}{
+		{caCert.Bytes(), false, true},
+		{caCert.Bytes(), true, true},
+		{[]byte{}, false, false},
+		{[]byte{}, true, true},
 	}
 
-	got, _ := ioutil.ReadAll(resp.Body)
-	defer resp.Body.Close()
-	if string(got) != body {
-		t.Errorf("response body expected %q, got %q", body, got)
+	url := "https://" + net.JoinHostPort(host, port)
+
+	for _, tc := range tests {
+		client := createHTTPClient(tc.caCert, tc.insecureTLS)
+		resp, err := client.Get(url)
+		if (err == nil) != tc.expect {
+			t.Errorf("Get() does not expected benavior: %v", err)
+		}
+		if resp != nil {
+			resp.Body.Close()
+		}
 	}
 }
