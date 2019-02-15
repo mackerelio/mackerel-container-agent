@@ -69,9 +69,7 @@ func (c *client) newRequest(endpoint string) (*http.Request, error) {
 }
 
 func readBody(resp *http.Response) ([]byte, error) {
-	if resp.Body != nil {
-		defer resp.Body.Close()
-	}
+	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("incorrect status code %d", resp.StatusCode)
 	}

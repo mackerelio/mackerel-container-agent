@@ -91,9 +91,7 @@ func (c *client) newRequest(endpoint string) (*http.Request, error) {
 }
 
 func decodeBody(resp *http.Response, out interface{}) error {
-	if resp.Body != nil {
-		defer resp.Body.Close()
-	}
+	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("incorrect status code %d", resp.StatusCode)
 	}
