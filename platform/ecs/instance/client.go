@@ -73,7 +73,7 @@ func readBody(resp *http.Response) ([]byte, error) {
 		defer resp.Body.Close()
 	}
 	if resp.StatusCode != http.StatusOK {
-		return []byte{}, fmt.Errorf("incorrect status code %d", resp.StatusCode)
+		return nil, fmt.Errorf("incorrect status code %d", resp.StatusCode)
 	}
 	return ioutil.ReadAll(resp.Body)
 }
