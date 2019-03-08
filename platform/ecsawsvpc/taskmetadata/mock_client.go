@@ -30,12 +30,18 @@ func (c *MockClient) ApplyOption(opt MockClientOption) {
 	opt(c)
 }
 
+type errCallbackNotFound string
+
+func (err errCallbackNotFound) Error() string {
+	return string(err) + " callback not found"
+}
+
 // GetMetadata ...
 func (c *MockClient) GetMetadata(ctx context.Context) (*ecsTypes.TaskResponse, error) {
 	if c.getMetadataCallback != nil {
 		return c.getMetadataCallback(ctx)
 	}
-	return nil, nil
+	return nil, errCallbackNotFound("GetMetadata")
 }
 
 // MockGetMetadata returns an option to set the callback of GetMetadata
@@ -50,7 +56,7 @@ func (c *MockClient) GetStats(ctx context.Context) (map[string]*dockerTypes.Stat
 	if c.getStatsCallback != nil {
 		return c.getStatsCallback(ctx)
 	}
-	return nil, nil
+	return nil, errCallbackNotFound("GetStats")
 }
 
 // MockGetStats returns an option to set the callback of GetStats

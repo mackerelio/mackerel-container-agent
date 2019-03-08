@@ -343,6 +343,13 @@ func TestIgnoreContainer(t *testing.T) {
 				}, nil
 			},
 		),
+		agent.MockGetInstanceMetadata(
+			func(context.Context) (*ecsTypes.MetadataResponse, error) {
+				return &ecsTypes.MetadataResponse{
+					Cluster: "mackerel-container-agent",
+				}, nil
+			},
+		),
 	)
 
 	tests := []struct {
