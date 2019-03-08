@@ -29,12 +29,18 @@ func (c *MockClient) ApplyOption(opt MockClientOption) {
 	opt(c)
 }
 
+type errCallbackNotFound string
+
+func (err errCallbackNotFound) Error() string {
+	return string(err) + " callback not found"
+}
+
 // GetContainerStats ...
 func (c *MockClient) GetContainerStats(ctx context.Context, id string) (*dockerTypes.StatsJSON, error) {
 	if c.getContainerStatsCallback != nil {
 		return c.getContainerStatsCallback(ctx, id)
 	}
-	return nil, nil
+	return nil, errCallbackNotFound("GetContainerStats")
 }
 
 // MockGetContainerStats returns an option to set the callback of GetContainerStats
@@ -49,7 +55,7 @@ func (c *MockClient) InspectContainer(ctx context.Context, id string) (*dockerTy
 	if c.inspectContainerCallback != nil {
 		return c.inspectContainerCallback(ctx, id)
 	}
-	return nil, nil
+	return nil, errCallbackNotFound("InspectContainer")
 }
 
 // MockInspectContainer returns an option to set the callback of InspectContainer

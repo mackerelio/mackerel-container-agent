@@ -26,12 +26,18 @@ func (c *MockClient) ApplyOption(opt MockClientOption) {
 	opt(c)
 }
 
+type errCallbackNotFound string
+
+func (err errCallbackNotFound) Error() string {
+	return string(err) + " callback not found"
+}
+
 // GetPod ...
 func (c *MockClient) GetPod(ctx context.Context) (*Pod, error) {
 	if c.getPodCallback != nil {
 		return c.getPodCallback(ctx)
 	}
-	return nil, nil
+	return nil, errCallbackNotFound("GetPod")
 }
 
 // MockGetPod returns an option to set the callback of GetPod
@@ -46,7 +52,7 @@ func (c *MockClient) GetPodStats(ctx context.Context) (*PodStats, error) {
 	if c.getPodStatsCallback != nil {
 		return c.getPodStatsCallback(ctx)
 	}
-	return nil, nil
+	return nil, errCallbackNotFound("GetPodStats")
 }
 
 // MockGetPodStats returns an option to set the callback of GetPodStats
@@ -61,7 +67,7 @@ func (c *MockClient) GetSpec(ctx context.Context) (*MachineInfo, error) {
 	if c.getSpecCallback != nil {
 		return c.getSpecCallback(ctx)
 	}
-	return nil, nil
+	return nil, errCallbackNotFound("GetSpec")
 }
 
 // MockGetSpec returns an option to set the callback of GetSpec

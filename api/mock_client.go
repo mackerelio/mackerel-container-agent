@@ -36,12 +36,18 @@ func (c *MockClient) ApplyOption(opt MockClientOption) {
 	opt(c)
 }
 
+type errCallbackNotFound string
+
+func (err errCallbackNotFound) Error() string {
+	return string(err) + " callback not found"
+}
+
 // FindHost ...
 func (c *MockClient) FindHost(id string) (*mackerel.Host, error) {
 	if c.findHostCallback != nil {
 		return c.findHostCallback(id)
 	}
-	return nil, nil
+	return nil, errCallbackNotFound("FindHost")
 }
 
 // MockFindHost returns an option to set the callback of FindHost
@@ -56,7 +62,7 @@ func (c *MockClient) FindHosts(param *mackerel.FindHostsParam) ([]*mackerel.Host
 	if c.findHostsCallback != nil {
 		return c.findHostsCallback(param)
 	}
-	return nil, nil
+	return nil, errCallbackNotFound("FindHosts")
 }
 
 // MockFindHosts returns an option to set the callback of FindHosts
@@ -71,7 +77,7 @@ func (c *MockClient) CreateHost(param *mackerel.CreateHostParam) (string, error)
 	if c.createHostCallback != nil {
 		return c.createHostCallback(param)
 	}
-	return "", nil
+	return "", errCallbackNotFound("CreateHost")
 }
 
 // MockCreateHost returns an option to set the callback of CreateHost
@@ -86,7 +92,7 @@ func (c *MockClient) UpdateHost(hostID string, param *mackerel.UpdateHostParam) 
 	if c.updateHostCallback != nil {
 		return c.updateHostCallback(hostID, param)
 	}
-	return "", nil
+	return "", errCallbackNotFound("UpdateHost")
 }
 
 // MockUpdateHost returns an option to set the callback of UpdateHost
@@ -101,7 +107,7 @@ func (c *MockClient) UpdateHostStatus(hostID string, status string) error {
 	if c.updateHostStatusCallback != nil {
 		return c.updateHostStatusCallback(hostID, status)
 	}
-	return nil
+	return errCallbackNotFound("UpdateHostStatus")
 }
 
 // MockUpdateHostStatus returns an option to set the callback of UpdateHostStatus
@@ -116,7 +122,7 @@ func (c *MockClient) RetireHost(id string) error {
 	if c.retireHostCallback != nil {
 		return c.retireHostCallback(id)
 	}
-	return nil
+	return errCallbackNotFound("RetireHost")
 }
 
 // MockRetireHost returns an option to set the callback of RetireHost
