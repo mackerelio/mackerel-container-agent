@@ -1,5 +1,4 @@
 BIN := mackerel-container-agent
-LDFLAGS := -ldflags="-extldflags \"-static\""
 VERSION := 0.0.2
 REVISION := $(shell git rev-parse --short HEAD)
 
