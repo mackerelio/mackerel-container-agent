@@ -186,7 +186,7 @@ func getDockerID(proc procfs.Proc) (string, error) {
 	}
 	parts := strings.Split(memCgroup.CgroupPath, string(os.PathSeparator))
 	if parts[1] != "ecs" {
-		return "", fmt.Errorf("faild to parse %s", memCgroup.CgroupPath)
+		return "", fmt.Errorf("failed to parse %s", memCgroup.CgroupPath)
 	}
 	return parts[len(parts)-1], nil
 }
