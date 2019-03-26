@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"math"
 	"os"
-	"path/filepath"
+	"path"
 	"regexp"
 	"runtime"
 	"strings"
@@ -24,6 +24,7 @@ import (
 const (
 	taskArnPrefix   = "task/"
 	ecsSubgroupName = "ecs"
+	memorySubsystem = "memory"
 )
 
 // Task interface gets task metric values and metadata
@@ -180,13 +181,13 @@ func getDockerID(proc procfs.Proc) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	memCgroup := cgroup["memory"]
+	memCgroup := cgroup[memorySubsystem]
 	if memCgroup == nil {
 		return "", errors.New("memory cgroup not exists")
 	}
 	parts := strings.Split(memCgroup.CgroupPath, string(os.PathSeparator))
-	if len(parts) != 4 || parts[1] != "ecs" {
-		return "", fmt.Errorf("faild to parse %s", memCgroup.CgroupPath)
+	if len(parts) < 4 || parts[1] != "ecs" { // expect ["", "ecs", "task-id", "docker-id"] or ["", "ecs", "cluster-name", "task-id", "docker-id"]
+		return "", fmt.Errorf("failed to parse %s", memCgroup.CgroupPath)
 	}
 	return parts[len(parts)-1], nil
 }
@@ -204,9 +205,13 @@ func parseTaskArn(taskArn string) (string, error) {
 
 func (t *task) getResourceLimits() (ResourceLimits, error) {
 	var limits = ResourceLimits{}
-	subgroup := filepath.Join(ecsSubgroupName, t.id)
 
-	cgCPU, err := t.cgroup.CPU(subgroup)
+	sg, err := t.getTaskSubgroup()
+	if err != nil {
+		return limits, err
+	}
+
+	cgCPU, err := t.cgroup.CPU(sg)
 	if err != nil {
 		return limits, err
 	}
@@ -216,7 +221,7 @@ func (t *task) getResourceLimits() (ResourceLimits, error) {
 		limits.CPU = float64(cgCPU.CfsQuotaUs) / float64(cgCPU.CfsPeriodUs) * 100.0
 	}
 
-	cgMemory, err := t.cgroup.Memory(subgroup)
+	cgMemory, err := t.cgroup.Memory(sg)
 	if err != nil {
 		return limits, err
 	}
@@ -231,4 +236,19 @@ func (t *task) getResourceLimits() (ResourceLimits, error) {
 	}
 
 	return limits, nil
+}
+
+func (t *task) getTaskSubgroup() (string, error) {
+	cg, err := t.proc.Cgroup()
+	if err != nil {
+		return "", err
+	}
+
+	memSs, ok := cg[memorySubsystem]
+	if !ok {
+		return "", fmt.Errorf("%s subsystem does not exist", memorySubsystem)
+	}
+
+	// expect "/ecs/TASK_ID" or "/ecs/CLUSTER_NAME/TASK_ID"
+	return path.Dir(memSs.CgroupPath), nil
 }
