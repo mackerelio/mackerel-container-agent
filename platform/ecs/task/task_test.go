@@ -446,3 +446,39 @@ func TestIgnoreContainer(t *testing.T) {
 	}
 
 }
+
+func TestGetTaskSubGroup(t *testing.T) {
+	tests := []struct {
+		path     string
+		expected string
+	}{
+		{"/ecs/task-id/docker-id", "/ecs/task-id"},
+		{"/ecs/cluster-name/task-id/docker-id", "/ecs/cluster-name/task-id"},
+	}
+
+	for _, tc := range tests {
+		proc := procfs.NewMockProc(
+			procfs.MockCgroup(
+				func() (procfs.Cgroup, error) {
+					return procfs.Cgroup{
+						memorySubsystem: &procfs.CgroupLine{
+							CgroupPath: tc.path,
+						},
+					}, nil
+				},
+			),
+		)
+
+		tsk := &task{proc: proc}
+
+		got, err := tsk.getTaskSubgroup()
+		if err != nil {
+			t.Errorf("getTaskSubgroup() should not raise error: %v", err)
+		}
+
+		if got != tc.expected {
+			t.Errorf("getTaskSubgroup() expected %s containers, got %v containers", tc.expected, got)
+		}
+	}
+
+}

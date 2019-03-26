@@ -206,18 +206,10 @@ func parseTaskArn(taskArn string) (string, error) {
 func (t *task) getResourceLimits() (ResourceLimits, error) {
 	var limits = ResourceLimits{}
 
-	cg, err := t.proc.Cgroup()
+	sg, err := t.getTaskSubgroup()
 	if err != nil {
 		return limits, err
 	}
-
-	memSs, ok := cg[memorySubsystem]
-	if !ok {
-		return limits, fmt.Errorf("%s subsystem not exists", memorySubsystem)
-	}
-
-	taskSG, _ := path.Split(memSs.CgroupPath) // CgroupPath: "/ecs/TASK_ID/DOCKER_ID" or "/ecs/CLUSTER_NAME/TASK_ID/DOCKER_ID"
-	sg := path.Clean(taskSG)                  // remove tailing slash
 
 	cgCPU, err := t.cgroup.CPU(sg)
 	if err != nil {
@@ -244,4 +236,19 @@ func (t *task) getResourceLimits() (ResourceLimits, error) {
 	}
 
 	return limits, nil
+}
+
+func (t *task) getTaskSubgroup() (string, error) {
+	cg, err := t.proc.Cgroup()
+	if err != nil {
+		return "", err
+	}
+
+	memSs, ok := cg[memorySubsystem]
+	if !ok {
+		return "", fmt.Errorf("%s subsystem not exists", memorySubsystem)
+	}
+
+	// expect "/ecs/TASK_ID" or "/ecs/CLUSTER_NAME/TASK_ID"
+	return path.Dir(memSs.CgroupPath), nil
 }
