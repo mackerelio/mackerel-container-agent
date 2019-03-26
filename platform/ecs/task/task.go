@@ -24,6 +24,7 @@ import (
 const (
 	taskArnPrefix   = "task/"
 	ecsSubgroupName = "ecs"
+	memorySubsystem = "memory"
 )
 
 // Task interface gets task metric values and metadata
@@ -180,7 +181,7 @@ func getDockerID(proc procfs.Proc) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	memCgroup := cgroup["memory"]
+	memCgroup := cgroup[memorySubsystem]
 	if memCgroup == nil {
 		return "", errors.New("memory cgroup not exists")
 	}
