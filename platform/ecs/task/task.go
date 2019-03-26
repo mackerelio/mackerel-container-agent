@@ -246,7 +246,7 @@ func (t *task) getTaskSubgroup() (string, error) {
 
 	memSs, ok := cg[memorySubsystem]
 	if !ok {
-		return "", fmt.Errorf("%s subsystem not exists", memorySubsystem)
+		return "", fmt.Errorf("%s subsystem does not exist", memorySubsystem)
 	}
 
 	// expect "/ecs/TASK_ID" or "/ecs/CLUSTER_NAME/TASK_ID"
