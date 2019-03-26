@@ -99,7 +99,7 @@ var mockProc = procfs.NewMockProc(
 	procfs.MockCgroup(
 		func() (procfs.Cgroup, error) {
 			return procfs.Cgroup{
-				"memory": &procfs.CgroupLine{
+				memorySubsystem: &procfs.CgroupLine{
 					CgroupPath: "/ecs/e01d58a8-151b-40e8-bc01-22647b9ecfec/7e088b28bde202f19243853b0d20998a005984efa3d4b6c18e771fd149f86648",
 				},
 			}, nil
@@ -184,7 +184,7 @@ func TestDockerID(t *testing.T) {
 			procfs.MockCgroup(
 				func() (procfs.Cgroup, error) {
 					return procfs.Cgroup{
-						"memory": &procfs.CgroupLine{
+						memorySubsystem: &procfs.CgroupLine{
 							CgroupPath: tc.path,
 						},
 					}, nil
@@ -249,7 +249,7 @@ func TestMetadata(t *testing.T) {
 				procfs.MockCgroup(
 					func() (procfs.Cgroup, error) {
 						return procfs.Cgroup{
-							"memory": &procfs.CgroupLine{
+							memorySubsystem: &procfs.CgroupLine{
 								CgroupPath: "/ecs/task-id/docker-id",
 							},
 						}, nil
@@ -271,7 +271,7 @@ func TestMetadata(t *testing.T) {
 				procfs.MockCgroup(
 					func() (procfs.Cgroup, error) {
 						return procfs.Cgroup{
-							"memory": &procfs.CgroupLine{
+							memorySubsystem: &procfs.CgroupLine{
 								CgroupPath: "/ecs/cluster-name/task-id/docker-id-with-new-arn",
 							},
 						}, nil
