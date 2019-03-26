@@ -2,7 +2,7 @@ package task
 
 import (
 	"context"
-	"path/filepath"
+	"fmt"
 	"reflect"
 	"regexp"
 	"runtime"
@@ -21,20 +21,35 @@ import (
 var mockAgentClient = agent.NewMockClient(
 	agent.MockGetTaskMetadataWithDockerID(
 		func(_ context.Context, id string) (*ecsTypes.TaskResponse, error) {
-			if id != "7e088b28bde202f19243853b0d20998a005984efa3d4b6c18e771fd149f86648" {
-				return &ecsTypes.TaskResponse{
-					Arn: "arn:aws:ecs:us-east-1:999999999999:task/task_id",
-				}, nil
-			}
-			return &ecsTypes.TaskResponse{
-				Arn: "arn:aws:ecs:us-east-1:999999999999:task/e01d58a8-151b-40e8-bc01-22647b9ecfec",
-				Containers: []ecsTypes.ContainerResponse{
-					ecsTypes.ContainerResponse{
-						DockerID: "7e088b28bde202f19243853b0d20998a005984efa3d4b6c18e771fd149f86648",
-						Name:     "mackerel-container-agent",
+			var res *ecsTypes.TaskResponse
+
+			switch id {
+			case "7e088b28bde202f19243853b0d20998a005984efa3d4b6c18e771fd149f86648":
+				res = &ecsTypes.TaskResponse{
+					Arn: "arn:aws:ecs:us-east-1:999999999999:task/e01d58a8-151b-40e8-bc01-22647b9ecfec",
+					Containers: []ecsTypes.ContainerResponse{
+						ecsTypes.ContainerResponse{
+							DockerID: "7e088b28bde202f19243853b0d20998a005984efa3d4b6c18e771fd149f86648",
+							Name:     "mackerel-container-agent",
+						},
 					},
-				},
-			}, nil
+				}
+
+			case "docker-id":
+				res = &ecsTypes.TaskResponse{
+					Arn: "arn:aws:ecs:us-east-1:999999999999:task/task-id",
+				}
+			case "docker-id-with-new-arn":
+				res = &ecsTypes.TaskResponse{
+					Arn: "arn:aws:ecs:us-east-1:999999999999:task/cluster-name/task-id",
+				}
+			}
+
+			if res == nil {
+				return res, fmt.Errorf("invalid id: %s", id)
+			}
+
+			return res, nil
 		},
 	),
 	agent.MockGetInstanceMetadata(
@@ -49,16 +64,26 @@ var mockAgentClient = agent.NewMockClient(
 var mockCgroup = cgroupfs.NewMockCgroup(
 	cgroupfs.MockCPU(
 		func(subgroup string) (*cgroupfs.CPU, error) {
-			if subgroup == filepath.Join("ecs", "e01d58a8-151b-40e8-bc01-22647b9ecfec") {
-				return &cgroupfs.CPU{
+			var res *cgroupfs.CPU
+
+			switch subgroup {
+			case "/ecs/e01d58a8-151b-40e8-bc01-22647b9ecfec":
+				res = &cgroupfs.CPU{
 					CfsPeriodUs: 100000,
 					CfsQuotaUs:  25000,
-				}, nil
+				}
+			case "/ecs/task-id", "/ecs/cluster-name/task-id":
+				res = &cgroupfs.CPU{
+					CfsPeriodUs: 100000,
+					CfsQuotaUs:  -1,
+				}
 			}
-			return &cgroupfs.CPU{
-				CfsPeriodUs: 100000,
-				CfsQuotaUs:  -1,
-			}, nil
+
+			if res == nil {
+				return res, fmt.Errorf("invalid subgroup: %s", subgroup)
+			}
+
+			return res, nil
 		},
 	),
 	cgroupfs.MockMemory(
@@ -217,20 +242,42 @@ func TestMetadata(t *testing.T) {
 					func() (procfs.Cgroup, error) {
 						return procfs.Cgroup{
 							"memory": &procfs.CgroupLine{
-								CgroupPath: "/ecs/task_id/container_id",
+								CgroupPath: "/ecs/task-id/docker-id",
 							},
 						}, nil
 					},
 				),
 			),
 			&Metadata{
-				Arn:      "arn:aws:ecs:us-east-1:999999999999:task/task_id",
+				Arn:      "arn:aws:ecs:us-east-1:999999999999:task/task-id",
 				Instance: instanceMeta,
 				Limits: ResourceLimits{
 					CPU:    float64(runtime.NumCPU()) * 100.0,
 					Memory: uint64(134217728),
 				},
 				Containers: []Container{},
+			},
+		},
+		{
+			procfs.NewMockProc(
+				procfs.MockCgroup(
+					func() (procfs.Cgroup, error) {
+						return procfs.Cgroup{
+							"memory": &procfs.CgroupLine{
+								CgroupPath: "/ecs/cluster-name/task-id/docker-id-with-new-arn",
+							},
+						}, nil
+					},
+				),
+			),
+			&Metadata{
+				Arn:        "arn:aws:ecs:us-east-1:999999999999:task/cluster-name/task-id",
+				Containers: []Container{},
+				Instance:   instanceMeta,
+				Limits: ResourceLimits{
+					CPU:    float64(runtime.NumCPU()) * 100.0,
+					Memory: uint64(134217728),
+				},
 			},
 		},
 	}
@@ -244,7 +291,7 @@ func TestMetadata(t *testing.T) {
 
 		got, err := task.Metadata(ctx)
 		if err != nil {
-			t.Errorf("Metadata() should raise error: %v", err)
+			t.Errorf("Metadata() should not raise error: %v", err)
 		}
 		if !reflect.DeepEqual(got, tc.expected) {
 			t.Errorf("Metadata() expected %v, got %v", tc.expected, got)
