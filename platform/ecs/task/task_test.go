@@ -135,10 +135,18 @@ func TestDockerID(t *testing.T) {
 		{
 			cgroup: procfs.Cgroup{
 				"memory": &procfs.CgroupLine{
-					CgroupPath: "/ecs/e01d58a8-151b-40e8-bc01-22647b9ecfec/7e088b28bde202f19243853b0d20998a005984efa3d4b6c18e771fd149f86648",
+					CgroupPath: "/ecs/task-id/docker-id",
 				},
 			},
-			expected: "7e088b28bde202f19243853b0d20998a005984efa3d4b6c18e771fd149f86648",
+			expected: "docker-id",
+		},
+		{
+			cgroup: procfs.Cgroup{
+				"memory": &procfs.CgroupLine{
+					CgroupPath: "/ecs/cluster-name/task-id/docker-id",
+				},
+			},
+			expected: "docker-id",
 		},
 	}
 
