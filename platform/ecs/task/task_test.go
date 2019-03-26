@@ -154,24 +154,28 @@ var mockDockerClient = docker.NewMockClient(
 
 func TestDockerID(t *testing.T) {
 	tests := []struct {
-		cgroup   procfs.Cgroup
+		path     string
 		expected string
 	}{
 		{
-			cgroup: procfs.Cgroup{
-				"memory": &procfs.CgroupLine{
-					CgroupPath: "/ecs/task-id/docker-id",
-				},
-			},
+			path:     "/ecs/task-id/docker-id",
 			expected: "docker-id",
 		},
 		{
-			cgroup: procfs.Cgroup{
-				"memory": &procfs.CgroupLine{
-					CgroupPath: "/ecs/cluster-name/task-id/docker-id",
-				},
-			},
+			path:     "/ecs/cluster-name/task-id/docker-id",
 			expected: "docker-id",
+		},
+		{
+			path:     "/",
+			expected: "",
+		},
+		{
+			path:     "/ecs",
+			expected: "",
+		},
+		{
+			path:     "/ecs/task-id",
+			expected: "",
 		},
 	}
 
@@ -179,7 +183,11 @@ func TestDockerID(t *testing.T) {
 		mockProc := procfs.NewMockProc(
 			procfs.MockCgroup(
 				func() (procfs.Cgroup, error) {
-					return tc.cgroup, nil
+					return procfs.Cgroup{
+						"memory": &procfs.CgroupLine{
+							CgroupPath: tc.path,
+						},
+					}, nil
 				},
 			),
 		)

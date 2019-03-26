@@ -186,7 +186,7 @@ func getDockerID(proc procfs.Proc) (string, error) {
 		return "", errors.New("memory cgroup not exists")
 	}
 	parts := strings.Split(memCgroup.CgroupPath, string(os.PathSeparator))
-	if parts[1] != "ecs" {
+	if len(parts) < 4 || parts[1] != "ecs" { // expect ["", "ecs", "task-id", "docker-id"] or ["", "ecs", "cluster-name", "task-id", "docker-id"]
 		return "", fmt.Errorf("failed to parse %s", memCgroup.CgroupPath)
 	}
 	return parts[len(parts)-1], nil
