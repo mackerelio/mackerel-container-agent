@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"math"
 	"os"
-	"path/filepath"
+	"path"
 	"regexp"
 	"runtime"
 	"strings"
@@ -205,9 +205,21 @@ func parseTaskArn(taskArn string) (string, error) {
 
 func (t *task) getResourceLimits() (ResourceLimits, error) {
 	var limits = ResourceLimits{}
-	subgroup := filepath.Join(ecsSubgroupName, t.id)
 
-	cgCPU, err := t.cgroup.CPU(subgroup)
+	cg, err := t.proc.Cgroup()
+	if err != nil {
+		return limits, err
+	}
+
+	memSs, ok := cg[memorySubsystem]
+	if !ok {
+		return limits, fmt.Errorf("%s subsystem not exists", memorySubsystem)
+	}
+
+	taskSG, _ := path.Split(memSs.CgroupPath) // CgroupPath: "/ecs/TASK_ID/DOCKER_ID" or "/ecs/CLUSTER_NAME/TASK_ID/DOCKER_ID"
+	sg := path.Clean(taskSG)                  // remove tailing slash
+
+	cgCPU, err := t.cgroup.CPU(sg)
 	if err != nil {
 		return limits, err
 	}
@@ -217,7 +229,7 @@ func (t *task) getResourceLimits() (ResourceLimits, error) {
 		limits.CPU = float64(cgCPU.CfsQuotaUs) / float64(cgCPU.CfsPeriodUs) * 100.0
 	}
 
-	cgMemory, err := t.cgroup.Memory(subgroup)
+	cgMemory, err := t.cgroup.Memory(sg)
 	if err != nil {
 		return limits, err
 	}
