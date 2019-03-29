@@ -2,7 +2,7 @@ package ecsawsvpc
 
 import (
 	"context"
-	"strings"
+	"path"
 	"time"
 
 	ecsTypes "github.com/aws/amazon-ecs-agent/agent/handlers/v2"
@@ -14,8 +14,6 @@ import (
 	"github.com/mackerelio/mackerel-container-agent/platform/ecsawsvpc/taskmetadata"
 	agentSpec "github.com/mackerelio/mackerel-container-agent/spec"
 )
-
-const resourcePrefix = "task/"
 
 type specGenerator struct {
 	client    taskmetadata.Client
@@ -123,7 +121,7 @@ func generateSpec(task *ecsTypes.TaskResponse) (*taskSpec, error) {
 
 	spec := &taskSpec{
 		Cluster:            task.Cluster,
-		Task:               strings.TrimPrefix(taskARN.Resource, resourcePrefix),
+		Task:               path.Base(taskARN.Resource), // Resource format: 'task/task-id' or 'task/cluster-name/task-id'
 		TaskARN:            task.TaskARN,
 		TaskFamily:         task.Family,
 		TaskVersion:        task.Revision,
