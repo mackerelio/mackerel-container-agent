@@ -2,7 +2,7 @@ package ecs
 
 import (
 	"context"
-	"strings"
+	"path"
 
 	"github.com/aws/aws-sdk-go/aws/arn"
 
@@ -12,8 +12,6 @@ import (
 	"github.com/mackerelio/mackerel-container-agent/platform/ecs/task"
 	agentSpec "github.com/mackerelio/mackerel-container-agent/spec"
 )
-
-const resourcePrefix = "task/"
 
 type ecsSpec struct {
 	Cluster       string         `json:"cluster,omitempty"`
@@ -71,7 +69,7 @@ func (g *specGenerator) Generate(ctx context.Context) (interface{}, error) {
 
 	spec := &ecsSpec{
 		Cluster:       meta.Instance.Cluster,
-		Task:          strings.TrimPrefix(taskARN.Resource, resourcePrefix),
+		Task:          path.Base(taskARN.Resource), // Resource format: 'task/task-id' or 'task/cluster-name/task-id'
 		TaskARN:       meta.Arn,
 		TaskFamily:    meta.Family,
 		TaskVersion:   meta.Version,
