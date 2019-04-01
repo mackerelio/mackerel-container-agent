@@ -24,7 +24,9 @@ func (p *ecsPlatform) GetMetricGenerators() []metric.Generator {
 
 // GetSpecGenerators gets spec generator
 func (p *ecsPlatform) GetSpecGenerators() []spec.Generator {
-	return nil
+	return []spec.Generator{
+		newSpecGenerator(),
+	}
 }
 
 // GetCustomIdentifier gets custom identifier
