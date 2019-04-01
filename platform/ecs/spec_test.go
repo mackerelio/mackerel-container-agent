@@ -16,20 +16,13 @@ import (
 )
 
 func TestGenerateSpec(t *testing.T) {
-	var isNewARN bool
+	var mockTaskArn string
 
 	mockTask := task.NewMockTask(
 		task.MockMetadata(
 			func(context.Context) (*task.Metadata, error) {
-				var resource string
-				if isNewARN {
-					resource = "task/cluster-name/task-id"
-				} else {
-					resource = "task/e01d58a8-151b-40e8-bc01-22647b9ecfec"
-				}
-
 				return &task.Metadata{
-					Arn: "arn:aws:ecs:us-east-1:999999999999:" + resource,
+					Arn: mockTaskArn,
 					Containers: []task.Container{
 						{
 							DockerID:   "79c796ed2a7f864f485c76f83f3165488097279d296a7c05bd5201a1c69b2920",
@@ -63,28 +56,27 @@ func TestGenerateSpec(t *testing.T) {
 	generator := newSpecGenerator(mockTask)
 
 	tests := []struct {
-		isNewARN bool
-		taskARN  string
-		task     string
+		taskArn  string
+		expected string
 	}{
-		{false, "arn:aws:ecs:us-east-1:999999999999:task/e01d58a8-151b-40e8-bc01-22647b9ecfec", "e01d58a8-151b-40e8-bc01-22647b9ecfec"},
-		{true, "arn:aws:ecs:us-east-1:999999999999:task/cluster-name/task-id", "task-id"},
+		{"arn:aws:ecs:us-east-1:999999999999:task/e01d58a8-151b-40e8-bc01-22647b9ecfec", "e01d58a8-151b-40e8-bc01-22647b9ecfec"},
+		{"arn:aws:ecs:us-east-1:999999999999:task/cluster-name/task-id", "task-id"},
 	}
 
 	for _, tc := range tests {
-		isNewARN = tc.isNewARN
+		mockTaskArn = tc.taskArn
 
-		got, err := generator.Generate(context.Background())
+		v, err := generator.Generate(context.Background())
 		if err != nil {
 			t.Errorf("Generate() should not raise error: %v", err)
 		}
 
-		v, ok := got.(*agentSpec.CloudHostname)
+		got, ok := v.(*agentSpec.CloudHostname)
 		if !ok {
-			t.Errorf("Generate() should return *spec.CloudHostname got %T", got)
+			t.Errorf("Generate() should return *spec.CloudHostname got %T", v)
 		}
-		if v.Cloud.Provider != "ecs" {
-			t.Errorf("Provider should %q, got %q", "ecs", v.Cloud.Provider)
+		if got.Cloud.Provider != string(platform.ECS) {
+			t.Errorf("Provider should %q, got %q", string(platform.ECS), got.Cloud.Provider)
 		}
 
 		expected := &agentSpec.CloudHostname{
@@ -92,8 +84,8 @@ func TestGenerateSpec(t *testing.T) {
 				Provider: string(platform.ECS),
 				MetaData: &ecsSpec{
 					Cluster:       "mackerel-container-agent",
-					Task:          tc.task,
-					TaskARN:       tc.taskARN,
+					Task:          tc.expected,
+					TaskARN:       tc.taskArn,
 					TaskFamily:    "nginx-develop",
 					TaskVersion:   "2",
 					DesiredStatus: "RUNNING",
@@ -116,11 +108,11 @@ func TestGenerateSpec(t *testing.T) {
 					},
 				},
 			},
-			Hostname: tc.task,
+			Hostname: tc.expected,
 		}
 
-		if !reflect.DeepEqual(v, expected) {
-			t.Errorf("Generate() expected %v, got %v", expected, v)
+		if !reflect.DeepEqual(got, expected) {
+			t.Errorf("Generate() expected %v, got %v", expected, got)
 		}
 	}
 
