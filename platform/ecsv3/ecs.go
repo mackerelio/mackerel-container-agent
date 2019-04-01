@@ -25,7 +25,7 @@ func (p *ecsPlatform) GetMetricGenerators() []metric.Generator {
 // GetSpecGenerators gets spec generator
 func (p *ecsPlatform) GetSpecGenerators() []spec.Generator {
 	return []spec.Generator{
-		newSpecGenerator(),
+		newSpecGenerator(nil, false), // TODO
 	}
 }
 
