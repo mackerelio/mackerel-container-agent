@@ -29,6 +29,9 @@ func NewPlatform(ctx context.Context, ignoreContainer *regexp.Regexp) (platform.
 	case platform.ECSAwsvpc:
 		return ecsawsvpc.NewECSAwsvpcPlatform(false, ignoreContainer)
 
+	case platform.ECSv3:
+		return nil, errors.New("not implemented yet")
+
 	case platform.Fargate:
 		return ecsawsvpc.NewECSAwsvpcPlatform(true, ignoreContainer)
 
