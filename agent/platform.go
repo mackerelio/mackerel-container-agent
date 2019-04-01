@@ -11,6 +11,7 @@ import (
 	"github.com/mackerelio/mackerel-container-agent/platform/ecs"
 	ecsInstance "github.com/mackerelio/mackerel-container-agent/platform/ecs/instance"
 	"github.com/mackerelio/mackerel-container-agent/platform/ecsawsvpc"
+	"github.com/mackerelio/mackerel-container-agent/platform/ecsv3"
 	"github.com/mackerelio/mackerel-container-agent/platform/kubernetes"
 	"github.com/mackerelio/mackerel-container-agent/platform/kubernetes/kubelet"
 )
@@ -30,7 +31,7 @@ func NewPlatform(ctx context.Context, ignoreContainer *regexp.Regexp) (platform.
 		return ecsawsvpc.NewECSAwsvpcPlatform(false, ignoreContainer)
 
 	case platform.ECSv3:
-		return nil, errors.New("not implemented yet")
+		return ecsv3.NewECSPlatform(ignoreContainer)
 
 	case platform.Fargate:
 		return ecsawsvpc.NewECSAwsvpcPlatform(true, ignoreContainer)
