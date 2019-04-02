@@ -2,7 +2,6 @@ package ecsv3
 
 import (
 	"context"
-	"errors"
 	"regexp"
 
 	"github.com/mackerelio/mackerel-container-agent/metric"
@@ -48,7 +47,7 @@ func (p *ecsPlatform) GetSpecGenerators() []spec.Generator {
 
 // GetCustomIdentifier gets custom identifier
 func (p *ecsPlatform) GetCustomIdentifier(context.Context) (string, error) {
-	return "", errors.New("not implemented yet")
+	return "", nil
 }
 
 // StatusRunning reports p status is running
