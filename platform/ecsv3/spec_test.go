@@ -34,10 +34,10 @@ func TestGenerate(t *testing.T) {
 		isFargate bool
 		expected  platform.Type
 	}{
-		{"testdata/metadata_ec2_bridge.json", false, platform.ECS},
-		{"testdata/metadata_ec2_host.json", false, platform.ECS},
-		{"testdata/metadata_ec2_awsvpc.json", false, platform.ECS},
-		{"testdata/metadata_fargate.json", true, platform.Fargate},
+		{"taskmetadata/testdata/metadata_ec2_bridge.json", false, platform.ECS},
+		{"taskmetadata/testdata/metadata_ec2_host.json", false, platform.ECS},
+		{"taskmetadata/testdata/metadata_ec2_awsvpc.json", false, platform.ECS},
+		{"taskmetadata/testdata/metadata_fargate.json", true, platform.Fargate},
 	}
 
 	mock := &mockTaskMetadataFetcher{}
