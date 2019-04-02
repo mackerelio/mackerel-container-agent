@@ -8,54 +8,76 @@ import (
 	"testing"
 )
 
+var metadata, stats string
+
 func newServer() *httptest.Server {
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.RequestURI() {
 		case metadataPath:
-			http.ServeFile(w, r, "testdata/metadata_ec2_awsvpc.json")
-			// case statsPath:
-			//   http.ServeFile(w, r, "testdata/stats.json")
+			http.ServeFile(w, r, metadata)
+		case statsPath:
+			http.ServeFile(w, r, stats)
 		}
 	})
 	return httptest.NewServer(handler)
 }
 
 func TestGetTaskMetadata(t *testing.T) {
-	ctx := context.Background()
+	tests := []string{
+		"testdata/metadata_ec2_bridge.json",
+		"testdata/metadata_ec2_host.json",
+		"testdata/metadata_ec2_awsvpc.json",
+		"testdata/metadata_fargate.json",
+	}
+
 	ts := newServer()
 	defer ts.Close()
 
-	c, err := NewClient(ts.URL, nil)
-	if err != nil {
-		t.Errorf("NewClient() should not raise error: %v", err)
+	for _, path := range tests {
+		metadata = path
+		ctx := context.Background()
+
+		c, err := NewClient(ts.URL, nil)
+		if err != nil {
+			t.Errorf("NewClient() should not raise error: %v", err)
+		}
+
+		_, err = c.GetTaskMetadata(ctx)
+		if err != nil {
+			t.Errorf("GetTaskMetadata() should not raise error: %v", err)
+		}
 	}
 
-	_, err = c.GetTaskMetadata(ctx)
-	if err != nil {
-		t.Errorf("GetTaskMetadata() should not raise error: %v", err)
+}
+
+func TestGetTaskStats(t *testing.T) {
+	tests := []string{
+		"testdata/stats_ec2_bridge.json",
+		"testdata/stats_ec2_host.json",
+		"testdata/stats_ec2_awsvpc.json",
+		"testdata/stats_fargate.json",
+	}
+
+	ts := newServer()
+	defer ts.Close()
+
+	for _, path := range tests {
+		stats = path
+		ctx := context.Background()
+
+		c, err := NewClient(ts.URL, nil)
+		if err != nil {
+			t.Errorf("NewClient() should not raise error: %v", err)
+		}
+
+		_, err = c.GetTaskStats(ctx)
+		if err != nil {
+			t.Errorf("GetTaskStats() should not raise error: %v", err)
+		}
 	}
 }
 
-// func TestGetTaskStats(t *testing.T) {
-//   ctx := context.Background()
-//   ts := newServer()
-//   defer ts.Close()
-
-//   c, err := NewClient(ts.URL, nil)
-//   if err != nil {
-//     t.Errorf("NewClient() should not raise error: %v", err)
-//   }
-
-//   _, err = c.GetTaskStats(ctx)
-//   if err != nil {
-//     t.Errorf("GetTaskStats() should not raise error: %v", err)
-//   }
-// }
-
 func TestIgnoreContainer(t *testing.T) {
-	ts := newServer()
-	defer ts.Close()
-
 	tests := []struct {
 		ignoreContainer *regexp.Regexp
 		expected        int
@@ -65,8 +87,15 @@ func TestIgnoreContainer(t *testing.T) {
 		{regexp.MustCompile(``), 0},
 	}
 
+	ts := newServer()
+	defer ts.Close()
+
+	metadata = "testdata/metadata_ec2_awsvpc.json"
+	stats = "testdata/stats_ec2_awsvpc.json"
+
 	for _, tc := range tests {
 		ctx := context.Background()
+
 		c, err := NewClient(ts.URL, tc.ignoreContainer)
 		if err != nil {
 			t.Errorf("should not raise error: %v", err)
@@ -81,14 +110,14 @@ func TestIgnoreContainer(t *testing.T) {
 			t.Errorf("meta.Containers expected %d containers, got %v containers", tc.expected, got)
 		}
 
-		// stats, err := c.GetStats(ctx)
-		// if err != nil {
-		//   t.Errorf("GetStats() should not raise error: %v", err)
-		// }
-		// got = len(stats)
-		// if got != tc.expected {
-		//   t.Errorf("GetStats() expected %d containers, got %v containers", tc.expected, got)
-		// }
+		stats, err := c.GetTaskStats(ctx)
+		if err != nil {
+			t.Errorf("GetStats() should not raise error: %v", err)
+		}
+		got = len(stats)
+		if got != tc.expected {
+			t.Errorf("GetStats() expected %d containers, got %v containers", tc.expected, got)
+		}
 	}
 
 }
