@@ -9,11 +9,11 @@
     {
       "DockerId": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
       "Name": "~internal~ecs~pause",
-      "DockerName": "ecs-test-cluster-1-container001-eeeeeeeeeeeeeeeeeeee",
+      "DockerName": "ecs-test-cluster-1-internalecspause-eeeeeeeeeeeeeeeeeeee",
       "Image": "amazon/amazon-ecs-pause:0.1.0",
       "ImageID": "",
       "Labels": {
-        "com.amazonaws.ecs.cluster": "mackerel-container-agent-develop",
+        "com.amazonaws.ecs.cluster": "test-clusrer",
         "com.amazonaws.ecs.container-name": "~internal~ecs~pause",
         "com.amazonaws.ecs.task-arn": "arn:aws:ecs:ap-northeast-1:999999999999:task/task-id",
         "com.amazonaws.ecs.task-definition-family": "test-ec2-awsvpc",
@@ -39,8 +39,8 @@
     },
     {
       "DockerId": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
-      "Name": "container001",
-      "DockerName": "ecs-test-cluster-1-container001-ffffffffffffffffffff",
+      "Name": "mackerel-container-agent",
+      "DockerName": "ecs-test-cluster-1-mackerel-container-agent-ffffffffffffffffffff",
       "Image": "mackerel/mackerel-container-agent:latest",
       "ImageID": "sha256:ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
       "Labels": {

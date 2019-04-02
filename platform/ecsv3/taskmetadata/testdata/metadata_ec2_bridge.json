@@ -8,8 +8,8 @@
   "Containers": [
     {
       "DockerId": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
-      "Name": "container001",
-      "DockerName": "ecs-test-cluster-1-container001-ffffffffffffffffffff",
+      "Name": "mackerel-container-agent",
+      "DockerName": "ecs-test-cluster-1-mackerel-container-agent-ffffffffffffffffffff",
       "Image": "mackerel/mackerel-container-agent:latest",
       "ImageID": "sha256:ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
       "Labels": {
