@@ -3,12 +3,16 @@ package ecsv3
 import (
 	"context"
 	"regexp"
+	"strings"
 
+	"github.com/mackerelio/golib/logging"
 	"github.com/mackerelio/mackerel-container-agent/metric"
 	"github.com/mackerelio/mackerel-container-agent/platform"
 	"github.com/mackerelio/mackerel-container-agent/platform/ecsv3/taskmetadata"
 	"github.com/mackerelio/mackerel-container-agent/spec"
 )
+
+var logger = logging.GetLogger("ecs")
 
 // APIClient interface gets task metadata and task stats
 type APIClient interface {
@@ -51,6 +55,15 @@ func (p *ecsPlatform) GetCustomIdentifier(context.Context) (string, error) {
 }
 
 // StatusRunning reports p status is running
-func (p *ecsPlatform) StatusRunning(context.Context) bool {
-	return false
+func (p *ecsPlatform) StatusRunning(ctx context.Context) bool {
+	meta, err := p.client.GetTaskMetadata(ctx)
+	if err != nil {
+		logger.Warningf("failed to get metadata: %s", err)
+		return false
+	}
+	return isRunning(meta.KnownStatus)
+}
+
+func isRunning(status string) bool {
+	return strings.EqualFold("running", status)
 }
