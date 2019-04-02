@@ -11,6 +11,7 @@ import (
 	"time"
 
 	ecsTypes "github.com/aws/amazon-ecs-agent/agent/handlers/v2"
+	dockerTypes "github.com/docker/docker/api/types"
 )
 
 const (
@@ -69,36 +70,36 @@ func (c *Client) GetTaskMetadata(ctx context.Context) (*ecsTypes.TaskResponse, e
 	return &data, nil
 }
 
-// // GetTaskStats gets task stats
-// func (c *Client) GetTaskStats(ctx context.Context) (map[string]*dockerTypes.Stats, error) {
-//   req, err := c.newRequest(statsPath)
-//   if err != nil {
-//     return nil, err
-//   }
-//   resp, err := c.httpClient.Do(req.WithContext(ctx))
-//   if err != nil {
-//     return nil, err
-//   }
-//   var data map[string]*dockerTypes.Stats
-//   if err = decodeBody(resp, &data); err != nil {
-//     return nil, err
-//   }
+// GetTaskStats gets task stats
+func (c *Client) GetTaskStats(ctx context.Context) (map[string]*dockerTypes.StatsJSON, error) {
+	req, err := c.newRequest(statsPath)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := c.httpClient.Do(req.WithContext(ctx))
+	if err != nil {
+		return nil, err
+	}
+	var all map[string]*dockerTypes.StatsJSON
+	if err = decodeBody(resp, &all); err != nil {
+		return nil, err
+	}
 
-//   meta, err := c.GetTaskMetadata(ctx)
-//   if err != nil {
-//     return nil, err
-//   }
+	meta, err := c.GetTaskMetadata(ctx)
+	if err != nil {
+		return nil, err
+	}
 
-//   stats := make(map[string]*dockerTypes.Stats)
+	res := make(map[string]*dockerTypes.StatsJSON)
 
-//   for _, container := range meta.Containers {
-//     if v, ok := data[container.ID]; ok {
-//       stats[container.ID] = v
-//     }
-//   }
+	for _, container := range meta.Containers {
+		if v, ok := all[container.ID]; ok {
+			res[container.ID] = v
+		}
+	}
 
-//   return stats, nil
-// }
+	return res, nil
+}
 
 func (c *Client) newRequest(endpoint string) (*http.Request, error) {
 	u := *c.url
