@@ -11,11 +11,11 @@ import (
 	agentSpec "github.com/mackerelio/mackerel-container-agent/spec"
 )
 
-type mockTaskMetadataFetcher struct {
+type mockTaskMetadataGetter struct {
 	path string
 }
 
-func (m *mockTaskMetadataFetcher) FetchTaskMetadata(ctx context.Context) (*ecsTypes.TaskResponse, error) {
+func (m *mockTaskMetadataGetter) GetTaskMetadata(ctx context.Context) (*ecsTypes.TaskResponse, error) {
 	f, err := os.Open(m.path)
 	if err != nil {
 		return nil, err
@@ -40,7 +40,7 @@ func TestGenerate(t *testing.T) {
 		{"taskmetadata/testdata/metadata_fargate.json", true, platform.Fargate},
 	}
 
-	mock := &mockTaskMetadataFetcher{}
+	mock := &mockTaskMetadataGetter{}
 	ctx := context.Background()
 
 	for _, tc := range tests {

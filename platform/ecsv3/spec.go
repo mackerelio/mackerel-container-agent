@@ -13,25 +13,25 @@ import (
 	agentSpec "github.com/mackerelio/mackerel-container-agent/spec"
 )
 
-// TaskMetadataFetcher interface fetch ECS task metadata
-type TaskMetadataFetcher interface {
-	FetchTaskMetadata(context.Context) (*ecsTypes.TaskResponse, error)
+// TaskMetadataGetter interface fetch ECS task metadata
+type TaskMetadataGetter interface {
+	GetTaskMetadata(context.Context) (*ecsTypes.TaskResponse, error)
 }
 
 type specGenerator struct {
-	fetcher   TaskMetadataFetcher
+	client    TaskMetadataGetter
 	isFargate bool
 }
 
-func newSpecGenerator(fetcher TaskMetadataFetcher, isFargate bool) *specGenerator {
+func newSpecGenerator(client TaskMetadataGetter, isFargate bool) *specGenerator {
 	return &specGenerator{
-		fetcher:   fetcher,
+		client:    client,
 		isFargate: isFargate,
 	}
 }
 
 func (g *specGenerator) Generate(ctx context.Context) (interface{}, error) {
-	meta, err := g.fetcher.FetchTaskMetadata(ctx)
+	meta, err := g.client.GetTaskMetadata(ctx)
 	if err != nil {
 		return nil, err
 	}
