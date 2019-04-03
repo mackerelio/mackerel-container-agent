@@ -26,8 +26,8 @@ type ecsPlatform struct {
 }
 
 // NewECSPlatform creates a new Platform
-func NewECSPlatform(baseURL string, isFargate bool, ignoreContainer *regexp.Regexp) (platform.Platform, error) {
-	c, err := taskmetadata.NewClient(baseURL, ignoreContainer)
+func NewECSPlatform(metadataURI string, isFargate bool, ignoreContainer *regexp.Regexp) (platform.Platform, error) {
+	c, err := taskmetadata.NewClient(metadataURI, ignoreContainer)
 	if err != nil {
 		return nil, err
 	}

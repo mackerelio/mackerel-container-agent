@@ -29,8 +29,8 @@ type Client struct {
 }
 
 // NewClient creates a new Client
-func NewClient(baseURL string, ignoreContainer *regexp.Regexp) (*Client, error) {
-	u, err := url.Parse(baseURL)
+func NewClient(metadataURI string, ignoreContainer *regexp.Regexp) (*Client, error) {
+	u, err := url.Parse(metadataURI)
 	if err != nil {
 		return nil, err
 	}
