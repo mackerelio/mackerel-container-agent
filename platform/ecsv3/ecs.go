@@ -17,7 +17,7 @@ var logger = logging.GetLogger("ecs")
 // APIClient interface gets task metadata and task stats
 type APIClient interface {
 	TaskMetadataGetter
-	// TaskStatsGetter
+	TaskStatsGetter
 }
 
 type ecsPlatform struct {
@@ -39,7 +39,9 @@ func NewECSPlatform(baseURL string, isFargate bool, ignoreContainer *regexp.Rege
 
 // GetMetricGenerators gets metric generators
 func (p *ecsPlatform) GetMetricGenerators() []metric.Generator {
-	return nil
+	return []metric.Generator{
+		newMetricGenerator(p.client),
+	}
 }
 
 // GetSpecGenerators gets spec generator

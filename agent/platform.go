@@ -31,7 +31,8 @@ func NewPlatform(ctx context.Context, ignoreContainer *regexp.Regexp) (platform.
 		return ecsawsvpc.NewECSAwsvpcPlatform(false, ignoreContainer)
 
 	case platform.ECSv3:
-		return ecsv3.NewECSPlatform(ignoreContainer)
+		baseURL := os.Getenv("ECS_CONTAINER_METADATA_URI")
+		return ecsv3.NewECSPlatform(baseURL, false, ignoreContainer)
 
 	case platform.Fargate:
 		return ecsawsvpc.NewECSAwsvpcPlatform(true, ignoreContainer)
