@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	ecsTypes "github.com/aws/amazon-ecs-agent/agent/handlers/v2"
-	"github.com/mackerelio/mackerel-container-agent/platform"
+	"github.com/mackerelio/mackerel-container-agent/provider"
 	agentSpec "github.com/mackerelio/mackerel-container-agent/spec"
 )
 
@@ -30,14 +30,13 @@ func (m *mockTaskMetadataGetter) GetTaskMetadata(ctx context.Context) (*ecsTypes
 
 func TestGenerate(t *testing.T) {
 	tests := []struct {
-		path      string
-		isFargate bool
-		expected  platform.Type
+		path     string
+		provider provider.Type
 	}{
-		{"taskmetadata/testdata/metadata_ec2_bridge.json", false, platform.ECS},
-		{"taskmetadata/testdata/metadata_ec2_host.json", false, platform.ECS},
-		{"taskmetadata/testdata/metadata_ec2_awsvpc.json", false, platform.ECS},
-		{"taskmetadata/testdata/metadata_fargate.json", true, platform.Fargate},
+		{"taskmetadata/testdata/metadata_ec2_bridge.json", provider.ECS},
+		{"taskmetadata/testdata/metadata_ec2_host.json", provider.ECS},
+		{"taskmetadata/testdata/metadata_ec2_awsvpc.json", provider.ECS},
+		{"taskmetadata/testdata/metadata_fargate.json", provider.Fargate},
 	}
 
 	mock := &mockTaskMetadataGetter{}
@@ -45,7 +44,7 @@ func TestGenerate(t *testing.T) {
 
 	for _, tc := range tests {
 		mock.path = tc.path
-		g := newSpecGenerator(mock, tc.isFargate)
+		g := newSpecGenerator(mock, tc.provider)
 
 		spec, err := g.Generate(ctx)
 		if err != nil {
@@ -60,30 +59,10 @@ func TestGenerate(t *testing.T) {
 		if got.Hostname != "task-id" {
 			t.Errorf("Hostname expected %v, got %v", "task-id", got)
 		}
-		if got.Cloud.Provider != string(tc.expected) {
-			t.Errorf("Provider expected %v, got %v", tc.expected, got.Cloud.Provider)
-		}
 		if got.Cloud.MetaData == nil {
 			t.Error("MetaData should not be nil")
 		}
 		t.Logf("%+v\n\n", got.Cloud.MetaData)
-	}
-}
-
-func TestResolvePlatform(t *testing.T) {
-	tests := []struct {
-		isFargate bool
-		expected  platform.Type
-	}{
-		{true, platform.Fargate},
-		{false, platform.ECS},
-	}
-
-	for _, tc := range tests {
-		got := resolvePlatform(tc.isFargate)
-		if got != string(tc.expected) {
-			t.Errorf("resolvePlatform() expected %v, got %v", tc.expected, got)
-		}
 	}
 }
 

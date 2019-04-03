@@ -9,7 +9,7 @@ import (
 
 	mackerel "github.com/mackerelio/mackerel-client-go"
 
-	"github.com/mackerelio/mackerel-container-agent/platform"
+	"github.com/mackerelio/mackerel-container-agent/provider"
 	agentSpec "github.com/mackerelio/mackerel-container-agent/spec"
 )
 
@@ -19,14 +19,14 @@ type TaskMetadataGetter interface {
 }
 
 type specGenerator struct {
-	client    TaskMetadataGetter
-	isFargate bool
+	client   TaskMetadataGetter
+	provider provider.Type
 }
 
-func newSpecGenerator(client TaskMetadataGetter, isFargate bool) *specGenerator {
+func newSpecGenerator(client TaskMetadataGetter, provider provider.Type) *specGenerator {
 	return &specGenerator{
-		client:    client,
-		isFargate: isFargate,
+		client:   client,
+		provider: provider,
 	}
 }
 
@@ -43,7 +43,7 @@ func (g *specGenerator) Generate(ctx context.Context) (interface{}, error) {
 
 	return &agentSpec.CloudHostname{
 		Cloud: &mackerel.Cloud{
-			Provider: resolvePlatform(g.isFargate),
+			Provider: string(g.provider),
 			MetaData: spec,
 		},
 		Hostname: spec.Task,
@@ -137,13 +137,6 @@ func generateSpec(meta *ecsTypes.TaskResponse) (*taskSpec, error) {
 	}
 
 	return spec, nil
-}
-
-func resolvePlatform(isFargate bool) string {
-	if isFargate {
-		return string(platform.Fargate)
-	}
-	return string(platform.ECS)
 }
 
 func getTaskID(taskARN string) (string, error) {

@@ -2,6 +2,7 @@ package ecsv3
 
 import (
 	"context"
+	"errors"
 	"regexp"
 	"strings"
 
@@ -9,7 +10,13 @@ import (
 	"github.com/mackerelio/mackerel-container-agent/metric"
 	"github.com/mackerelio/mackerel-container-agent/platform"
 	"github.com/mackerelio/mackerel-container-agent/platform/ecsv3/taskmetadata"
+	"github.com/mackerelio/mackerel-container-agent/provider"
 	"github.com/mackerelio/mackerel-container-agent/spec"
+)
+
+const (
+	executionEnvFargate = "AWS_ECS_FARGATE"
+	executionEnvEC2     = "AWS_ECS_EC2"
 )
 
 var logger = logging.GetLogger("ecs")
@@ -21,19 +28,25 @@ type APIClient interface {
 }
 
 type ecsPlatform struct {
-	client    APIClient
-	isFargate bool
+	client   APIClient
+	provider provider.Type
 }
 
 // NewECSPlatform creates a new Platform
-func NewECSPlatform(metadataURI string, isFargate bool, ignoreContainer *regexp.Regexp) (platform.Platform, error) {
+func NewECSPlatform(metadataURI string, executionEnv string, ignoreContainer *regexp.Regexp) (platform.Platform, error) {
 	c, err := taskmetadata.NewClient(metadataURI, ignoreContainer)
 	if err != nil {
 		return nil, err
 	}
+
+	p, err := resolveProvider(executionEnv)
+	if err != nil {
+		return nil, err
+	}
+
 	return &ecsPlatform{
-		client:    c,
-		isFargate: isFargate,
+		client:   c,
+		provider: p,
 	}, nil
 }
 
@@ -47,7 +60,7 @@ func (p *ecsPlatform) GetMetricGenerators() []metric.Generator {
 // GetSpecGenerators gets spec generator
 func (p *ecsPlatform) GetSpecGenerators() []spec.Generator {
 	return []spec.Generator{
-		newSpecGenerator(p.client, p.isFargate),
+		newSpecGenerator(p.client, p.provider),
 	}
 }
 
@@ -68,4 +81,15 @@ func (p *ecsPlatform) StatusRunning(ctx context.Context) bool {
 
 func isRunning(status string) bool {
 	return strings.EqualFold("running", status)
+}
+
+func resolveProvider(executionEnv string) (provider.Type, error) {
+	switch executionEnv {
+	case executionEnvFargate:
+		return provider.Fargate, nil
+	case executionEnvEC2:
+		return provider.ECS, nil
+	default:
+		return provider.Type("UNKNOWN"), errors.New("unknown exectution env")
+	}
 }
