@@ -21,14 +21,14 @@ const (
 
 var logger = logging.GetLogger("ecs")
 
-// APIClient interface gets task metadata and task stats
-type APIClient interface {
+// TaskMetadataEndpointClient interface gets task metadata and task stats
+type TaskMetadataEndpointClient interface {
 	TaskMetadataGetter
 	TaskStatsGetter
 }
 
 type ecsPlatform struct {
-	client   APIClient
+	client   TaskMetadataEndpointClient
 	provider provider.Type
 }
 
