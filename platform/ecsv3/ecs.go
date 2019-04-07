@@ -3,10 +3,14 @@ package ecsv3
 import (
 	"context"
 	"errors"
+	"fmt"
 	"regexp"
 	"strings"
 
+	ecsTypes "github.com/aws/amazon-ecs-agent/agent/handlers/v2"
+
 	"github.com/mackerelio/golib/logging"
+
 	"github.com/mackerelio/mackerel-container-agent/metric"
 	"github.com/mackerelio/mackerel-container-agent/platform"
 	"github.com/mackerelio/mackerel-container-agent/platform/ecsv3/taskmetadata"
@@ -27,13 +31,22 @@ type TaskMetadataEndpointClient interface {
 	TaskStatsGetter
 }
 
+type networkMode string
+
+const (
+	bridgeNetworkMode networkMode = "bridge"
+	hostNetworkMode   networkMode = "host"
+	awsvpcNetworkMode networkMode = "awsvpc"
+)
+
 type ecsPlatform struct {
-	client   TaskMetadataEndpointClient
-	provider provider.Type
+	client      TaskMetadataEndpointClient
+	provider    provider.Type
+	networkMode networkMode
 }
 
 // NewECSPlatform creates a new Platform
-func NewECSPlatform(metadataURI string, executionEnv string, ignoreContainer *regexp.Regexp) (platform.Platform, error) {
+func NewECSPlatform(ctx context.Context, metadataURI string, executionEnv string, ignoreContainer *regexp.Regexp) (platform.Platform, error) {
 	c, err := taskmetadata.NewClient(metadataURI, ignoreContainer)
 	if err != nil {
 		return nil, err
@@ -44,17 +57,34 @@ func NewECSPlatform(metadataURI string, executionEnv string, ignoreContainer *re
 		return nil, err
 	}
 
+	meta, err := c.GetTaskMetadata(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	nm, err := detectNetworkMode(meta)
+	if err != nil {
+		return nil, err
+	}
+
 	return &ecsPlatform{
-		client:   c,
-		provider: p,
+		client:      c,
+		provider:    p,
+		networkMode: nm,
 	}, nil
 }
 
 // GetMetricGenerators gets metric generators
 func (p *ecsPlatform) GetMetricGenerators() []metric.Generator {
-	return []metric.Generator{
+	g := []metric.Generator{
 		newMetricGenerator(p.client),
 	}
+
+	if p.networkMode != bridgeNetworkMode {
+		g = append(g, metric.NewInterfaceGenerator())
+	}
+
+	return g
 }
 
 // GetSpecGenerators gets spec generator
@@ -91,5 +121,27 @@ func resolveProvider(executionEnv string) (provider.Type, error) {
 		return provider.ECS, nil
 	default:
 		return provider.Type("UNKNOWN"), errors.New("unknown exectution env")
+	}
+}
+
+func detectNetworkMode(meta *ecsTypes.TaskResponse) (networkMode, error) {
+	if len(meta.Containers) == 0 {
+		return "", errors.New("there are no containers")
+	}
+
+	if len(meta.Containers[0].Networks) == 0 {
+		return "", errors.New("there are no networks")
+	}
+
+	nm := meta.Containers[0].Networks[0].NetworkMode
+	switch nm {
+	case "default", "bridge":
+		return bridgeNetworkMode, nil
+	case "host":
+		return hostNetworkMode, nil
+	case "awsvpc":
+		return awsvpcNetworkMode, nil
+	default:
+		return "", fmt.Errorf("unsupported NetworkMode: %v", nm)
 	}
 }
