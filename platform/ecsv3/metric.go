@@ -77,6 +77,8 @@ func (g *metricGenerator) Generate(ctx context.Context) (metric.Values, error) {
 		metricValues["container.cpu."+name+".limit"] = getCPULimit(meta)
 		metricValues["container.memory."+name+".usage"] = calculateMemoryMetrics(curr)
 		metricValues["container.memory."+name+".limit"] = g.getMemoryLimit(&c, meta)
+
+		calculateInterfaceMetrics(name, prev, curr, timeDelta, metricValues)
 	}
 
 	g.prevStats = stats
@@ -114,4 +116,16 @@ func calculateCPUMetrics(prev, curr *dockerTypes.StatsJSON, timeDelta time.Durat
 
 func calculateMemoryMetrics(stats *dockerTypes.StatsJSON) float64 {
 	return float64(stats.MemoryStats.Usage - stats.MemoryStats.Stats["cache"])
+}
+
+func calculateInterfaceMetrics(name string, prev, curr *dockerTypes.StatsJSON, timeDelta time.Duration, metricValues metric.Values) {
+	for ifn, pv := range prev.Networks {
+		cv, ok := curr.Networks[ifn]
+		if !ok {
+			continue
+		}
+		prefix := "interface." + name + "-" + metric.SanitizeMetricKey(ifn)
+		metricValues[prefix+".rxBytes.delta"] = float64(cv.RxBytes-pv.RxBytes) / timeDelta.Seconds()
+		metricValues[prefix+".txBytes.delta"] = float64(cv.TxBytes-pv.TxBytes) / timeDelta.Seconds()
+	}
 }
