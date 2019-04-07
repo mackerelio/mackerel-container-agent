@@ -28,7 +28,7 @@ func (m *mockTaskMetadataGetter) GetTaskMetadata(ctx context.Context) (*ecsTypes
 	return &res, nil
 }
 
-func TestGenerate(t *testing.T) {
+func TestGenerateSpec(t *testing.T) {
 	tests := []struct {
 		path     string
 		provider provider.Type
