@@ -84,7 +84,7 @@ func NewPlatform(ctx context.Context, ignoreContainer *regexp.Regexp) (platform.
 func getEnvValue(name string) (string, error) {
 	value := os.Getenv(name)
 	if value == "" {
-		return value, fmt.Errorf("please set the %s environment variable", name)
+		return value, fmt.Errorf("%s environment variable is not set", name)
 	}
 	return value, nil
 }
