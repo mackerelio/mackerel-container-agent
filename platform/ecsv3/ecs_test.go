@@ -12,8 +12,8 @@ func TestIsRunning(t *testing.T) {
 		status string
 		expect bool
 	}{
-		{"running", true},
-		{"Running", true},
+		{"running", false},
+		{"Running", false},
 		{"RUNNING", true},
 		{"PENDING", false},
 		{"", false},

@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"regexp"
-	"strings"
 
 	ecsTypes "github.com/aws/amazon-ecs-agent/agent/handlers/v2"
 
@@ -109,7 +108,7 @@ func (p *ecsPlatform) StatusRunning(ctx context.Context) bool {
 }
 
 func isRunning(status string) bool {
-	return strings.EqualFold("running", status)
+	return status == "RUNNING"
 }
 
 func resolveProvider(executionEnv string) (provider, error) {
