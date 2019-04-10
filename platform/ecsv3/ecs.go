@@ -14,7 +14,6 @@ import (
 	"github.com/mackerelio/mackerel-container-agent/metric"
 	"github.com/mackerelio/mackerel-container-agent/platform"
 	"github.com/mackerelio/mackerel-container-agent/platform/ecsv3/taskmetadata"
-	"github.com/mackerelio/mackerel-container-agent/provider"
 	"github.com/mackerelio/mackerel-container-agent/spec"
 )
 
@@ -41,7 +40,7 @@ const (
 
 type ecsPlatform struct {
 	client      TaskMetadataEndpointClient
-	provider    provider.Type
+	provider    provider
 	networkMode networkMode
 }
 
@@ -113,14 +112,14 @@ func isRunning(status string) bool {
 	return strings.EqualFold("running", status)
 }
 
-func resolveProvider(executionEnv string) (provider.Type, error) {
+func resolveProvider(executionEnv string) (provider, error) {
 	switch executionEnv {
 	case executionEnvFargate:
-		return provider.Fargate, nil
+		return fargateProvider, nil
 	case executionEnvEC2:
-		return provider.ECS, nil
+		return ecsProvider, nil
 	default:
-		return provider.Type("UNKNOWN"), errors.New("unknown exectution env")
+		return provider("UNKNOWN"), errors.New("unknown exectution env")
 	}
 }
 

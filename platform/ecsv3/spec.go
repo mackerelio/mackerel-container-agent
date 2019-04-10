@@ -9,7 +9,6 @@ import (
 
 	mackerel "github.com/mackerelio/mackerel-client-go"
 
-	"github.com/mackerelio/mackerel-container-agent/provider"
 	agentSpec "github.com/mackerelio/mackerel-container-agent/spec"
 )
 
@@ -20,10 +19,10 @@ type TaskMetadataGetter interface {
 
 type specGenerator struct {
 	client   TaskMetadataGetter
-	provider provider.Type
+	provider provider
 }
 
-func newSpecGenerator(client TaskMetadataGetter, provider provider.Type) *specGenerator {
+func newSpecGenerator(client TaskMetadataGetter, provider provider) *specGenerator {
 	return &specGenerator{
 		client:   client,
 		provider: provider,

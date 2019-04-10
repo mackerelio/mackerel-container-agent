@@ -5,8 +5,6 @@ import (
 
 	"github.com/aws/amazon-ecs-agent/agent/containermetadata"
 	ecsTypes "github.com/aws/amazon-ecs-agent/agent/handlers/v2"
-
-	"github.com/mackerelio/mackerel-container-agent/provider"
 )
 
 func TestIsRunning(t *testing.T) {
@@ -32,12 +30,12 @@ func TestIsRunning(t *testing.T) {
 func TestResolveProvider(t *testing.T) {
 	tests := []struct {
 		executionEnv string
-		expect       provider.Type
+		expect       provider
 	}{
-		{"AWS_ECS_FARGATE", provider.Fargate},
-		{"AWS_ECS_EC2", provider.ECS},
-		{"unknown", provider.Type("UNKNOWN")},
-		{"", provider.Type("UNKNOWN")},
+		{"AWS_ECS_FARGATE", fargateProvider},
+		{"AWS_ECS_EC2", ecsProvider},
+		{"unknown", provider("UNKNOWN")},
+		{"", provider("UNKNOWN")},
 	}
 
 	for _, tc := range tests {

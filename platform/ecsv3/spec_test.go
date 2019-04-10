@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	ecsTypes "github.com/aws/amazon-ecs-agent/agent/handlers/v2"
-	"github.com/mackerelio/mackerel-container-agent/provider"
+
 	agentSpec "github.com/mackerelio/mackerel-container-agent/spec"
 )
 
@@ -31,12 +31,12 @@ func (m *mockTaskMetadataGetter) GetTaskMetadata(ctx context.Context) (*ecsTypes
 func TestGenerateSpec(t *testing.T) {
 	tests := []struct {
 		path     string
-		provider provider.Type
+		provider provider
 	}{
-		{"taskmetadata/testdata/metadata_ec2_bridge.json", provider.ECS},
-		{"taskmetadata/testdata/metadata_ec2_host.json", provider.ECS},
-		{"taskmetadata/testdata/metadata_ec2_awsvpc.json", provider.ECS},
-		{"taskmetadata/testdata/metadata_fargate.json", provider.Fargate},
+		{"taskmetadata/testdata/metadata_ec2_bridge.json", ecsProvider},
+		{"taskmetadata/testdata/metadata_ec2_host.json", ecsProvider},
+		{"taskmetadata/testdata/metadata_ec2_awsvpc.json", ecsProvider},
+		{"taskmetadata/testdata/metadata_fargate.json", fargateProvider},
 	}
 
 	mock := &mockTaskMetadataGetter{}
