@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/kubernetes/apimachinery/pkg/api/resource"
+	"k8s.io/apimachinery/pkg/api/resource"
 
 	mackerel "github.com/mackerelio/mackerel-client-go"
 
