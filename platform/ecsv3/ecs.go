@@ -118,7 +118,7 @@ func resolveProvider(executionEnv string) (provider, error) {
 	case executionEnvEC2:
 		return ecsProvider, nil
 	default:
-		return provider("UNKNOWN"), errors.New("unknown exectution env")
+		return provider("UNKNOWN"), fmt.Errorf("unknown execution env: %q", executionEnv)
 	}
 }
 
