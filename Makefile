@@ -64,5 +64,4 @@ release: check-release-deps
 .PHONY: update
 update:
 	go get -u ./...
-	go get github.com/docker/docker@master
 	go mod tidy
