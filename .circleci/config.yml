@@ -21,7 +21,7 @@ jobs:
 
       - run:
           name: Get CI dependency
-          command: go get github.com/jstemmer/go-junit-report
+          command: GO111MODULE=off go get github.com/jstemmer/go-junit-report
 
       - run:
           name: Build
