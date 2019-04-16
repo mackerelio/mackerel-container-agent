@@ -20,7 +20,7 @@ require (
 	github.com/docker/go-connections v0.4.0 // indirect
 	github.com/docker/go-units v0.3.3 // indirect
 	github.com/go-yaml/yaml v2.1.0+incompatible
-	github.com/godbus/dbus v4.1.0+incompatible // indirect
+	github.com/godbus/dbus v0.0.0-20190413140323-8e900ab0295c // indirect
 	github.com/gogo/protobuf v1.2.1 // indirect
 	github.com/golang/mock v1.2.0 // indirect
 	github.com/golang/protobuf v1.3.1 // indirect
@@ -38,7 +38,7 @@ require (
 	github.com/onsi/gomega v1.5.0 // indirect
 	github.com/opencontainers/go-digest v1.0.0-rc1 // indirect
 	github.com/opencontainers/image-spec v1.0.1 // indirect
-	github.com/opencontainers/runtime-spec v1.0.1 // indirect
+	github.com/opencontainers/runtime-spec v0.1.2-0.20190408193819-a1b50f621a48 // indirect
 	github.com/pborman/uuid v1.2.0 // indirect
 	github.com/pkg/errors v0.8.1
 	github.com/prometheus/client_golang v0.9.3-0.20190127221311-3c4408c8b829 // indirect
@@ -46,17 +46,14 @@ require (
 	github.com/prometheus/common v0.3.0 // indirect
 	github.com/prometheus/procfs v0.0.0-20190412120340-e22ddced7142 // indirect
 	github.com/sirupsen/logrus v1.4.1 // indirect
-	golang.org/x/crypto v0.0.0-20190411191339-88737f569e3a // indirect
-	golang.org/x/lint v0.0.0-20190409202823-959b441ac422 // indirect
-	golang.org/x/net v0.0.0-20190404232315-eb5bcb51f2a3 // indirect
+	golang.org/x/net v0.0.0-20190415214537-1da14a5a36f2 // indirect
 	golang.org/x/sync v0.0.0-20190412183630-56d357773e84
-	golang.org/x/sys v0.0.0-20190412213103-97732733099d // indirect
+	golang.org/x/sys v0.0.0-20190415145633-3fd5a3612ccd // indirect
 	golang.org/x/time v0.0.0-20190308202827-9d24e82272b4 // indirect
-	golang.org/x/tools v0.0.0-20190411180116-681f9ce8ac52 // indirect
 	google.golang.org/appengine v1.4.0 // indirect
-	google.golang.org/genproto v0.0.0-20190404172233-64821d5d2107 // indirect
+	google.golang.org/genproto v0.0.0-20190415143225-d1146b9035b9 // indirect
 	google.golang.org/grpc v1.20.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gotest.tools v2.2.0+incompatible // indirect
-	k8s.io/apimachinery v0.0.0-20190413052414-40a3f73b0fa2
+	k8s.io/apimachinery v0.0.0-20190415132420-07d458fe0356
 )
