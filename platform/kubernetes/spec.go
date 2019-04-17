@@ -135,8 +135,8 @@ func (g *specGenerator) Generate(ctx context.Context) (interface{}, error) {
 				containerSpec.Ports = ports
 				for j, p := range c.Ports {
 					ports[j] = containerPort{
-						ContainerPort: p.ContainerPort,
-						HostPort:      p.HostPort,
+						ContainerPort: int(p.ContainerPort),
+						HostPort:      int(p.HostPort),
 						Name:          p.Name,
 						Protocol:      string(p.Protocol),
 						HostIP:        p.HostIP,
