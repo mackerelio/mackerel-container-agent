@@ -2,6 +2,8 @@ BIN := mackerel-container-agent
 VERSION := 0.0.3
 REVISION := $(shell git rev-parse --short HEAD)
 
+export GO111MODULE=on
+
 .PHONY: all
 all: clean build
 
@@ -9,32 +11,27 @@ BUILD_LDFLAGS := "\
 	-X main.version=$(VERSION) \
 	-X main.revision=$(REVISION)"
 
-.PHONY: deps
-deps:
-	go get -d ./...
-
 .PHONY: build
-build: deps
+build:
 	go build -ldflags=$(BUILD_LDFLAGS) -o build/$(BIN) ./cmd/$(BIN)/...
 
-.PHONY: test-deps
-test-deps:
-	go get -d -t ./...
-	go get -u golang.org/x/lint/golint
-
 .PHONY: test
-test: test-deps
+test:
 	go test -v ./...
 
+.PHONY: lint-deps
+lint-deps:
+	GO111MODULE=off go get golang.org/x/lint/golint
+
 .PHONY: lint
-lint: test-deps
+lint: lint-deps
 	go vet ./...
 	golint -set_exit_status ./...
 
 .PHONY: clean
 clean:
 	rm -fr build
-	go clean
+	go clean ./...
 
 .PHONY: linux
 linux:
@@ -63,3 +60,8 @@ check-release-deps:
 release: check-release-deps
 	(cd script && cpanm -qn --installdeps .)
 	perl script/create-release-pullrequest
+
+.PHONY: update
+update:
+	go get -u ./...
+	go mod tidy
