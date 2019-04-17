@@ -113,7 +113,7 @@ func TestGenerateSpec(t *testing.T) {
 						Status: "True",
 					},
 				},
-				StartTime: func() *time.Time { t, _ := time.Parse(time.RFC3339Nano, "2018-07-30T07:19:40Z"); return &t }(),
+				StartTime: func() *time.Time { t, _ := time.Parse(time.RFC3339, "2018-07-30T07:19:40Z"); t = t.Local(); return &t }(),
 			},
 		},
 		Hostname: "myapp",

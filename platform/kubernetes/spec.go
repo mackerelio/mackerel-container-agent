@@ -158,7 +158,7 @@ func (g *specGenerator) Generate(ctx context.Context) (interface{}, error) {
 	spec.Phase = string(p.Status.Phase)
 	spec.HostIP = p.Status.HostIP
 	spec.PodIP = p.Status.PodIP
-	spec.StartTime = p.Status.StartTime
+	spec.StartTime = &p.Status.StartTime.Time
 	if p.Status.Conditions != nil {
 		conds := make([]podCondition, len(p.Status.Conditions))
 		spec.Conditions = conds
