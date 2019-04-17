@@ -9,7 +9,7 @@ require (
 	github.com/Songmu/timeout v0.3.1
 	github.com/Songmu/wrapcommander v0.0.0-20190209161912-6edabfc62ab9 // indirect
 	github.com/aws/amazon-ecs-agent v1.26.1
-	github.com/aws/aws-sdk-go v1.19.11
+	github.com/aws/aws-sdk-go v1.19.12
 	github.com/beorn7/perks v1.0.0 // indirect
 	github.com/cihub/seelog v0.0.0-20170130134532-f561c5e57575 // indirect
 	github.com/containerd/cgroups v0.0.0-20190328223300-4994991857f9 // indirect
@@ -29,6 +29,7 @@ require (
 	github.com/google/gofuzz v1.0.0 // indirect
 	github.com/google/uuid v1.1.1 // indirect
 	github.com/gorilla/mux v1.7.1 // indirect
+	github.com/json-iterator/go v1.1.6 // indirect
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
 	github.com/kylelemons/godebug v0.0.0-20170820004349-d65d576e9348 // indirect
 	github.com/mackerelio/go-osstat v0.0.0-20190412014440-b90c0b34edef
@@ -45,17 +46,19 @@ require (
 	github.com/prometheus/client_golang v0.9.3-0.20190127221311-3c4408c8b829 // indirect
 	github.com/prometheus/client_model v0.0.0-20190129233127-fd36f4220a90 // indirect
 	github.com/prometheus/common v0.3.0 // indirect
-	github.com/prometheus/procfs v0.0.0-20190412120340-e22ddced7142 // indirect
+	github.com/prometheus/procfs v0.0.0-20190416084830-8368d24ba045 // indirect
 	github.com/sirupsen/logrus v1.4.1 // indirect
+	github.com/spf13/pflag v1.0.3 // indirect
 	golang.org/x/net v0.0.0-20190415214537-1da14a5a36f2 // indirect
 	golang.org/x/sync v0.0.0-20190412183630-56d357773e84
-	golang.org/x/sys v0.0.0-20190415145633-3fd5a3612ccd // indirect
+	golang.org/x/sys v0.0.0-20190416152802-12500544f89f // indirect
 	golang.org/x/time v0.0.0-20190308202827-9d24e82272b4 // indirect
 	google.golang.org/genproto v0.0.0-20190415143225-d1146b9035b9 // indirect
 	google.golang.org/grpc v1.20.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gotest.tools v2.2.0+incompatible // indirect
 	k8s.io/api v0.0.0-20190416052506-9eb4726e83e4
-	k8s.io/apimachinery v0.0.0-20190416052411-7dcd37fca543
+	k8s.io/apimachinery v0.0.0-20190416092415-3370b4aef5d6
+	k8s.io/klog v0.3.0 // indirect
 	k8s.io/kubernetes v1.14.1
 )
