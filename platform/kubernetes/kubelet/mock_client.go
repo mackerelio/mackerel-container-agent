@@ -4,12 +4,13 @@ import (
 	"context"
 
 	cadvisorTypes "github.com/google/cadvisor/info/v1"
+	kubernetesTypes "k8s.io/api/core/v1"
 	kubeletTypes "k8s.io/kubernetes/pkg/kubelet/apis/stats/v1alpha1"
 )
 
 // MockClient represents a mock client of Kubelet APIs
 type MockClient struct {
-	getPodCallback      func(context.Context) (*Pod, error)
+	getPodCallback      func(context.Context) (*kubernetesTypes.Pod, error)
 	getPodStatsCallback func(context.Context) (*kubeletTypes.PodStats, error)
 	getSpecCallback     func(context.Context) (*cadvisorTypes.MachineInfo, error)
 }
@@ -38,7 +39,7 @@ func (err errCallbackNotFound) Error() string {
 }
 
 // GetPod ...
-func (c *MockClient) GetPod(ctx context.Context) (*Pod, error) {
+func (c *MockClient) GetPod(ctx context.Context) (*kubernetesTypes.Pod, error) {
 	if c.getPodCallback != nil {
 		return c.getPodCallback(ctx)
 	}
@@ -46,7 +47,7 @@ func (c *MockClient) GetPod(ctx context.Context) (*Pod, error) {
 }
 
 // MockGetPod returns an option to set the callback of GetPod
-func MockGetPod(callback func(context.Context) (*Pod, error)) MockClientOption {
+func MockGetPod(callback func(context.Context) (*kubernetesTypes.Pod, error)) MockClientOption {
 	return func(c *MockClient) {
 		c.getPodCallback = callback
 	}

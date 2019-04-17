@@ -55,6 +55,7 @@ require (
 	google.golang.org/grpc v1.20.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gotest.tools v2.2.0+incompatible // indirect
-	k8s.io/apimachinery v0.0.0-20190415132420-07d458fe0356
+	k8s.io/api v0.0.0-20190416052506-9eb4726e83e4
+	k8s.io/apimachinery v0.0.0-20190416052411-7dcd37fca543
 	k8s.io/kubernetes v1.14.1
 )

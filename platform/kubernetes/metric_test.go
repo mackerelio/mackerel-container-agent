@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	cadvisorTypes "github.com/google/cadvisor/info/v1"
+	kubernetesTypes "k8s.io/api/core/v1"
 	kubeletTypes "k8s.io/kubernetes/pkg/kubelet/apis/stats/v1alpha1"
 
 	"github.com/mackerelio/mackerel-container-agent/metric"
@@ -17,18 +18,18 @@ import (
 func TestGenerateStats(t *testing.T) {
 	ctx := context.Background()
 	client := kubelet.NewMockClient(
-		kubelet.MockGetPod(func(context.Context) (*kubelet.Pod, error) {
+		kubelet.MockGetPod(func(context.Context) (*kubernetesTypes.Pod, error) {
 			raw, err := ioutil.ReadFile("kubelet/testdata/pods.json")
 			if err != nil {
 				return nil, err
 			}
-			var podList kubelet.PodList
+			var podList kubernetesTypes.PodList
 			if err := json.Unmarshal(raw, &podList); err != nil {
 				return nil, err
 			}
 			for _, pod := range podList.Items {
-				if pod.Metadata.Namespace == "default" && pod.Metadata.Name == "myapp" {
-					return pod, nil
+				if pod.ObjectMeta.Namespace == "default" && pod.ObjectMeta.Name == "myapp" {
+					return &pod, nil
 				}
 			}
 			return nil, nil
@@ -129,9 +130,9 @@ func TestGetMemoryLimit(t *testing.T) {
 		hostMemTotal: &hostMemTotal,
 	}
 	for _, tc := range tests {
-		container := kubelet.Container{
+		container := kubernetesTypes.Container{
 			Name: name,
-			Resources: kubelet.ResourceRequirements{
+			Resources: kubernetesTypes.ResourceRequirements{
 				Limits: tc.limit,
 			},
 		}

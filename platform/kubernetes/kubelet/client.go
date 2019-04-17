@@ -10,12 +10,13 @@ import (
 	"regexp"
 
 	cadvisorTypes "github.com/google/cadvisor/info/v1"
+	kubernetesTypes "k8s.io/api/core/v1"
 	kubeletTypes "k8s.io/kubernetes/pkg/kubelet/apis/stats/v1alpha1"
 )
 
 // Client interface gets metadata and stats
 type Client interface {
-	GetPod(context.Context) (*Pod, error)
+	GetPod(context.Context) (*kubernetesTypes.Pod, error)
 	GetPodStats(context.Context) (*kubeletTypes.PodStats, error)
 	GetSpec(context.Context) (*cadvisorTypes.MachineInfo, error)
 }
@@ -57,7 +58,7 @@ func NewClient(httpClient *http.Client, token, baseURL, namespace, name string, 
 }
 
 // GetPod gets pod
-func (c *client) GetPod(ctx context.Context) (*Pod, error) {
+func (c *client) GetPod(ctx context.Context) (*kubernetesTypes.Pod, error) {
 	req, err := c.newRequest(podsPath)
 	if err != nil {
 		return nil, err
@@ -66,15 +67,15 @@ func (c *client) GetPod(ctx context.Context) (*Pod, error) {
 	if err != nil {
 		return nil, err
 	}
-	var podList PodList
+	var podList kubernetesTypes.PodList
 	if err = decodeBody(resp, &podList); err != nil {
 		return nil, err
 	}
 
-	var pod *Pod
+	var pod *kubernetesTypes.Pod
 	for _, p := range podList.Items {
-		if p.Metadata.Namespace == c.namespace && p.Metadata.Name == c.name {
-			pod = p
+		if p.ObjectMeta.Namespace == c.namespace && p.ObjectMeta.Name == c.name {
+			pod = &p
 			break
 		}
 	}
@@ -83,7 +84,7 @@ func (c *client) GetPod(ctx context.Context) (*Pod, error) {
 	}
 
 	if c.ignoreContainer != nil {
-		containers := make([]Container, 0, len(pod.Spec.Containers))
+		containers := make([]kubernetesTypes.Container, 0, len(pod.Spec.Containers))
 		for _, container := range pod.Spec.Containers {
 			if c.ignoreContainer.MatchString(container.Name) {
 				continue
