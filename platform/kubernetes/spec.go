@@ -123,7 +123,11 @@ func (g *specGenerator) Generate(ctx context.Context) (interface{}, error) {
 			}
 
 			if limits := c.Resources.Limits; limits != nil {
-				containerSpec.Resources.Limits = resourceList(limits)
+				rl := resourceList{}
+				for k, v := range limits {
+					rl[string(k)] = v.String()
+				}
+				containerSpec.Resources.Limits = rl
 			}
 
 			if c.Ports != nil {
