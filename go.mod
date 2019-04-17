@@ -24,6 +24,7 @@ require (
 	github.com/gogo/protobuf v1.2.1 // indirect
 	github.com/golang/mock v1.2.0 // indirect
 	github.com/golang/protobuf v1.3.1 // indirect
+	github.com/google/cadvisor v0.33.1
 	github.com/google/go-cmp v0.2.0 // indirect
 	github.com/google/gofuzz v1.0.0 // indirect
 	github.com/google/uuid v1.1.1 // indirect
@@ -50,7 +51,6 @@ require (
 	golang.org/x/sync v0.0.0-20190412183630-56d357773e84
 	golang.org/x/sys v0.0.0-20190415145633-3fd5a3612ccd // indirect
 	golang.org/x/time v0.0.0-20190308202827-9d24e82272b4 // indirect
-	google.golang.org/appengine v1.4.0 // indirect
 	google.golang.org/genproto v0.0.0-20190415143225-d1146b9035b9 // indirect
 	google.golang.org/grpc v1.20.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect

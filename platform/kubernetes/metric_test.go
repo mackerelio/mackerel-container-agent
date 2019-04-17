@@ -7,6 +7,8 @@ import (
 	"reflect"
 	"testing"
 
+	cadvisorTypes "github.com/google/cadvisor/info/v1"
+
 	"github.com/mackerelio/mackerel-container-agent/metric"
 	"github.com/mackerelio/mackerel-container-agent/platform/kubernetes/kubelet"
 )
@@ -46,12 +48,12 @@ func TestGenerateStats(t *testing.T) {
 			}
 			return nil, nil
 		}),
-		kubelet.MockGetSpec(func(context.Context) (*kubelet.MachineInfo, error) {
+		kubelet.MockGetSpec(func(context.Context) (*cadvisorTypes.MachineInfo, error) {
 			raw, err := ioutil.ReadFile("kubelet/testdata/spec.json")
 			if err != nil {
 				return nil, err
 			}
-			var info kubelet.MachineInfo
+			var info cadvisorTypes.MachineInfo
 			if err := json.Unmarshal(raw, &info); err != nil {
 				return nil, err
 			}

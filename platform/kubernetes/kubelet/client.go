@@ -8,13 +8,15 @@ import (
 	"net/url"
 	"path"
 	"regexp"
+
+	cadvisorTypes "github.com/google/cadvisor/info/v1"
 )
 
 // Client interface gets metadata and stats
 type Client interface {
 	GetPod(context.Context) (*Pod, error)
 	GetPodStats(context.Context) (*PodStats, error)
-	GetSpec(context.Context) (*MachineInfo, error)
+	GetSpec(context.Context) (*cadvisorTypes.MachineInfo, error)
 }
 
 const (
@@ -134,7 +136,7 @@ func (c *client) GetPodStats(ctx context.Context) (*PodStats, error) {
 }
 
 // GetPodStats gets pod spec
-func (c *client) GetSpec(ctx context.Context) (*MachineInfo, error) {
+func (c *client) GetSpec(ctx context.Context) (*cadvisorTypes.MachineInfo, error) {
 	req, err := c.newRequest(specPath)
 	if err != nil {
 		return nil, err
@@ -143,7 +145,7 @@ func (c *client) GetSpec(ctx context.Context) (*MachineInfo, error) {
 	if err != nil {
 		return nil, err
 	}
-	var info MachineInfo
+	var info cadvisorTypes.MachineInfo
 	if err = decodeBody(resp, &info); err != nil {
 		return nil, err
 	}
