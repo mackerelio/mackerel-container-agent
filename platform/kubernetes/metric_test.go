@@ -9,6 +9,7 @@ import (
 
 	cadvisorTypes "github.com/google/cadvisor/info/v1"
 	kubernetesTypes "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
 	kubeletTypes "k8s.io/kubernetes/pkg/kubelet/apis/stats/v1alpha1"
 
 	"github.com/mackerelio/mackerel-container-agent/metric"
@@ -90,39 +91,35 @@ func TestGetMemoryLimit(t *testing.T) {
 	hostMemTotal := 2096058368.0
 	name := "dummy"
 	tests := []struct {
-		limit    kubelet.ResourceList
+		quantity string
 		expected float64
 	}{
 		{
-			nil,
+			"",
 			hostMemTotal,
 		},
 		{
-			kubelet.ResourceList{},
-			hostMemTotal,
-		},
-		{
-			kubelet.ResourceList{"memory": "134217728"},
+			"134217728",
 			134217728.0,
 		},
 		{
-			kubelet.ResourceList{"memory": "128e6"},
+			"128e6",
 			128000000.0,
 		},
 		{
-			kubelet.ResourceList{"memory": "128M"},
+			"128M",
 			128000000.0,
 		},
 		{
-			kubelet.ResourceList{"memory": "128Mi"},
+			"128Mi",
 			134217728.0,
 		},
 		{
-			kubelet.ResourceList{"memory": "1G"},
+			"1G",
 			1000000000.0,
 		},
 		{
-			kubelet.ResourceList{"memory": "1Gi"},
+			"1Gi",
 			1073741824.0,
 		},
 	}
@@ -130,10 +127,12 @@ func TestGetMemoryLimit(t *testing.T) {
 		hostMemTotal: &hostMemTotal,
 	}
 	for _, tc := range tests {
+		q, _ := resource.ParseQuantity(tc.quantity)
+		rn := kubernetesTypes.ResourceName("memory")
 		container := kubernetesTypes.Container{
 			Name: name,
 			Resources: kubernetesTypes.ResourceRequirements{
-				Limits: tc.limit,
+				Limits: kubernetesTypes.ResourceList{rn: q},
 			},
 		}
 		got := g.getMermoryLimit(&container)

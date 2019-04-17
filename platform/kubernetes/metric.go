@@ -87,7 +87,7 @@ func (g *metricGenerator) Generate(ctx context.Context) (metric.Values, error) {
 
 func (g *metricGenerator) getMermoryLimit(container *kubernetesTypes.Container) float64 {
 	limit := *g.hostMemTotal
-	if v, ok := container.Resources.Limits["memory"]; ok {
+	if v, ok := container.Resources.Limits["memory"]; ok && v.Format != "" {
 		i, _ := v.AsInt64()
 		limit = float64(i)
 	}
