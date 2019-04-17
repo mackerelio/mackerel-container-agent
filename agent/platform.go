@@ -11,6 +11,7 @@ import (
 	"github.com/mackerelio/mackerel-container-agent/platform/ecs"
 	ecsInstance "github.com/mackerelio/mackerel-container-agent/platform/ecs/instance"
 	"github.com/mackerelio/mackerel-container-agent/platform/ecsawsvpc"
+	"github.com/mackerelio/mackerel-container-agent/platform/ecsv3"
 	"github.com/mackerelio/mackerel-container-agent/platform/kubernetes"
 	"github.com/mackerelio/mackerel-container-agent/platform/kubernetes/kubelet"
 )
@@ -28,6 +29,17 @@ func NewPlatform(ctx context.Context, ignoreContainer *regexp.Regexp) (platform.
 
 	case platform.ECSAwsvpc:
 		return ecsawsvpc.NewECSAwsvpcPlatform(false, ignoreContainer)
+
+	case platform.ECSv3:
+		metadataURI, err := getEnvValue("ECS_CONTAINER_METADATA_URI")
+		if err != nil {
+			return nil, err
+		}
+		executionEnv, err := getEnvValue("AWS_EXECUTION_ENV")
+		if err != nil {
+			return nil, err
+		}
+		return ecsv3.NewECSPlatform(ctx, metadataURI, executionEnv, ignoreContainer)
 
 	case platform.Fargate:
 		return ecsawsvpc.NewECSAwsvpcPlatform(true, ignoreContainer)
@@ -72,7 +84,7 @@ func NewPlatform(ctx context.Context, ignoreContainer *regexp.Regexp) (platform.
 func getEnvValue(name string) (string, error) {
 	value := os.Getenv(name)
 	if value == "" {
-		return value, fmt.Errorf("please set the %s environment variable", name)
+		return value, fmt.Errorf("%s environment variable is not set", name)
 	}
 	return value, nil
 }

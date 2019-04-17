@@ -1,0 +1,79 @@
+{
+  "Cluster": "test-clusrer",
+  "TaskARN": "arn:aws:ecs:ap-northeast-1:999999999999:task/task-id",
+  "Family": "test-fargate",
+  "Revision": "1",
+  "DesiredStatus": "RUNNING",
+  "KnownStatus": "RUNNING",
+  "Containers": [
+    {
+      "DockerId": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "Name": "~internal~ecs~pause",
+      "DockerName": "ecs-test-cluster-1-internalecspause-eeeeeeeeeeeeeeeeeeee",
+      "Image": "amazon/amazon-ecs-pause:0.1.0",
+      "ImageID": "",
+      "Labels": {
+        "com.amazonaws.ecs.cluster": "test-cluster",
+        "com.amazonaws.ecs.container-name": "~internal~ecs~pause",
+        "com.amazonaws.ecs.task-arn": "arn:aws:ecs:ap-northeast-1:999999999999:task/task-id",
+        "com.amazonaws.ecs.task-definition-family": "test-fargate",
+        "com.amazonaws.ecs.task-definition-version": "1"
+      },
+      "DesiredStatus": "RESOURCES_PROVISIONED",
+      "KnownStatus": "RESOURCES_PROVISIONED",
+      "Limits": {
+        "CPU": 0,
+        "Memory": 0
+      },
+      "CreatedAt": "2019-03-29T02:55:12.245682179Z",
+      "StartedAt": "2019-03-29T02:55:12.902702165Z",
+      "Type": "CNI_PAUSE",
+      "Networks": [
+        {
+          "NetworkMode": "awsvpc",
+          "IPv4Addresses": [
+            "10.0.10.32"
+          ]
+        }
+      ]
+    },
+    {
+      "DockerId": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+      "Name": "mackerel-container-agent",
+      "DockerName": "ecs-test-cluster-1-mackerel-container-agent-ffffffffffffffffffff",
+      "Image": "mackerel/mackerel-container-agent:latest",
+      "ImageID": "sha256:ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+      "Labels": {
+        "com.amazonaws.ecs.cluster": "test-cluster",
+        "com.amazonaws.ecs.container-name": "mackerel-container-agent",
+        "com.amazonaws.ecs.task-arn": "arn:aws:ecs:ap-northeast-1:999999999999:task/task-id",
+        "com.amazonaws.ecs.task-definition-family": "test-fargate",
+        "com.amazonaws.ecs.task-definition-version": "1"
+      },
+      "DesiredStatus": "RUNNING",
+      "KnownStatus": "RUNNING",
+      "Limits": {
+        "CPU": 0,
+        "Memory": 128
+      },
+      "CreatedAt": "2019-03-29T02:54:57.61447652Z",
+      "StartedAt": "2019-03-29T02:54:58.346799541Z",
+      "Type": "NORMAL",
+      "Networks": [
+        {
+          "NetworkMode": "awsvpc",
+          "IPv4Addresses": [
+            "10.0.10.32"
+          ]
+        }
+      ]
+    }
+  ],
+  "Limits": {
+    "CPU": 0.25,
+    "Memory": 256
+  },
+  "PullStartedAt": "2019-03-29T02:54:51.763717413Z",
+  "PullStoppedAt": "2019-03-29T02:54:58.303055973Z",
+  "AvailabilityZone": "ap-northeast-1a"
+}
