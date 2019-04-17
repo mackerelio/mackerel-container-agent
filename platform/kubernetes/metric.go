@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"k8s.io/apimachinery/pkg/api/resource"
+	kubeletTypes "k8s.io/kubernetes/pkg/kubelet/apis/stats/v1alpha1"
 
 	mackerel "github.com/mackerelio/mackerel-client-go"
 
@@ -17,7 +18,7 @@ type metricGenerator struct {
 	client       kubelet.Client
 	hostMemTotal *float64
 	hostNumCores *float64
-	prevStats    *kubelet.PodStats
+	prevStats    *kubeletTypes.PodStats
 	prevTime     time.Time
 }
 
@@ -107,7 +108,7 @@ func (g *metricGenerator) getCPULimit(container *kubelet.Container) float64 {
 	return limit
 }
 
-func calculateCPUMetrics(prev, curr *kubelet.ContainerStats, delta time.Duration) float64 {
+func calculateCPUMetrics(prev, curr *kubeletTypes.ContainerStats, delta time.Duration) float64 {
 	return float64(*curr.CPU.UsageCoreNanoSeconds-*prev.CPU.UsageCoreNanoSeconds) / float64(delta.Nanoseconds()) * 100
 }
 

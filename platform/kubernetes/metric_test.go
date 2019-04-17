@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	cadvisorTypes "github.com/google/cadvisor/info/v1"
+	kubeletTypes "k8s.io/kubernetes/pkg/kubelet/apis/stats/v1alpha1"
 
 	"github.com/mackerelio/mackerel-container-agent/metric"
 	"github.com/mackerelio/mackerel-container-agent/platform/kubernetes/kubelet"
@@ -32,12 +33,12 @@ func TestGenerateStats(t *testing.T) {
 			}
 			return nil, nil
 		}),
-		kubelet.MockGetPodStats(func(context.Context) (*kubelet.PodStats, error) {
+		kubelet.MockGetPodStats(func(context.Context) (*kubeletTypes.PodStats, error) {
 			raw, err := ioutil.ReadFile("kubelet/testdata/summary.json")
 			if err != nil {
 				return nil, err
 			}
-			var summary kubelet.Summary
+			var summary kubeletTypes.Summary
 			if err := json.Unmarshal(raw, &summary); err != nil {
 				return nil, err
 			}

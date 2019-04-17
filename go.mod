@@ -56,4 +56,5 @@ require (
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gotest.tools v2.2.0+incompatible // indirect
 	k8s.io/apimachinery v0.0.0-20190415132420-07d458fe0356
+	k8s.io/kubernetes v1.14.1
 )
