@@ -31,7 +31,7 @@ lint: lint-deps
 .PHONY: clean
 clean:
 	rm -fr build
-	GO111MODULE=off go clean
+	go clean ./...
 
 .PHONY: linux
 linux:
