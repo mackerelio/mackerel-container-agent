@@ -1,4 +1,7 @@
 # mackerel-container-agent
+
+![container-agent-si](docs/images/container-agent-si.png "mackerel-container-agent")
+
 This is a monitoring agent of [Mackerel](https://mackerel.io/) for containers on container orchestration platforms.
 Please use [mackerel-agent](https://github.com/mackerelio/mackerel-agent) for non-container environment.
 
