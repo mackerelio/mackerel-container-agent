@@ -94,7 +94,7 @@ func (p *kubernetesPlatform) GetCustomIdentifier(ctx context.Context) (string, e
 	if err != nil {
 		return "", err
 	}
-	return pod.Metadata.UID + ".kubernetes", nil
+	return string(pod.ObjectMeta.UID) + ".kubernetes", nil
 }
 
 // StatusRunning reports p status is running
@@ -104,7 +104,7 @@ func (p *kubernetesPlatform) StatusRunning(ctx context.Context) bool {
 		logger.Warningf("failed to get metadata: %s", err)
 		return false
 	}
-	return strings.EqualFold("running", meta.Status.Phase)
+	return strings.EqualFold("running", string(meta.Status.Phase))
 }
 
 func createHTTPClient(caCert []byte, insecureTLS bool) *http.Client {

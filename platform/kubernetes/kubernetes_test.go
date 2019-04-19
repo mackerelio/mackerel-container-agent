@@ -9,6 +9,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	kubernetesTypes "k8s.io/api/core/v1"
+
 	"github.com/mackerelio/mackerel-container-agent/platform/kubernetes/kubelet"
 )
 
@@ -31,9 +33,9 @@ func TestStatusRunning(t *testing.T) {
 		ctx := context.Background()
 		mockClient.ApplyOption(
 			kubelet.MockGetPod(
-				func(context.Context) (*kubelet.Pod, error) {
-					return &kubelet.Pod{
-						Status: kubelet.PodStatus{Phase: tc.status},
+				func(context.Context) (*kubernetesTypes.Pod, error) {
+					return &kubernetesTypes.Pod{
+						Status: kubernetesTypes.PodStatus{Phase: kubernetesTypes.PodPhase(tc.status)},
 					}, nil
 				},
 			),

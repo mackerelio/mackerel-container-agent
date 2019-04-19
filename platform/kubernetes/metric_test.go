@@ -7,6 +7,11 @@ import (
 	"reflect"
 	"testing"
 
+	cadvisorTypes "github.com/google/cadvisor/info/v1"
+	kubernetesTypes "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
+	kubeletTypes "k8s.io/kubernetes/pkg/kubelet/apis/stats/v1alpha1"
+
 	"github.com/mackerelio/mackerel-container-agent/metric"
 	"github.com/mackerelio/mackerel-container-agent/platform/kubernetes/kubelet"
 )
@@ -14,28 +19,28 @@ import (
 func TestGenerateStats(t *testing.T) {
 	ctx := context.Background()
 	client := kubelet.NewMockClient(
-		kubelet.MockGetPod(func(context.Context) (*kubelet.Pod, error) {
+		kubelet.MockGetPod(func(context.Context) (*kubernetesTypes.Pod, error) {
 			raw, err := ioutil.ReadFile("kubelet/testdata/pods.json")
 			if err != nil {
 				return nil, err
 			}
-			var podList kubelet.PodList
+			var podList kubernetesTypes.PodList
 			if err := json.Unmarshal(raw, &podList); err != nil {
 				return nil, err
 			}
 			for _, pod := range podList.Items {
-				if pod.Metadata.Namespace == "default" && pod.Metadata.Name == "myapp" {
-					return pod, nil
+				if pod.ObjectMeta.Namespace == "default" && pod.ObjectMeta.Name == "myapp" {
+					return &pod, nil
 				}
 			}
 			return nil, nil
 		}),
-		kubelet.MockGetPodStats(func(context.Context) (*kubelet.PodStats, error) {
+		kubelet.MockGetPodStats(func(context.Context) (*kubeletTypes.PodStats, error) {
 			raw, err := ioutil.ReadFile("kubelet/testdata/summary.json")
 			if err != nil {
 				return nil, err
 			}
-			var summary kubelet.Summary
+			var summary kubeletTypes.Summary
 			if err := json.Unmarshal(raw, &summary); err != nil {
 				return nil, err
 			}
@@ -46,12 +51,12 @@ func TestGenerateStats(t *testing.T) {
 			}
 			return nil, nil
 		}),
-		kubelet.MockGetSpec(func(context.Context) (*kubelet.MachineInfo, error) {
+		kubelet.MockGetSpec(func(context.Context) (*cadvisorTypes.MachineInfo, error) {
 			raw, err := ioutil.ReadFile("kubelet/testdata/spec.json")
 			if err != nil {
 				return nil, err
 			}
-			var info kubelet.MachineInfo
+			var info cadvisorTypes.MachineInfo
 			if err := json.Unmarshal(raw, &info); err != nil {
 				return nil, err
 			}
@@ -86,39 +91,35 @@ func TestGetMemoryLimit(t *testing.T) {
 	hostMemTotal := 2096058368.0
 	name := "dummy"
 	tests := []struct {
-		limit    kubelet.ResourceList
+		quantity string
 		expected float64
 	}{
 		{
-			nil,
+			"",
 			hostMemTotal,
 		},
 		{
-			kubelet.ResourceList{},
-			hostMemTotal,
-		},
-		{
-			kubelet.ResourceList{"memory": "134217728"},
+			"134217728",
 			134217728.0,
 		},
 		{
-			kubelet.ResourceList{"memory": "128e6"},
+			"128e6",
 			128000000.0,
 		},
 		{
-			kubelet.ResourceList{"memory": "128M"},
+			"128M",
 			128000000.0,
 		},
 		{
-			kubelet.ResourceList{"memory": "128Mi"},
+			"128Mi",
 			134217728.0,
 		},
 		{
-			kubelet.ResourceList{"memory": "1G"},
+			"1G",
 			1000000000.0,
 		},
 		{
-			kubelet.ResourceList{"memory": "1Gi"},
+			"1Gi",
 			1073741824.0,
 		},
 	}
@@ -126,10 +127,12 @@ func TestGetMemoryLimit(t *testing.T) {
 		hostMemTotal: &hostMemTotal,
 	}
 	for _, tc := range tests {
-		container := kubelet.Container{
+		q, _ := resource.ParseQuantity(tc.quantity)
+		rn := kubernetesTypes.ResourceName("memory")
+		container := kubernetesTypes.Container{
 			Name: name,
-			Resources: kubelet.ResourceRequirements{
-				Limits: tc.limit,
+			Resources: kubernetesTypes.ResourceRequirements{
+				Limits: kubernetesTypes.ResourceList{rn: q},
 			},
 		}
 		got := g.getMermoryLimit(&container)

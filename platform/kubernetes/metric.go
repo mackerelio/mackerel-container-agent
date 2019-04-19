@@ -5,7 +5,8 @@ import (
 	"strconv"
 	"time"
 
-	"k8s.io/apimachinery/pkg/api/resource"
+	kubernetesTypes "k8s.io/api/core/v1"
+	kubeletTypes "k8s.io/kubernetes/pkg/kubelet/apis/stats/v1alpha1"
 
 	mackerel "github.com/mackerelio/mackerel-client-go"
 
@@ -17,7 +18,7 @@ type metricGenerator struct {
 	client       kubelet.Client
 	hostMemTotal *float64
 	hostNumCores *float64
-	prevStats    *kubelet.PodStats
+	prevStats    *kubeletTypes.PodStats
 	prevTime     time.Time
 }
 
@@ -84,21 +85,19 @@ func (g *metricGenerator) Generate(ctx context.Context) (metric.Values, error) {
 	return metrics, nil
 }
 
-func (g *metricGenerator) getMermoryLimit(container *kubelet.Container) float64 {
+func (g *metricGenerator) getMermoryLimit(container *kubernetesTypes.Container) float64 {
 	limit := *g.hostMemTotal
-	if v, ok := container.Resources.Limits["memory"]; ok {
-		q, _ := resource.ParseQuantity(v)
-		i, _ := q.AsInt64()
+	if v, ok := container.Resources.Limits["memory"]; ok && v.Format != "" {
+		i, _ := v.AsInt64()
 		limit = float64(i)
 	}
 	return limit
 }
 
-func (g *metricGenerator) getCPULimit(container *kubelet.Container) float64 {
+func (g *metricGenerator) getCPULimit(container *kubernetesTypes.Container) float64 {
 	limit := *g.hostNumCores * 100
 	if v, ok := container.Resources.Limits["cpu"]; ok {
-		q, _ := resource.ParseQuantity(v)
-		if d := q.AsDec(); d != nil {
+		if d := v.AsDec(); d != nil {
 			if v, err := strconv.ParseFloat(d.String(), 64); err == nil {
 				limit = v * 100
 			}
@@ -107,7 +106,7 @@ func (g *metricGenerator) getCPULimit(container *kubelet.Container) float64 {
 	return limit
 }
 
-func calculateCPUMetrics(prev, curr *kubelet.ContainerStats, delta time.Duration) float64 {
+func calculateCPUMetrics(prev, curr *kubeletTypes.ContainerStats, delta time.Duration) float64 {
 	return float64(*curr.CPU.UsageCoreNanoSeconds-*prev.CPU.UsageCoreNanoSeconds) / float64(delta.Nanoseconds()) * 100
 }
 

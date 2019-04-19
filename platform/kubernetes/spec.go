@@ -89,21 +89,21 @@ func (g *specGenerator) Generate(ctx context.Context) (interface{}, error) {
 	}
 
 	var spec = &podSpec{
-		ClusterName:    p.Metadata.ClusterName,
-		Namespace:      p.Metadata.Namespace,
-		Name:           p.Metadata.Name,
-		UID:            p.Metadata.UID,
-		ResouceVersion: p.Metadata.ResouceVersion,
-		Labels:         p.Metadata.Labels,
+		ClusterName:    p.ObjectMeta.ClusterName,
+		Namespace:      p.ObjectMeta.Namespace,
+		Name:           p.ObjectMeta.Name,
+		UID:            string(p.ObjectMeta.UID),
+		ResouceVersion: p.ObjectMeta.ResourceVersion,
+		Labels:         p.ObjectMeta.Labels,
 	}
-	if p.Metadata.OwnerReferences != nil {
-		ownerRefs := make([]ownerReference, len(p.Metadata.OwnerReferences))
+	if p.ObjectMeta.OwnerReferences != nil {
+		ownerRefs := make([]ownerReference, len(p.ObjectMeta.OwnerReferences))
 		spec.OwnerReferences = ownerRefs
-		for i, r := range p.Metadata.OwnerReferences {
+		for i, r := range p.ObjectMeta.OwnerReferences {
 			ownerRefs[i] = ownerReference{
 				Kind: r.Kind,
 				Name: r.Name,
-				UID:  r.UID,
+				UID:  string(r.UID),
 			}
 		}
 	}
@@ -123,7 +123,11 @@ func (g *specGenerator) Generate(ctx context.Context) (interface{}, error) {
 			}
 
 			if limits := c.Resources.Limits; limits != nil {
-				containerSpec.Resources.Limits = resourceList(limits)
+				rl := resourceList{}
+				for k, v := range limits {
+					rl[string(k)] = v.String()
+				}
+				containerSpec.Resources.Limits = rl
 			}
 
 			if c.Ports != nil {
@@ -131,10 +135,10 @@ func (g *specGenerator) Generate(ctx context.Context) (interface{}, error) {
 				containerSpec.Ports = ports
 				for j, p := range c.Ports {
 					ports[j] = containerPort{
-						ContainerPort: p.ContainerPort,
-						HostPort:      p.HostPort,
+						ContainerPort: int(p.ContainerPort),
+						HostPort:      int(p.HostPort),
 						Name:          p.Name,
-						Protocol:      p.Protocol,
+						Protocol:      string(p.Protocol),
 						HostIP:        p.HostIP,
 					}
 				}
@@ -151,17 +155,17 @@ func (g *specGenerator) Generate(ctx context.Context) (interface{}, error) {
 		}
 	}
 
-	spec.Phase = p.Status.Phase
+	spec.Phase = string(p.Status.Phase)
 	spec.HostIP = p.Status.HostIP
 	spec.PodIP = p.Status.PodIP
-	spec.StartTime = p.Status.StartTime
+	spec.StartTime = &p.Status.StartTime.Time
 	if p.Status.Conditions != nil {
 		conds := make([]podCondition, len(p.Status.Conditions))
 		spec.Conditions = conds
 		for i, c := range p.Status.Conditions {
 			conds[i] = podCondition{
-				Status: c.Status,
-				Type:   c.Type,
+				Status: string(c.Status),
+				Type:   string(c.Type),
 			}
 		}
 	}

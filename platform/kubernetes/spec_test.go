@@ -8,6 +8,8 @@ import (
 	"testing"
 	"time"
 
+	kubernetesTypes "k8s.io/api/core/v1"
+
 	mackerel "github.com/mackerelio/mackerel-client-go"
 
 	"github.com/mackerelio/mackerel-container-agent/platform"
@@ -17,18 +19,18 @@ import (
 
 func TestGenerateSpec(t *testing.T) {
 	client := kubelet.NewMockClient(
-		kubelet.MockGetPod(func(context.Context) (*kubelet.Pod, error) {
+		kubelet.MockGetPod(func(context.Context) (*kubernetesTypes.Pod, error) {
 			raw, err := ioutil.ReadFile("kubelet/testdata/pods.json")
 			if err != nil {
 				return nil, err
 			}
-			var podList kubelet.PodList
+			var podList kubernetesTypes.PodList
 			if err := json.Unmarshal(raw, &podList); err != nil {
 				return nil, err
 			}
 			for _, pod := range podList.Items {
-				if pod.Metadata.Namespace == "default" && pod.Metadata.Name == "myapp" {
-					return pod, nil
+				if pod.ObjectMeta.Namespace == "default" && pod.ObjectMeta.Name == "myapp" {
+					return &pod, nil
 				}
 			}
 			return nil, nil
@@ -111,7 +113,7 @@ func TestGenerateSpec(t *testing.T) {
 						Status: "True",
 					},
 				},
-				StartTime: func() *time.Time { t, _ := time.Parse(time.RFC3339Nano, "2018-07-30T07:19:40Z"); return &t }(),
+				StartTime: func() *time.Time { t, _ := time.Parse(time.RFC3339, "2018-07-30T07:19:40Z"); t = t.Local(); return &t }(),
 			},
 		},
 		Hostname: "myapp",
