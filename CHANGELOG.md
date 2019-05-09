@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.0.4 (2019-05-09)
+
+* Use k8s packages #19 (hayajo)
+* Add banner image #20 (hayajo)
+* Support Task Metadata Endpoint v3 #17 (hayajo)
+* Support Go Modules #18 (hayajo)
+
+
 ## 0.0.3 (2019-04-04)
 
 * Improve getting TaskID #15 (hayajo)
