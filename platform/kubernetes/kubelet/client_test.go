@@ -2,8 +2,11 @@ package kubelet
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
+	"path"
 	"regexp"
 	"testing"
 )
@@ -227,5 +230,47 @@ func TestRequestToken(t *testing.T) {
 	_, err = c.GetSpec(ctx)
 	if err != nil {
 		t.Errorf("newRequest() should not raise error: %v", err)
+	}
+}
+
+func TestErrorMessage(t *testing.T) {
+	var body string
+
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(body))
+	})
+	ts := httptest.NewServer(handler)
+
+	c, err := NewClient(ts.Client(), "", ts.URL, "", "", nil)
+	if err != nil {
+		t.Errorf("should not raise error: %v", err)
+	}
+
+	tests := []struct {
+		body string
+	}{
+		{"Bad Request"},
+		{"Bad\nRequest"},
+	}
+
+	for _, tc := range tests {
+		body = tc.body
+
+		ctx := context.Background()
+
+		_, err = c.GetPod(ctx)
+		if err == nil {
+			t.Errorf("should raise error")
+		}
+
+		u, _ := url.Parse(ts.URL)
+		u.Path = path.Join(u.Path, podsPath)
+		expected := fmt.Sprintf("got status code %d (url: %s, body: %q)", http.StatusBadRequest, u, tc.body)
+
+		got := err.Error()
+		if got != expected {
+			t.Errorf("error message expected %q, got %q", expected, got)
+		}
 	}
 }
