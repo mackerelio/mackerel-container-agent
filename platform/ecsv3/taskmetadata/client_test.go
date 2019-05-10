@@ -2,8 +2,11 @@ package taskmetadata
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
+	"path"
 	"regexp"
 	"testing"
 )
@@ -120,4 +123,46 @@ func TestIgnoreContainer(t *testing.T) {
 		}
 	}
 
+}
+
+func TestErrorMessage(t *testing.T) {
+	var body string
+
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(body))
+	})
+	ts := httptest.NewServer(handler)
+
+	c, err := NewClient(ts.URL, nil)
+	if err != nil {
+		t.Errorf("should not raise error: %v", err)
+	}
+
+	tests := []struct {
+		body string
+	}{
+		{"Bad Request"},
+		{"Bad\nRequest"},
+	}
+
+	for _, tc := range tests {
+		body = tc.body
+
+		ctx := context.Background()
+
+		_, err = c.GetTaskMetadata(ctx)
+		if err == nil {
+			t.Errorf("should raise error")
+		}
+
+		u, _ := url.Parse(ts.URL)
+		u.Path = path.Join(u.Path, metadataPath)
+		expected := fmt.Sprintf("got status code %d (url: %s, body: %q)", http.StatusBadRequest, u, tc.body)
+
+		got := err.Error()
+		if got != expected {
+			t.Errorf("error message expected %q, got %q", expected, got)
+		}
+	}
 }
