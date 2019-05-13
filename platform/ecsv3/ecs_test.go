@@ -1,10 +1,15 @@
 package ecsv3
 
 import (
+	"context"
+	"errors"
 	"testing"
+	"time"
 
 	"github.com/aws/amazon-ecs-agent/agent/containermetadata"
 	ecsTypes "github.com/aws/amazon-ecs-agent/agent/handlers/v2"
+
+	"github.com/mackerelio/mackerel-container-agent/platform/ecsv3/internal"
 )
 
 func TestIsRunning(t *testing.T) {
@@ -148,4 +153,36 @@ func TestDetectNetworkMode(t *testing.T) {
 		}
 	}
 
+}
+
+func TestGetTaskMetadata(t *testing.T) {
+	ctx := context.Background()
+	interval := 200 * time.Millisecond
+
+	var callCount int
+	mock := internal.NewMockTaskMetadataGetter(
+		internal.MockGetTaskMetadata(
+			func(ctx context.Context) (*ecsTypes.TaskResponse, error) {
+				callCount++
+				return nil, errors.New("/task api error")
+			},
+		),
+	)
+
+	go func() {
+		time.Sleep(700 * time.Millisecond)
+		mock.ApplyOption(
+			internal.MockGetTaskMetadata(
+				func(ctx context.Context) (*ecsTypes.TaskResponse, error) {
+					return &ecsTypes.TaskResponse{}, nil
+				},
+			),
+		)
+	}()
+
+	getTaskMetadata(ctx, mock, interval)
+
+	if expected := 4; callCount != expected {
+		t.Errorf("GetTaskMetadata() expected calls %d times, but calls %d times", expected, callCount)
+	}
 }
