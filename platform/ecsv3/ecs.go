@@ -59,7 +59,10 @@ func NewECSPlatform(ctx context.Context, metadataURI string, executionEnv string
 		return nil, err
 	}
 
-	meta := getTaskMetadata(ctx, c, taskMetadataWaitForReadyInterval)
+	meta, err := getTaskMetadata(ctx, c, taskMetadataWaitForReadyInterval)
+	if err != nil {
+		return nil, err
+	}
 
 	nm, err := detectNetworkMode(meta)
 	if err != nil {
@@ -145,28 +148,21 @@ func detectNetworkMode(meta *ecsTypes.TaskResponse) (networkMode, error) {
 	}
 }
 
-func getTaskMetadata(ctx context.Context, client TaskMetadataGetter, interval time.Duration) *ecsTypes.TaskResponse {
-	var meta *ecsTypes.TaskResponse
-	var duration time.Duration
-
-loop:
+func getTaskMetadata(ctx context.Context, client TaskMetadataGetter, interval time.Duration) (*ecsTypes.TaskResponse, error) {
+	// Retry until GetTaskMetadata succeeds.
 	for {
+		meta, err := client.GetTaskMetadata(ctx)
+		if err == nil {
+			return meta, nil
+		}
+
+		logger.Infof("wait for the task API to be ready: %q", err)
+
 		select {
-		case <-time.After(duration):
-			var err error
-			meta, err = client.GetTaskMetadata(ctx)
-			if err != nil {
-				if duration == 0 {
-					duration = interval
-				}
-				logger.Infof("wait for the task API to be ready: %q", err)
-				continue
-			}
-			break loop
+		case <-time.After(interval):
+			continue
 		case <-ctx.Done():
-			return nil
+			return nil, ctx.Err()
 		}
 	}
-
-	return meta
 }
