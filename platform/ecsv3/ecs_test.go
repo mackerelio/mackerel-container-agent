@@ -156,33 +156,66 @@ func TestDetectNetworkMode(t *testing.T) {
 }
 
 func TestGetTaskMetadata(t *testing.T) {
-	ctx := context.Background()
+	ctx, cancel := context.WithCancel(context.Background())
 	interval := 200 * time.Millisecond
 
-	var callCount int
-	mock := internal.NewMockTaskMetadataGetter(
-		internal.MockGetTaskMetadata(
-			func(ctx context.Context) (*ecsTypes.TaskResponse, error) {
-				callCount++
-				return nil, errors.New("/task api error")
-			},
-		),
-	)
-
-	go func() {
-		time.Sleep(700 * time.Millisecond)
-		mock.ApplyOption(
-			internal.MockGetTaskMetadata(
+	tests := []struct {
+		after            time.Duration
+		callback         internal.MockTaskMetadataGetterOption
+		expectCallCount  int
+		expectRaiseError bool
+	}{
+		{
+			after: 700 * time.Millisecond,
+			callback: internal.MockGetTaskMetadata(
 				func(ctx context.Context) (*ecsTypes.TaskResponse, error) {
 					return &ecsTypes.TaskResponse{}, nil
 				},
 			),
+			expectCallCount:  4,
+			expectRaiseError: false,
+		},
+		{
+			after: 700 * time.Millisecond,
+			callback: internal.MockGetTaskMetadata(
+				func(ctx context.Context) (*ecsTypes.TaskResponse, error) {
+					cancel()
+					return nil, errors.New("/task api already canceled")
+				},
+			),
+			expectCallCount:  4,
+			expectRaiseError: true,
+		},
+	}
+
+	for _, tc := range tests {
+		var callCount int
+		mock := internal.NewMockTaskMetadataGetter(
+			internal.MockGetTaskMetadata(
+				func(ctx context.Context) (*ecsTypes.TaskResponse, error) {
+					callCount++
+					return nil, errors.New("/task api error")
+				},
+			),
 		)
-	}()
 
-	getTaskMetadata(ctx, mock, interval)
+		go func() {
+			time.Sleep(tc.after)
+			mock.ApplyOption(tc.callback)
+		}()
 
-	if expected := 4; callCount != expected {
-		t.Errorf("GetTaskMetadata() expected calls %d times, but calls %d times", expected, callCount)
+		_, err := getTaskMetadata(ctx, mock, interval)
+
+		if callCount != tc.expectCallCount {
+			t.Errorf("GetTaskMetadata() expected calls %d times, but calls %d times", tc.expectCallCount, callCount)
+		}
+
+		if (err != nil) != tc.expectRaiseError {
+			var not string
+			if !tc.expectRaiseError {
+				not = " not"
+			}
+			t.Errorf("GetTaskMetadata() should%s raise error: %v", not, err)
+		}
 	}
 }
