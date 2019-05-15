@@ -7,26 +7,9 @@ import (
 	"testing"
 
 	ecsTypes "github.com/aws/amazon-ecs-agent/agent/handlers/v2"
-
+	"github.com/mackerelio/mackerel-container-agent/platform/ecsv3/internal"
 	agentSpec "github.com/mackerelio/mackerel-container-agent/spec"
 )
-
-type mockTaskMetadataGetter struct {
-	path string
-}
-
-func (m *mockTaskMetadataGetter) GetTaskMetadata(ctx context.Context) (*ecsTypes.TaskResponse, error) {
-	f, err := os.Open(m.path)
-	if err != nil {
-		return nil, err
-	}
-	defer f.Close()
-	var res ecsTypes.TaskResponse
-	if err := json.NewDecoder(f).Decode(&res); err != nil {
-		return nil, err
-	}
-	return &res, nil
-}
 
 func TestGenerateSpec(t *testing.T) {
 	tests := []struct {
@@ -39,11 +22,29 @@ func TestGenerateSpec(t *testing.T) {
 		{"taskmetadata/testdata/metadata_fargate.json", fargateProvider},
 	}
 
-	mock := &mockTaskMetadataGetter{}
+	var path string
+	mock := internal.NewMockTaskMetadataGetter(
+		internal.MockGetTaskMetadata(
+			func(ctx context.Context) (*ecsTypes.TaskResponse, error) {
+				f, err := os.Open(path)
+				if err != nil {
+					return nil, err
+				}
+				defer f.Close()
+				var res ecsTypes.TaskResponse
+				if err := json.NewDecoder(f).Decode(&res); err != nil {
+					return nil, err
+				}
+				return &res, nil
+			},
+		),
+	)
+
 	ctx := context.Background()
 
 	for _, tc := range tests {
-		mock.path = tc.path
+		path = tc.path
+
 		g := newSpecGenerator(mock, tc.provider)
 
 		spec, err := g.Generate(ctx)

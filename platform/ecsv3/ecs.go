@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"regexp"
+	"time"
 
 	ecsTypes "github.com/aws/amazon-ecs-agent/agent/handlers/v2"
 
@@ -21,7 +22,10 @@ const (
 	executionEnvEC2     = "AWS_ECS_EC2"
 )
 
-var logger = logging.GetLogger("ecs")
+var (
+	logger                           = logging.GetLogger("ecs")
+	taskMetadataWaitForReadyInterval = 3 * time.Second
+)
 
 // TaskMetadataEndpointClient interface gets task metadata and task stats
 type TaskMetadataEndpointClient interface {
@@ -55,7 +59,7 @@ func NewECSPlatform(ctx context.Context, metadataURI string, executionEnv string
 		return nil, err
 	}
 
-	meta, err := c.GetTaskMetadata(ctx)
+	meta, err := getTaskMetadata(ctx, c, taskMetadataWaitForReadyInterval)
 	if err != nil {
 		return nil, err
 	}
@@ -141,5 +145,25 @@ func detectNetworkMode(meta *ecsTypes.TaskResponse) (networkMode, error) {
 		return awsvpcNetworkMode, nil
 	default:
 		return "", fmt.Errorf("unsupported NetworkMode: %v", nm)
+	}
+}
+
+func getTaskMetadata(ctx context.Context, client TaskMetadataGetter, interval time.Duration) (*ecsTypes.TaskResponse, error) {
+	// GetTaskMetadata will return an error until all containers associated with the task have been created.
+	// To avoid exiting with this error, retry until GetTaskMetadata succeeds.
+	for {
+		meta, err := client.GetTaskMetadata(ctx)
+		if err == nil {
+			return meta, nil
+		}
+
+		logger.Infof("wait for the task API to be ready: %q", err)
+
+		select {
+		case <-time.After(interval):
+			continue
+		case <-ctx.Done():
+			return nil, ctx.Err()
+		}
 	}
 }

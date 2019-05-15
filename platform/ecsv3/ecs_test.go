@@ -1,10 +1,15 @@
 package ecsv3
 
 import (
+	"context"
+	"errors"
 	"testing"
+	"time"
 
 	"github.com/aws/amazon-ecs-agent/agent/containermetadata"
 	ecsTypes "github.com/aws/amazon-ecs-agent/agent/handlers/v2"
+
+	"github.com/mackerelio/mackerel-container-agent/platform/ecsv3/internal"
 )
 
 func TestIsRunning(t *testing.T) {
@@ -148,4 +153,69 @@ func TestDetectNetworkMode(t *testing.T) {
 		}
 	}
 
+}
+
+func TestGetTaskMetadata(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	interval := 200 * time.Millisecond
+
+	tests := []struct {
+		after            time.Duration
+		callback         internal.MockTaskMetadataGetterOption
+		expectCallCount  int
+		expectRaiseError bool
+	}{
+		{
+			after: 700 * time.Millisecond,
+			callback: internal.MockGetTaskMetadata(
+				func(ctx context.Context) (*ecsTypes.TaskResponse, error) {
+					return &ecsTypes.TaskResponse{}, nil
+				},
+			),
+			expectCallCount:  4,
+			expectRaiseError: false,
+		},
+		{
+			after: 700 * time.Millisecond,
+			callback: internal.MockGetTaskMetadata(
+				func(ctx context.Context) (*ecsTypes.TaskResponse, error) {
+					cancel()
+					return nil, errors.New("/task api already canceled")
+				},
+			),
+			expectCallCount:  4,
+			expectRaiseError: true,
+		},
+	}
+
+	for _, tc := range tests {
+		var callCount int
+		mock := internal.NewMockTaskMetadataGetter(
+			internal.MockGetTaskMetadata(
+				func(ctx context.Context) (*ecsTypes.TaskResponse, error) {
+					callCount++
+					return nil, errors.New("/task api error")
+				},
+			),
+		)
+
+		go func() {
+			time.Sleep(tc.after)
+			mock.ApplyOption(tc.callback)
+		}()
+
+		_, err := getTaskMetadata(ctx, mock, interval)
+
+		if callCount != tc.expectCallCount {
+			t.Errorf("GetTaskMetadata() expected calls %d times, but calls %d times", tc.expectCallCount, callCount)
+		}
+
+		if (err != nil) != tc.expectRaiseError {
+			var not string
+			if !tc.expectRaiseError {
+				not = " not"
+			}
+			t.Errorf("GetTaskMetadata() should%s raise error: %v", not, err)
+		}
+	}
 }
