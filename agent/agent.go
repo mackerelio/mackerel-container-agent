@@ -50,6 +50,9 @@ func (a *agent) Run(_ []string) error {
 }
 
 func (a *agent) start(ctx context.Context) error {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
 	conf, err := config.Load(os.Getenv("MACKEREL_AGENT_CONFIG"))
 	if err != nil {
 		return err
@@ -67,6 +70,23 @@ func (a *agent) start(ctx context.Context) error {
 	if conf.ReadinessProbe != nil && conf.ReadinessProbe.HTTP != nil {
 		conf.ReadinessProbe.HTTP.UserAgent = client.UserAgent
 	}
+
+	sigCh := make(chan os.Signal, 1)
+	signal.Notify(sigCh, os.Interrupt, syscall.SIGTERM, syscall.SIGQUIT)
+	defer signal.Stop(sigCh)
+	var sig os.Signal
+	go func() {
+		select {
+		case sig = <-sigCh:
+			cancel()
+		case <-ctx.Done():
+		}
+	}()
+	defer func() {
+		if sig != nil {
+			logger.Infof("stop the agent: signal = %s", sig)
+		}
+	}()
 
 	pform, err := NewPlatform(ctx, conf.IgnoreContainer.Regexp)
 	if err != nil {
@@ -95,9 +115,5 @@ func (a *agent) start(ctx context.Context) error {
 		WithVersion(a.version, a.revision).
 		WithCustomIdentifier(customIdentifier)
 
-	sigCh := make(chan os.Signal, 1)
-	signal.Notify(sigCh, os.Interrupt, syscall.SIGTERM, syscall.SIGQUIT)
-	defer signal.Stop(sigCh)
-
-	return run(ctx, client, metricManager, checkManager, specManager, pform, conf, sigCh)
+	return run(ctx, client, metricManager, checkManager, specManager, pform, conf)
 }

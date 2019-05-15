@@ -2,7 +2,6 @@ package agent
 
 import (
 	"context"
-	"os"
 	"time"
 
 	"github.com/Songmu/retry"
@@ -34,13 +33,9 @@ func run(
 	specManager *spec.Manager,
 	pform platform.Platform,
 	conf *config.Config,
-	sigCh <-chan os.Signal,
 ) error {
 	specManager.SetChecks(checkManager.Configs())
-
-	ctx, cancel := context.WithCancel(ctx)
 	eg, ctx := errgroup.WithContext(ctx)
-	defer cancel()
 
 	hostResolver := newHostResolver(client, conf.Root)
 	eg.Go(func() error {
@@ -114,17 +109,6 @@ func run(
 		}
 	})
 
-	var sig os.Signal
-	eg.Go(func() error {
-		select {
-		case sig = <-sigCh:
-			cancel()
-			return nil
-		case <-ctx.Done():
-		}
-		return nil
-	})
-
 	eg.Go(func() error {
 		return metricManager.Run(ctx, metricsInterval)
 	})
@@ -142,8 +126,5 @@ func run(
 		logger.Warningf("failed to retire: %s", err)
 	}
 
-	if sig != nil {
-		logger.Infof("stop the agent: signal = %s", sig)
-	}
 	return err
 }
