@@ -149,7 +149,8 @@ func detectNetworkMode(meta *ecsTypes.TaskResponse) (networkMode, error) {
 }
 
 func getTaskMetadata(ctx context.Context, client TaskMetadataGetter, interval time.Duration) (*ecsTypes.TaskResponse, error) {
-	// Retry until GetTaskMetadata succeeds.
+	// GetTaskMetadata will return an error until all containers associated with the task have been created.
+	// To avoid exiting with this error, retry until GetTaskMetadata succeeds.
 	for {
 		meta, err := client.GetTaskMetadata(ctx)
 		if err == nil {
