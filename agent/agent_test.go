@@ -119,7 +119,7 @@ func TestAgentRun_RetryMetricPost(t *testing.T) {
 	checkManager := check.NewManager(createMockCheckGenerators(), client)
 	specManager := spec.NewManager(createMockSpecGenerators(), client)
 
-	err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf, make(chan os.Signal, 1))
+	err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf)
 	if err != nil {
 		t.Errorf("err should be nil but got: %+v", err)
 	}
@@ -173,7 +173,7 @@ func TestAgentRun_ResolveHostIdLazy(t *testing.T) {
 	checkManager := check.NewManager(createMockCheckGenerators(), client)
 	specManager := spec.NewManager(createMockSpecGenerators(), client)
 
-	err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf, make(chan os.Signal, 1))
+	err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf)
 	if err != nil {
 		t.Errorf("err should be nil but got: %+v", err)
 	}
@@ -215,7 +215,7 @@ func TestAgentRun_NoRetryBadRequest(t *testing.T) {
 	checkManager := check.NewManager(createMockCheckGenerators(), client)
 	specManager := spec.NewManager(createMockSpecGenerators(), client)
 
-	err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf, make(chan os.Signal, 1))
+	err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf)
 	if err == nil {
 		t.Errorf("err should not be nil but got: %+v", err)
 	}
@@ -250,12 +250,11 @@ func TestAgentRun_AutoRetirement(t *testing.T) {
 	checkManager := check.NewManager(createMockCheckGenerators(), client)
 	specManager := spec.NewManager(createMockSpecGenerators(), client)
 
-	sigCh := make(chan os.Signal, 1)
 	go func() {
 		time.Sleep(200 * time.Millisecond)
-		sigCh <- os.Interrupt
+		cancel()
 	}()
-	err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf, sigCh)
+	err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf)
 	if err != nil {
 		t.Errorf("err should be nil but got: %+v", err)
 	}
@@ -297,12 +296,11 @@ func TestAgentRun_AutoRetirement_Retry(t *testing.T) {
 	checkManager := check.NewManager(createMockCheckGenerators(), client)
 	specManager := spec.NewManager(createMockSpecGenerators(), client)
 
-	sigCh := make(chan os.Signal, 1)
 	go func() {
 		time.Sleep(200 * time.Millisecond)
-		sigCh <- os.Interrupt
+		cancel()
 	}()
-	err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf, sigCh)
+	err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf)
 	if err != nil {
 		t.Errorf("err should be nil but got: %+v", err)
 	}
@@ -335,12 +333,11 @@ func TestAgentRun_AutoRetirement_HostIDError(t *testing.T) {
 	checkManager := check.NewManager(createMockCheckGenerators(), client)
 	specManager := spec.NewManager(createMockSpecGenerators(), client)
 
-	sigCh := make(chan os.Signal, 1)
 	go func() {
 		time.Sleep(200 * time.Millisecond)
-		sigCh <- os.Interrupt
+		cancel()
 	}()
-	err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf, sigCh)
+	err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf)
 	if err != nil {
 		t.Errorf("err should be nil but got: %+v", err)
 	}
@@ -386,7 +383,7 @@ func TestAgentRun_MetricPlugin(t *testing.T) {
 	checkManager := check.NewManager(nil, client)
 	specManager := spec.NewManager(createMockSpecGenerators(), client)
 
-	err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf, make(chan os.Signal, 1))
+	err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf)
 	if err != nil {
 		t.Errorf("err should be nil but got: %+v", err)
 	}
@@ -437,7 +434,7 @@ func TestAgentRun_CustomIdentifier(t *testing.T) {
 	checkManager := check.NewManager(createMockCheckGenerators(), client)
 	specManager := spec.NewManager(createMockSpecGenerators(), client).WithCustomIdentifier(customIdentifier)
 
-	err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf, make(chan os.Signal, 1))
+	err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf)
 	if err != nil {
 		t.Errorf("err should be nil but got: %+v", err)
 	}
@@ -481,7 +478,7 @@ func TestAgentRun_CustomIdentifier_CreateHost(t *testing.T) {
 	checkManager := check.NewManager(createMockCheckGenerators(), client)
 	specManager := spec.NewManager(createMockSpecGenerators(), client).WithCustomIdentifier(customIdentifier)
 
-	err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf, make(chan os.Signal, 1))
+	err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf)
 	if err != nil {
 		t.Errorf("err should be nil but got: %+v", err)
 	}
@@ -548,7 +545,7 @@ func TestAgentRun_StatusRunning(t *testing.T) {
 	checkManager := check.NewManager(createMockCheckGenerators(), client)
 	specManager := spec.NewManager([]spec.Generator{&mockSpecGeneratorStatus{pform}}, client)
 
-	err := run(ctx, client, metricManager, checkManager, specManager, pform, conf, make(chan os.Signal, 1))
+	err := run(ctx, client, metricManager, checkManager, specManager, pform, conf)
 	if err != nil {
 		t.Errorf("err should be nil but got: %+v", err)
 	}
@@ -584,7 +581,7 @@ func TestAgentRun_ReadinessProbe(t *testing.T) {
 	metricManager := metric.NewManager(createMockMetricGenerators(), client)
 	checkManager := check.NewManager(createMockCheckGenerators(), client)
 	specManager := spec.NewManager(createMockSpecGenerators(), client)
-	err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf, make(chan os.Signal, 1))
+	err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf)
 	if err != nil {
 		t.Errorf("err should be nil but got: %+v", err)
 	}
@@ -615,7 +612,7 @@ func TestAgentRun_ReadinessProbe_SleepLong(t *testing.T) {
 	metricManager := metric.NewManager(createMockMetricGenerators(), client)
 	checkManager := check.NewManager(createMockCheckGenerators(), client)
 	specManager := spec.NewManager(createMockSpecGenerators(), client)
-	err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf, make(chan os.Signal, 1))
+	err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf)
 	if err != nil {
 		t.Errorf("err should be nil but got: %+v", err)
 	}
@@ -648,7 +645,7 @@ func TestAgentRun_HostStatusOnStart(t *testing.T) {
 	metricManager := metric.NewManager(createMockMetricGenerators(), client)
 	checkManager := check.NewManager(createMockCheckGenerators(), client)
 	specManager := spec.NewManager(createMockSpecGenerators(), client)
-	err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf, make(chan os.Signal, 1))
+	err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf)
 	if err != nil {
 		t.Errorf("err should be nil but got: %+v", err)
 	}
