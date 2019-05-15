@@ -1,0 +1,23 @@
+#!/bin/bash
+
+set -e
+
+DOCKER_REPOSITORY=${DOCKER_REPOSITORY:-"mackerel/mackerel-container-agent"}
+DOCKER_USER=${DOCKER_USER:-$(read -r -p "Docker Hub User: " __user && echo -n "${__user}")}
+DOCKER_IMAGE_TAG=${DOCKER_IMAGE_TAG:-"v$(make --silent version)-$(git branch --contains | awk '{print $2}')"}
+
+if [[ "${DOCKER_IMAGE_TAG}" == "latest" || "${DOCKER_IMAGE_TAG}" =~ ^v[0-9]+[.][0-9]+[.][0-9]+-alpha$ ]]; then
+  echo "tag \"${DOCKER_IMAGE_TAG}\" is not allowed"
+  exit 1
+fi
+
+image="${DOCKER_REPOSITORY}:${DOCKER_IMAGE_TAG}"
+
+read -r -p "Docker Hub Password [${DOCKER_USER}]: " -s passwd
+echo -n "${passwd}" | docker login --username "${DOCKER_USER}" --password-stdin
+
+make linux
+
+set -x
+docker build -t "${image}" .
+docker push "${image}"
