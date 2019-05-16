@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.0.4 (2019-05-16)
+
+* add build-and-push-dockerimage script for pushing Docker Image manually #26 (hayajo)
+* notify interrupt signals before creating platform #25 (itchyny)
+* retry request to the "/task" API #24 (hayajo)
+* Improve error message #22 (hayajo)
+* Use k8s packages #19 (hayajo)
+* Add banner image #20 (hayajo)
+* Support Task Metadata Endpoint v3 #17 (hayajo)
+* Support Go Modules #18 (hayajo)
+
+
 ## 0.0.3 (2019-04-04)
 
 * Improve getting TaskID #15 (hayajo)
