@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"path"
 	"testing"
 )
@@ -33,5 +34,29 @@ func TestGetLocalIPv4(t *testing.T) {
 	}
 	if addr != "10.0.1.100" {
 		t.Errorf("GetLocalIPv4() expected 10.0.1.100, got %s", addr)
+	}
+}
+
+func TestNoProxy(t *testing.T) {
+	var useProxy bool
+
+	dt := http.DefaultTransport.(*http.Transport)
+	origProxy := dt.Proxy
+	defer func() {
+		dt.Proxy = origProxy
+	}()
+	dt.Proxy = func(req *http.Request) (*url.URL, error) {
+		useProxy = true
+		return nil, nil
+	}
+
+	th := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {})
+	ts := httptest.NewServer(th)
+
+	c, _ := NewClient(ts.URL)
+	c.GetLocalIPv4(context.Background())
+
+	if useProxy == true {
+		t.Error("proxy should not be used")
 	}
 }

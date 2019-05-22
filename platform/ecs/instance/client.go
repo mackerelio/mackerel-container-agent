@@ -37,12 +37,22 @@ func NewClient(baseURL string) (Client, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &client{
+	dt := http.DefaultTransport.(*http.Transport)
+	c := &client{
 		url: u,
 		httpClient: &http.Client{
 			Timeout: timeout,
+			Transport: &http.Transport{
+				Proxy:                 nil,
+				DialContext:           dt.DialContext,
+				MaxIdleConns:          dt.MaxIdleConns,
+				IdleConnTimeout:       dt.IdleConnTimeout,
+				TLSHandshakeTimeout:   dt.TLSHandshakeTimeout,
+				ExpectContinueTimeout: dt.ExpectContinueTimeout,
+			},
 		},
-	}, nil
+	}
+	return c, nil
 }
 
 // GetLocalIPv4 gets instance IPv4 address
