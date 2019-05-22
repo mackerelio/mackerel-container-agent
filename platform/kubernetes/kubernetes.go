@@ -115,8 +115,8 @@ func createHTTPClient(caCert []byte, insecureTLS bool) *http.Client {
 		DualStack: true,
 	}
 	// Copy from the definition of http.DefaultTransport.
+	// Don't use Proxy.
 	transport := &http.Transport{
-		Proxy:                 http.ProxyFromEnvironment,
 		Dial:                  dialer.Dial,
 		DialContext:           dialer.DialContext,
 		MaxIdleConns:          100,
