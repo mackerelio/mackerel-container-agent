@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"regexp"
 	"testing"
 )
@@ -91,4 +92,28 @@ func TestIgnoreContainer(t *testing.T) {
 		}
 	}
 
+}
+
+func TestNoProxy(t *testing.T) {
+	var useProxy bool
+
+	dt := http.DefaultTransport.(*http.Transport)
+	origProxy := dt.Proxy
+	defer func() {
+		dt.Proxy = origProxy
+	}()
+	dt.Proxy = func(req *http.Request) (*url.URL, error) {
+		useProxy = true
+		return nil, nil
+	}
+
+	th := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {})
+	ts := httptest.NewServer(th)
+
+	c, _ := NewClient(ts.URL, nil)
+	c.GetMetadata(context.Background())
+
+	if useProxy == true {
+		t.Error("proxy should not be used")
+	}
 }

@@ -42,13 +42,23 @@ func NewClient(baseURL string, ignoreContainer *regexp.Regexp) (Client, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &client{
+	dt := http.DefaultTransport.(*http.Transport)
+	c := &client{
 		url: u,
 		httpClient: &http.Client{
 			Timeout: timeout,
+			Transport: &http.Transport{
+				Proxy:                 nil,
+				DialContext:           dt.DialContext,
+				MaxIdleConns:          dt.MaxIdleConns,
+				IdleConnTimeout:       dt.IdleConnTimeout,
+				TLSHandshakeTimeout:   dt.TLSHandshakeTimeout,
+				ExpectContinueTimeout: dt.ExpectContinueTimeout,
+			},
 		},
 		ignoreContainer: ignoreContainer,
-	}, nil
+	}
+	return c, nil
 }
 
 // GetMetadata gets task metadata
