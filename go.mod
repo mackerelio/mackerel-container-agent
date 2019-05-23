@@ -53,6 +53,7 @@ require (
 	golang.org/x/sync v0.0.0-20190412183630-56d357773e84
 	golang.org/x/sys v0.0.0-20190416152802-12500544f89f // indirect
 	golang.org/x/time v0.0.0-20190308202827-9d24e82272b4 // indirect
+	google.golang.org/appengine v1.4.0 // indirect
 	google.golang.org/genproto v0.0.0-20190415143225-d1146b9035b9 // indirect
 	google.golang.org/grpc v1.20.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect

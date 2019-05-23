@@ -43,11 +43,11 @@ func (p *probeHTTP) Check(ctx context.Context) error {
 		u.Host = "localhost"
 	}
 
-	timeout := p.timeout
-	if timeout == 0 {
-		timeout = defaultTimeoutHTTP
+	client, err := p.createHTTPClient()
+	if err != nil {
+		return err
 	}
-	client := http.Client{Timeout: timeout}
+
 	method := strings.ToUpper(p.Method)
 	if method == "" {
 		method = "GET"
@@ -84,4 +84,28 @@ func (p *probeHTTP) InitialDelay() time.Duration {
 
 func (p *probeHTTP) Period() time.Duration {
 	return p.period
+}
+
+func (p *probeHTTP) createHTTPClient() (*http.Client, error) {
+	dt := http.DefaultTransport.(*http.Transport)
+	tp := &http.Transport{
+		DialContext:           dt.DialContext,
+		MaxIdleConns:          dt.MaxIdleConns,
+		IdleConnTimeout:       dt.IdleConnTimeout,
+		TLSHandshakeTimeout:   dt.TLSHandshakeTimeout,
+		ExpectContinueTimeout: dt.ExpectContinueTimeout,
+		Proxy:                 http.ProxyURL(p.Proxy.URL),
+	}
+
+	timeout := p.timeout
+	if timeout == 0 {
+		timeout = defaultTimeoutHTTP
+	}
+
+	c := &http.Client{
+		Timeout:   timeout,
+		Transport: tp,
+	}
+
+	return c, nil
 }
