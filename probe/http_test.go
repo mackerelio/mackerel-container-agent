@@ -131,7 +131,7 @@ func TestProbeHTTP_Check(t *testing.T) {
 					Method:  tc.method,
 					Path:    tc.path,
 					Headers: tc.headers,
-					Proxy:   config.URLWrapper{proxyURL},
+					Proxy:   config.URLWrapper{URL: proxyURL},
 				},
 				TimeoutSeconds: tc.timeoutSeconds,
 			})
