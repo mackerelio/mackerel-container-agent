@@ -108,35 +108,28 @@ func (p *kubernetesPlatform) StatusRunning(ctx context.Context) bool {
 }
 
 func createHTTPClient(caCert []byte, insecureTLS bool) *http.Client {
-	// Copy from the definition of http.DefaultTransport.DialContext.
-	dialer := &net.Dialer{
-		Timeout:   30 * time.Second,
-		KeepAlive: 30 * time.Second,
-		DualStack: true,
-	}
-	// Copy from the definition of http.DefaultTransport.
-	// Don't use Proxy.
-	transport := &http.Transport{
-		Dial:                  dialer.Dial,
-		DialContext:           dialer.DialContext,
-		MaxIdleConns:          100,
-		IdleConnTimeout:       90 * time.Second,
-		TLSHandshakeTimeout:   10 * time.Second,
-		ExpectContinueTimeout: 1 * time.Second,
+	dt := http.DefaultTransport.(*http.Transport)
+	tp := &http.Transport{
+		Proxy:                 nil,
+		DialContext:           dt.DialContext,
+		MaxIdleConns:          dt.MaxIdleConns,
+		IdleConnTimeout:       dt.IdleConnTimeout,
+		TLSHandshakeTimeout:   dt.TLSHandshakeTimeout,
+		ExpectContinueTimeout: dt.ExpectContinueTimeout,
 	}
 
-	transport.TLSClientConfig = &tls.Config{
+	tp.TLSClientConfig = &tls.Config{
 		InsecureSkipVerify: insecureTLS,
 	}
 
 	if len(caCert) > 0 {
 		certPool := x509.NewCertPool()
 		certPool.AppendCertsFromPEM(caCert)
-		transport.TLSClientConfig.RootCAs = certPool
+		tp.TLSClientConfig.RootCAs = certPool
 	}
 
 	return &http.Client{
 		Timeout:   timeout,
-		Transport: transport,
+		Transport: tp,
 	}
 }
