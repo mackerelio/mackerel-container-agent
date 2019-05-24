@@ -77,5 +77,8 @@ func TestCreateHTTPClient(t *testing.T) {
 		if resp != nil {
 			resp.Body.Close()
 		}
+		if client.Transport.(*http.Transport).Proxy != nil {
+			t.Error("proxy should not be used")
+		}
 	}
 }
