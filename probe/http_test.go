@@ -26,6 +26,7 @@ func TestProbeHTTP_Check(t *testing.T) {
 		status         int
 		sleep          time.Duration
 		shouldErr      bool
+		useProxy       bool
 	}{
 		{
 			name:   "ok",
@@ -81,6 +82,23 @@ func TestProbeHTTP_Check(t *testing.T) {
 			headers: []config.Header{{Name: "Host", Value: "example.com"}},
 			status:  http.StatusOK,
 		},
+		{
+			name:     "proxy",
+			path:     "/",
+			status:   http.StatusOK,
+			useProxy: true,
+		},
+	}
+
+	var proxyHandler func(*http.Request) (*url.URL, error)
+
+	dt := http.DefaultTransport.(*http.Transport)
+	origProxy := dt.Proxy
+	defer func() {
+		dt.Proxy = origProxy
+	}()
+	dt.Proxy = func(req *http.Request) (*url.URL, error) {
+		return proxyHandler(req)
 	}
 
 	for _, tc := range testCases {
@@ -88,6 +106,22 @@ func TestProbeHTTP_Check(t *testing.T) {
 			ts := newHTTPServer(t, "ok", tc.headers, tc.method, tc.path, tc.sleep, tc.status)
 			defer ts.Close()
 			u, _ := url.Parse(ts.URL)
+
+			var passedProxy bool
+			proxyHandler = func(req *http.Request) (*url.URL, error) {
+				passedProxy = true
+				return nil, nil
+			}
+
+			var proxyURL *url.URL
+			if tc.useProxy {
+				ps := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					passedProxy = true
+					ts.Config.Handler.ServeHTTP(w, r)
+				}))
+				proxyURL, _ = url.Parse(ps.URL)
+				defer ps.Close()
+			}
 
 			p := NewProbe(&config.Probe{
 				HTTP: &config.ProbeHTTP{
@@ -97,10 +131,19 @@ func TestProbeHTTP_Check(t *testing.T) {
 					Method:  tc.method,
 					Path:    tc.path,
 					Headers: tc.headers,
+					Proxy:   config.URLWrapper{URL: proxyURL},
 				},
 				TimeoutSeconds: tc.timeoutSeconds,
 			})
+
 			err := p.Check(context.Background())
+
+			if tc.useProxy && !passedProxy {
+				t.Errorf("request should through the proxy")
+			}
+			if !tc.useProxy && passedProxy {
+				t.Errorf("request should not through the proxy")
+			}
 
 			if err != nil && !tc.shouldErr {
 				t.Errorf("should not raise error: %v", err)

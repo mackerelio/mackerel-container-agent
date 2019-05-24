@@ -2,6 +2,7 @@ package config
 
 import (
 	"errors"
+	"net/url"
 
 	"github.com/mackerelio/mackerel-container-agent/cmdutil"
 )
@@ -60,12 +61,25 @@ type ProbeHTTP struct {
 	Path      string   `yaml:"path"`
 	Headers   []Header `yaml:"headers"`
 	UserAgent string
+	Proxy     URLWrapper `yaml:"proxy"`
 }
 
 // Header is a request header for http probe.
 type Header struct {
 	Name  string `yaml:"name"`
 	Value string `yaml:"value"`
+}
+
+// URLWrapper wraps url.URL
+type URLWrapper struct {
+	*url.URL
+}
+
+// UnmarshalText decodes host status string
+func (u *URLWrapper) UnmarshalText(text []byte) error {
+	var err error
+	u.URL, err = url.Parse(string(text))
+	return err
 }
 
 // ProbeTCP is a probe with tcp.

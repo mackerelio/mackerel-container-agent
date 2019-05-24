@@ -343,6 +343,8 @@ plugin:
 }
 
 func TestReadinessProbe(t *testing.T) {
+	proxy, _ := url.Parse("http://proxy.example.com:8080")
+
 	testCases := []struct {
 		name      string
 		config    string
@@ -443,6 +445,7 @@ readinessProbe:
         value: test
       - name: Host
         value: example.com
+    proxy: "http://proxy.example.com:8080"
   initialDelaySeconds: 10
   timeoutSeconds: 5
   periodSeconds: 3
@@ -457,6 +460,7 @@ readinessProbe:
 						Port:    "8080",
 						Path:    "/healthy",
 						Headers: []Header{{"X-Custom-Header", "test"}, {"Host", "example.com"}},
+						Proxy:   URLWrapper{proxy},
 					},
 					InitialDelaySeconds: 10,
 					TimeoutSeconds:      5,
