@@ -17,5 +17,5 @@ RUN apt-get update -yq && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists
 
-RUN find /usr/bin/ -type l -regextype posix-egrep -name 'mackerel-plugin-*' -a ! -regex ".*mackerel-plugin-(${BUNDLE_AGENT_PLUGINS})" | xargs /bin/rm
-RUN find /usr/bin/ -type l -regextype posix-egrep -name 'check-*' -a ! -regex ".*check-(${BUNDLE_CHECK_PLUGINS})" | xargs /bin/rm
+RUN find /usr/bin/ -type l -regextype posix-egrep -name 'mackerel-plugin-*' -a ! -regex ".*mackerel-plugin-(${BUNDLE_AGENT_PLUGINS})" -delete
+RUN find /usr/bin/ -type l -regextype posix-egrep -name 'check-*' -a ! -regex ".*check-(${BUNDLE_CHECK_PLUGINS})" -delete
