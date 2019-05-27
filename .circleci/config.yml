@@ -86,7 +86,7 @@ jobs:
           command: |
             TAG=v$(echo ${CIRCLE_BRANCH} | sed -E 's/.*-([0-9.]+)$/\1/')
             docker build -t $DOCKER_REPOSITORY:${TAG:?'parse failed'}${TAG_SUFFIX} .
-            docker build -build-arg REPOSITORY=${DOCKER_REPOSITORY} --build-arg TAG=${TAG}${TAG_SUFFIX} -t ${DOCKER_REPOSITORY}:${TAG}-plugins${TAG_SUFFIX} -f Dockerfile.plugins .
+            docker build --build-arg REPOSITORY=${DOCKER_REPOSITORY} --build-arg TAG=${TAG}${TAG_SUFFIX} -t ${DOCKER_REPOSITORY}:${TAG}-plugins${TAG_SUFFIX} -f Dockerfile.plugins .
 
       - run:
           name: Push Docker Image
@@ -115,7 +115,7 @@ jobs:
           name: Build Docker Image
           command: |
             docker build -t $DOCKER_REPOSITORY:latest -t $DOCKER_REPOSITORY:${CIRCLE_TAG} .
-            docker build -build-arg REPOSITORY=${DOCKER_REPOSITORY} --build-arg TAG=${CIRCLE_TAG} -t ${DOCKER_REPOSITORY}:plugins -t ${DOCKER_REPOSITORY}:${CIRCLE_TAG}-plugins -f Dockerfile.plugins .
+            docker build --build-arg REPOSITORY=${DOCKER_REPOSITORY} --build-arg TAG=${CIRCLE_TAG} -t ${DOCKER_REPOSITORY}:plugins -t ${DOCKER_REPOSITORY}:${CIRCLE_TAG}-plugins -f Dockerfile.plugins .
 
       - run:
           name: Push Docker Image
