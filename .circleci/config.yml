@@ -58,6 +58,7 @@ jobs:
           root: .
           paths:
             - Dockerfile
+            - Dockerfile.plugins
             - build/*
             - Makefile
 
