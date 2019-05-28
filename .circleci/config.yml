@@ -69,6 +69,7 @@ jobs:
       - image: circleci/golang
 
     environment:
+      TAG_PREFIX: "v"
       TAG_SUFFIX: "-alpha"
 
     steps:
@@ -85,16 +86,20 @@ jobs:
       - run:
           name: Build Docker Image
           command: |
-            TAG=v$(echo ${CIRCLE_BRANCH} | sed -E 's/.*-([0-9.]+)$/\1/')
-            docker build -t $DOCKER_REPOSITORY:${TAG:?'parse failed'}${TAG_SUFFIX} .
-            docker build --build-arg REPOSITORY=${DOCKER_REPOSITORY} --build-arg TAG=${TAG}${TAG_SUFFIX} -t ${DOCKER_REPOSITORY}:${TAG}-plugins${TAG_SUFFIX} -f Dockerfile.plugins .
+            VERSION=$(echo "${CIRCLE_BRANCH}" | awk 'match($0, /.*-([0-9.]+)$/, a) { print a[1] }')
+            TAG="${TAG_PREFIX}${VERSION:?'parse failed'}${TAG_SUFFIX}"
+            TAG_PLUGINS="${TAG_PREFIX}${VERSION}-plugins${TAG_SUFFIX}"
+            docker build -t "${DOCKER_REPOSITORY}:${TAG}" .
+            docker build --build-arg "REPOSITORY=${DOCKER_REPOSITORY}" --build-arg "TAG=${TAG}" -t "${DOCKER_REPOSITORY}:${TAG_PLUGINS}" -f Dockerfile.plugins .
 
       - run:
           name: Push Docker Image
           command: |
-            TAG=v$(echo ${CIRCLE_BRANCH} | sed -E 's/.*-([0-9.]+)$/\1/')
-            docker push $DOCKER_REPOSITORY:${TAG:?'parse failed'}${TAG_SUFFIX}
-            docker push $DOCKER_REPOSITORY:${TAG}-plugins${TAG_SUFFIX}
+            VERSION=$(echo "${CIRCLE_BRANCH}" | awk 'match($0, /.*-([0-9.]+)$/, a) { print a[1] }')
+            TAG="${TAG_PREFIX}${VERSION}${TAG_SUFFIX}"
+            TAG_PLUGINS="${TAG_PREFIX}${VERSION}-plugins${TAG_SUFFIX}"
+            docker push "${DOCKER_REPOSITORY}:${TAG}"
+            docker push "${DOCKER_REPOSITORY}:${TAG_PLUGINS}"
 
   build_image:
     working_directory: /tmp/workspace
