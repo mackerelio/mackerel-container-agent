@@ -86,7 +86,7 @@ jobs:
       - run:
           name: Build Docker Image
           command: |
-            VERSION=$(echo "${CIRCLE_BRANCH}" | awk 'match($0, /([0-9.]+)$/, a) { print a[1] }')
+            VERSION=$(echo "${CIRCLE_BRANCH}" | perl -nE '/([0-9.]+)$/; say $1')
             TAG="${TAG_PREFIX}${VERSION:?'parse failed'}${TAG_SUFFIX}"
             TAG_PLUGINS="${TAG_PREFIX}${VERSION}-plugins${TAG_SUFFIX}"
             docker build -t "${DOCKER_REPOSITORY}:${TAG}" .
@@ -95,7 +95,7 @@ jobs:
       - run:
           name: Push Docker Image
           command: |
-            VERSION=$(echo "${CIRCLE_BRANCH}" | awk 'match($0, /([0-9.]+)$/, a) { print a[1] }')
+            VERSION=$(echo "${CIRCLE_BRANCH}" | perl -nE '/([0-9.]+)$/; say $1')
             TAG="${TAG_PREFIX}${VERSION}${TAG_SUFFIX}"
             TAG_PLUGINS="${TAG_PREFIX}${VERSION}-plugins${TAG_SUFFIX}"
             docker push "${DOCKER_REPOSITORY}:${TAG}"
