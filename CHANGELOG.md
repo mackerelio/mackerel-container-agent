@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.0.5 (2019-05-28)
+
+* Refactor docker-image tag decisions #37 (hayajo)
+* fix to push plugins-alpha Docker image #36 (hayajo)
+* add Dockerfile.plugins to CircleCI workspace #34 (hayajo)
+* fix `docker build` options #32 (hayajo)
+* Provide the plugin bundled Docker image #30 (hayajo)
+* don't use HTTP_PROXY when requesting HTTP probe #29 (hayajo)
+* don't use HTTP_PROXY when requesting API #28 (hayajo)
+
+
 ## 0.0.4 (2019-05-16)
 
 * add build-and-push-dockerimage script for pushing Docker Image manually #26 (hayajo)
