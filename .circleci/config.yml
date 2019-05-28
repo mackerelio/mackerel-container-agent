@@ -94,6 +94,7 @@ jobs:
           command: |
             TAG=v$(echo ${CIRCLE_BRANCH} | sed -E 's/.*-([0-9.]+)$/\1/')
             docker push $DOCKER_REPOSITORY:${TAG:?'parse failed'}${TAG_SUFFIX}
+            docker push $DOCKER_REPOSITORY:${TAG}-plugins${TAG_SUFFIX}
 
   build_image:
     working_directory: /tmp/workspace
