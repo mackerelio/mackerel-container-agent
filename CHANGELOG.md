@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.0.5 (2019-05-30)
+
+* Improve deployment #32 #34 #36 #37 #39 (hayajo)
+* Provide the plugin bundled Docker image #30 (hayajo)
+* don't use HTTP_PROXY when requesting HTTP probe #29 (hayajo)
+* don't use HTTP_PROXY when requesting API #28 (hayajo)
+
+
 ## 0.0.4 (2019-05-16)
 
 * add build-and-push-dockerimage script for pushing Docker Image manually #26 (hayajo)
