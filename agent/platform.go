@@ -8,7 +8,7 @@ import (
 	"regexp"
 
 	"github.com/mackerelio/mackerel-container-agent/platform"
-	"github.com/mackerelio/mackerel-container-agent/platform/ecsv3"
+	"github.com/mackerelio/mackerel-container-agent/platform/ecs"
 	"github.com/mackerelio/mackerel-container-agent/platform/kubernetes"
 	"github.com/mackerelio/mackerel-container-agent/platform/kubernetes/kubelet"
 )
@@ -32,7 +32,7 @@ func NewPlatform(ctx context.Context, ignoreContainer *regexp.Regexp) (platform.
 		if err != nil {
 			return nil, err
 		}
-		return ecsv3.NewECSPlatform(ctx, metadataURI, executionEnv, ignoreContainer)
+		return ecs.NewECSPlatform(ctx, metadataURI, executionEnv, ignoreContainer)
 
 	case platform.Kubernetes:
 		useReadOnlyPort := true

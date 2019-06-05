@@ -2,82 +2,83 @@ package ecs
 
 import (
 	"context"
+	"runtime"
 	"time"
 
+	ecsTypes "github.com/aws/amazon-ecs-agent/agent/handlers/v2"
+	dockerTypes "github.com/docker/docker/api/types"
+
+	"github.com/mackerelio/go-osstat/memory"
 	mackerel "github.com/mackerelio/mackerel-client-go"
 
 	"github.com/mackerelio/mackerel-container-agent/metric"
-	"github.com/mackerelio/mackerel-container-agent/platform/ecs/task"
 )
 
-type metricGenerator struct {
-	task      task.Task
-	prevStats map[string]*task.Stats
-	prevTime  time.Time
+// TaskStatsGetter interface fetch ECS task stats
+type TaskStatsGetter interface {
+	GetTaskStats(context.Context) (map[string]*dockerTypes.StatsJSON, error)
 }
 
-func newMetricGenerator(task task.Task) *metricGenerator {
+type metricGenerator struct {
+	client       TaskMetadataEndpointClient
+	hostMemTotal *float64
+	prevStats    map[string]*dockerTypes.StatsJSON
+	prevTime     time.Time
+}
+
+func newMetricGenerator(client TaskMetadataEndpointClient) *metricGenerator {
 	return &metricGenerator{
-		task: task,
+		client: client,
 	}
 }
 
 // Generate generates metric values
 func (g *metricGenerator) Generate(ctx context.Context) (metric.Values, error) {
-	stats, err := g.task.Stats(ctx)
+	stats, err := g.client.GetTaskStats(ctx)
 	if err != nil {
 		return nil, err
 	}
-	now := time.Now()
 
+	if g.hostMemTotal == nil {
+		memory, err := memory.Get()
+		if err != nil {
+			return nil, err
+		}
+		total := float64(memory.Total)
+		g.hostMemTotal = &total
+	}
+
+	now := time.Now()
 	if g.prevStats == nil || g.prevTime.Before(now.Add(-10*time.Minute)) {
 		g.prevStats = stats
 		g.prevTime = now
 		return nil, nil
 	}
 
-	var metricValues = make(metric.Values)
-
-	task, err := g.task.Metadata(ctx)
+	meta, err := g.client.GetTaskMetadata(ctx)
 	if err != nil {
 		return nil, err
 	}
 
 	timeDelta := now.Sub(g.prevTime)
-	for _, c := range task.Containers {
-		prev, ok := g.prevStats[c.Name]
-		if !ok || prev == nil {
+	metricValues := make(metric.Values)
+	for _, c := range meta.Containers {
+		prev, ok := g.prevStats[c.ID]
+		if !ok || prev == nil { // stats of the volume container can be nil value.
 			continue
 		}
-		curr, ok := stats[c.Name]
-		if !ok || curr == nil {
+		curr, ok := stats[c.ID]
+		if !ok || curr == nil { // stats of the volume container can be nil value.
 			continue
 		}
 
 		name := metric.SanitizeMetricKey(c.Name)
-
 		metricValues["container.cpu."+name+".usage"] = calculateCPUMetrics(prev, curr, timeDelta)
+		metricValues["container.cpu."+name+".limit"] = getCPULimit(meta)
 		metricValues["container.memory."+name+".usage"] = calculateMemoryMetrics(curr)
+		metricValues["container.memory."+name+".limit"] = g.getMemoryLimit(&c, meta)
 
-		var cpuLimit float64
-		if curr.CPU.Limit > 0.0 {
-			cpuLimit = curr.CPU.Limit
-		} else {
-			cpuLimit = task.Limits.CPU
-		}
-		metricValues["container.cpu."+name+".limit"] = cpuLimit
-
-		var memoryLimit float64
-		if curr.Memory.Limit > 0 {
-			memoryLimit = float64(curr.Memory.Limit)
-		} else {
-			memoryLimit = float64(task.Limits.Memory)
-		}
-		metricValues["container.memory."+name+".limit"] = memoryLimit
-
-		if g.task.IsPrivateNetworkMode() {
-			generateInterfaceMetrics(name, prev, curr, timeDelta, metricValues)
-		}
+		calculateInterfaceMetrics(name, prev, curr, timeDelta, metricValues)
 	}
 
 	g.prevStats = stats
@@ -86,28 +87,45 @@ func (g *metricGenerator) Generate(ctx context.Context) (metric.Values, error) {
 	return metricValues, nil
 }
 
-func calculateCPUMetrics(prev, curr *task.Stats, timeDelta time.Duration) float64 {
+// GetGraphDefs gets graph definitions
+func (g *metricGenerator) GetGraphDefs(ctx context.Context) ([]*mackerel.GraphDefsParam, error) {
+	return nil, nil
+}
+
+func (g *metricGenerator) getMemoryLimit(c *ecsTypes.ContainerResponse, meta *ecsTypes.TaskResponse) float64 {
+	if c.Limits.Memory != nil && *c.Limits.Memory != 0 {
+		return float64(*c.Limits.Memory * MiB)
+	} else if meta.Limits != nil && meta.Limits.Memory != nil && *meta.Limits.Memory != 0 {
+		return float64(*meta.Limits.Memory * MiB)
+	}
+	return *g.hostMemTotal
+}
+
+func getCPULimit(meta *ecsTypes.TaskResponse) float64 {
+	// Return Task CPU Limit or Host CPU Limit because Container CPU Limit means `cpu.shares`.
+	if meta.Limits != nil && meta.Limits.CPU != nil && *meta.Limits.CPU != 0.0 {
+		return *meta.Limits.CPU * 100
+	}
+	return float64(runtime.NumCPU() * 100)
+}
+
+func calculateCPUMetrics(prev, curr *dockerTypes.StatsJSON, timeDelta time.Duration) float64 {
 	// calculate used cpu cores. (1core == 100.0)
-	return float64(curr.CPU.Total-prev.CPU.Total) / float64(timeDelta.Nanoseconds()) * 100.0
+	return float64(curr.CPUStats.CPUUsage.TotalUsage-prev.CPUStats.CPUUsage.TotalUsage) / float64(timeDelta.Nanoseconds()) * 100
 }
 
-func calculateMemoryMetrics(stats *task.Stats) float64 {
-	return float64(stats.Memory.Usage - stats.Memory.Stats["cache"])
+func calculateMemoryMetrics(stats *dockerTypes.StatsJSON) float64 {
+	return float64(stats.MemoryStats.Usage - stats.MemoryStats.Stats["cache"])
 }
 
-func generateInterfaceMetrics(name string, prev, curr *task.Stats, timeDelta time.Duration, metricValues metric.Values) {
-	for ifName, prevValue := range prev.Network {
-		currValue, ok := curr.Network[ifName]
+func calculateInterfaceMetrics(name string, prev, curr *dockerTypes.StatsJSON, timeDelta time.Duration, metricValues metric.Values) {
+	for ifn, pv := range prev.Networks {
+		cv, ok := curr.Networks[ifn]
 		if !ok {
 			continue
 		}
-		prefix := "interface." + name + "-" + metric.SanitizeMetricKey(ifName)
-		metricValues[prefix+".rxBytes.delta"] = float64(currValue.RxBytes-prevValue.RxBytes) / timeDelta.Seconds()
-		metricValues[prefix+".txBytes.delta"] = float64(currValue.TxBytes-prevValue.TxBytes) / timeDelta.Seconds()
+		prefix := "interface." + name + "-" + metric.SanitizeMetricKey(ifn)
+		metricValues[prefix+".rxBytes.delta"] = float64(cv.RxBytes-pv.RxBytes) / timeDelta.Seconds()
+		metricValues[prefix+".txBytes.delta"] = float64(cv.TxBytes-pv.TxBytes) / timeDelta.Seconds()
 	}
-}
-
-// GetGraphDefs gets graph definitions
-func (g *metricGenerator) GetGraphDefs(context.Context) ([]*mackerel.GraphDefsParam, error) {
-	return nil, nil
 }
