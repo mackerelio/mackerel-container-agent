@@ -4,89 +4,144 @@ import (
 	"context"
 	"path"
 
+	ecsTypes "github.com/aws/amazon-ecs-agent/agent/handlers/v2"
 	"github.com/aws/aws-sdk-go/aws/arn"
 
 	mackerel "github.com/mackerelio/mackerel-client-go"
 
-	"github.com/mackerelio/mackerel-container-agent/platform"
-	"github.com/mackerelio/mackerel-container-agent/platform/ecs/task"
 	agentSpec "github.com/mackerelio/mackerel-container-agent/spec"
 )
 
-type ecsSpec struct {
-	Cluster       string         `json:"cluster,omitempty"`
-	Task          string         `json:"task,omitempty"`
-	TaskARN       string         `json:"task_arn,omitempty"`
-	TaskFamily    string         `json:"task_family,omitempty"`
-	TaskVersion   string         `json:"task_version,omitempty"`
-	DesiredStatus string         `json:"desired_status,omitempty"`
-	KnownStatus   string         `json:"known_status,omitempty"`
-	Containers    []container    `json:"containers,omitempty"`
-	Limits        resourceLimits `json:"limits,omitempty"`
-}
-
-type container struct {
-	DockerID   string `json:"docker_id,omitempty"`
-	DockerName string `json:"docker_name,omitempty"`
-	Name       string `json:"name,omitempty"`
-}
-
-type resourceLimits struct {
-	CPU    float64 `json:"cpu,omitempty"`
-	Memory uint64  `json:"memory,omitempty"`
+// TaskMetadataGetter interface fetch ECS task metadata
+type TaskMetadataGetter interface {
+	GetTaskMetadata(context.Context) (*ecsTypes.TaskResponse, error)
 }
 
 type specGenerator struct {
-	task task.Task
+	client   TaskMetadataGetter
+	provider provider
 }
 
-func newSpecGenerator(task task.Task) *specGenerator {
+func newSpecGenerator(client TaskMetadataGetter, provider provider) *specGenerator {
 	return &specGenerator{
-		task: task,
+		client:   client,
+		provider: provider,
 	}
 }
 
-// Generate generates metadata
 func (g *specGenerator) Generate(ctx context.Context) (interface{}, error) {
-	meta, err := g.task.Metadata(ctx)
+	meta, err := g.client.GetTaskMetadata(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	taskARN, err := arn.Parse(meta.Arn)
+	spec, err := generateSpec(meta)
 	if err != nil {
 		return nil, err
-	}
-
-	containers := make([]container, len(meta.Containers))
-	for i, c := range meta.Containers {
-		containers[i] = container{
-			DockerID:   c.DockerID,
-			DockerName: c.DockerName,
-			Name:       c.Name,
-		}
-	}
-
-	spec := &ecsSpec{
-		Cluster:       meta.Instance.Cluster,
-		Task:          path.Base(taskARN.Resource), // Resource format: 'task/task-id' or 'task/cluster-name/task-id'
-		TaskARN:       meta.Arn,
-		TaskFamily:    meta.Family,
-		TaskVersion:   meta.Version,
-		DesiredStatus: meta.DesiredStatus,
-		KnownStatus:   meta.KnownStatus,
-		Containers:    containers,
-		Limits: resourceLimits{
-			CPU:    meta.Limits.CPU,
-			Memory: meta.Limits.Memory,
-		},
 	}
 
 	return &agentSpec.CloudHostname{
 		Cloud: &mackerel.Cloud{
-			Provider: string(platform.ECS),
+			Provider: string(g.provider),
 			MetaData: spec,
 		},
 		Hostname: spec.Task,
 	}, nil
+}
+
+func generateSpec(meta *ecsTypes.TaskResponse) (*taskSpec, error) {
+	taskID, err := getTaskID(meta.TaskARN)
+	if err != nil {
+		return nil, err
+	}
+
+	spec := &taskSpec{
+		Cluster:            meta.Cluster,
+		Task:               taskID,
+		TaskARN:            meta.TaskARN,
+		TaskFamily:         meta.Family,
+		TaskVersion:        meta.Revision,
+		DesiredStatus:      meta.DesiredStatus,
+		KnownStatus:        meta.KnownStatus,
+		PullStartedAt:      meta.PullStartedAt,
+		PullStoppedAt:      meta.PullStoppedAt,
+		ExecutionStoppedAt: meta.ExecutionStoppedAt,
+	}
+
+	if meta.Containers != nil {
+		containers := make([]containerSpec, len(meta.Containers))
+		spec.Containers = containers
+
+		for i, c := range meta.Containers {
+			containers[i] = containerSpec{
+				DockerID:      c.ID,
+				DockerName:    c.DockerName,
+				Name:          c.Name,
+				Image:         c.Image,
+				ImageID:       c.ImageID,
+				Labels:        c.Labels,
+				DesiredStatus: c.DesiredStatus,
+				KnownStatus:   c.KnownStatus,
+				ExitCode:      c.ExitCode,
+				CreatedAt:     c.CreatedAt,
+				StartedAt:     c.StartedAt,
+				FinishedAt:    c.FinishedAt,
+				Type:          c.Type,
+				Limits: limitSpec{
+					CPU:    c.Limits.CPU,
+					Memory: c.Limits.Memory,
+				},
+			}
+
+			if c.Ports != nil {
+				ports := make([]portSpec, len(c.Ports))
+				for j, p := range c.Ports {
+					ports[j] = portSpec{
+						ContainerPort: p.ContainerPort,
+						HostPort:      p.HostPort,
+						Protocol:      p.Protocol,
+					}
+				}
+				containers[i].Ports = ports
+			}
+
+			if c.Networks != nil {
+				networks := make([]networkSpec, len(c.Networks))
+				for j, n := range c.Networks {
+					networks[j] = networkSpec{
+						NetworkMode:   n.NetworkMode,
+						IPv4Addresses: n.IPv4Addresses,
+						IPv6Addresses: n.IPv6Addresses,
+					}
+				}
+				containers[i].Networks = networks
+			}
+
+			if h := c.Health; h != nil {
+				containers[i].Health = &healthStatus{
+					ExitCode: h.ExitCode,
+					Output:   h.Output,
+					Since:    h.Since,
+					Status:   int32(h.Status),
+				}
+			}
+		}
+	}
+
+	if meta.Limits != nil {
+		spec.Limits = limitSpec{
+			CPU:    meta.Limits.CPU,
+			Memory: meta.Limits.Memory,
+		}
+	}
+
+	return spec, nil
+}
+
+func getTaskID(taskARN string) (string, error) {
+	a, err := arn.Parse(taskARN)
+	if err != nil {
+		return "", err
+	}
+	return path.Base(a.Resource), nil
 }

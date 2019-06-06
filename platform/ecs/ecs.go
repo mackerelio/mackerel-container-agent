@@ -2,59 +2,97 @@ package ecs
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"regexp"
-	"strings"
+	"time"
+
+	ecsTypes "github.com/aws/amazon-ecs-agent/agent/handlers/v2"
 
 	"github.com/mackerelio/golib/logging"
 
 	"github.com/mackerelio/mackerel-container-agent/metric"
 	"github.com/mackerelio/mackerel-container-agent/platform"
-	"github.com/mackerelio/mackerel-container-agent/platform/ecs/agent"
-	"github.com/mackerelio/mackerel-container-agent/platform/ecs/cgroupfs"
-	"github.com/mackerelio/mackerel-container-agent/platform/ecs/docker"
-	"github.com/mackerelio/mackerel-container-agent/platform/ecs/instance"
-	"github.com/mackerelio/mackerel-container-agent/platform/ecs/procfs"
-	"github.com/mackerelio/mackerel-container-agent/platform/ecs/task"
+	"github.com/mackerelio/mackerel-container-agent/platform/ecs/taskmetadata"
 	"github.com/mackerelio/mackerel-container-agent/spec"
 )
 
-var logger = logging.GetLogger("ecs")
+const (
+	executionEnvFargate = "AWS_ECS_FARGATE"
+	executionEnvEC2     = "AWS_ECS_EC2"
+)
 
-var procfsMountPoint = procfs.DefaultMountPoint
-var dockerSockMountPoint = "/var/run/docker.sock"
-var cgroupfsMountPoint = "/host/sys/fs/cgroup"
+var (
+	logger                           = logging.GetLogger("ecs")
+	taskMetadataWaitForReadyInterval = 3 * time.Second
+)
+
+// TaskMetadataEndpointClient interface gets task metadata and task stats
+type TaskMetadataEndpointClient interface {
+	TaskMetadataGetter
+	TaskStatsGetter
+}
+
+type networkMode string
+
+const (
+	bridgeNetworkMode networkMode = "bridge"
+	hostNetworkMode   networkMode = "host"
+	awsvpcNetworkMode networkMode = "awsvpc"
+)
 
 type ecsPlatform struct {
-	task task.Task
+	client      TaskMetadataEndpointClient
+	provider    provider
+	networkMode networkMode
 }
 
 // NewECSPlatform creates a new Platform
-func NewECSPlatform(ctx context.Context, instanceClient instance.Client, ignoreContainer *regexp.Regexp) (platform.Platform, error) {
-	task, err := newTask(ctx, instanceClient, ignoreContainer)
+func NewECSPlatform(ctx context.Context, metadataURI string, executionEnv string, ignoreContainer *regexp.Regexp) (platform.Platform, error) {
+	c, err := taskmetadata.NewClient(metadataURI, ignoreContainer)
 	if err != nil {
 		return nil, err
 	}
+
+	p, err := resolveProvider(executionEnv)
+	if err != nil {
+		return nil, err
+	}
+
+	meta, err := getTaskMetadata(ctx, c, taskMetadataWaitForReadyInterval)
+	if err != nil {
+		return nil, err
+	}
+
+	nm, err := detectNetworkMode(meta)
+	if err != nil {
+		return nil, err
+	}
+
 	return &ecsPlatform{
-		task: task,
+		client:      c,
+		provider:    p,
+		networkMode: nm,
 	}, nil
 }
 
 // GetMetricGenerators gets metric generators
 func (p *ecsPlatform) GetMetricGenerators() []metric.Generator {
-	var generator = []metric.Generator{
-		newMetricGenerator(p.task),
+	g := []metric.Generator{
+		newMetricGenerator(p.client),
 	}
-	if !p.task.IsPrivateNetworkMode() {
-		generator = append(generator, metric.NewInterfaceGenerator())
+
+	if p.networkMode != bridgeNetworkMode {
+		g = append(g, metric.NewInterfaceGenerator())
 	}
-	return generator
+
+	return g
 }
 
 // GetSpecGenerators gets spec generator
 func (p *ecsPlatform) GetSpecGenerators() []spec.Generator {
 	return []spec.Generator{
-		newSpecGenerator(p.task),
+		newSpecGenerator(p.client, p.provider),
 	}
 }
 
@@ -65,38 +103,67 @@ func (p *ecsPlatform) GetCustomIdentifier(context.Context) (string, error) {
 
 // StatusRunning reports p status is running
 func (p *ecsPlatform) StatusRunning(ctx context.Context) bool {
-	meta, err := p.task.Metadata(ctx)
+	meta, err := p.client.GetTaskMetadata(ctx)
 	if err != nil {
 		logger.Warningf("failed to get metadata: %s", err)
 		return false
 	}
-	return strings.EqualFold("running", meta.KnownStatus)
+	return isRunning(meta.KnownStatus)
 }
 
-func newTask(ctx context.Context, instanceClient instance.Client, ignoreContainer *regexp.Regexp) (task.Task, error) {
-	proc, err := procfs.Self(procfsMountPoint)
-	if err != nil {
-		return nil, err
-	}
-	dockerClient, err := docker.NewClient(dockerSockMountPoint)
-	if err != nil {
-		return nil, err
-	}
-	agentClient, err := newAgentClient(ctx, instanceClient)
-	if err != nil {
-		return nil, err
-	}
-	cgroup, err := cgroupfs.NewCgroup(cgroupfsMountPoint)
-	if err != nil {
-		return nil, err
-	}
-	return task.NewTaskWithProc(ctx, proc, dockerClient, agentClient, cgroup, ignoreContainer)
+func isRunning(status string) bool {
+	return status == "RUNNING"
 }
 
-func newAgentClient(ctx context.Context, instanceClient instance.Client) (agent.Client, error) {
-	host, err := instanceClient.GetLocalIPv4(ctx)
-	if err != nil {
-		return nil, err
+func resolveProvider(executionEnv string) (provider, error) {
+	switch executionEnv {
+	case executionEnvFargate:
+		return fargateProvider, nil
+	case executionEnvEC2:
+		return ecsProvider, nil
+	default:
+		return provider("UNKNOWN"), fmt.Errorf("unknown execution env: %q", executionEnv)
 	}
-	return agent.NewClient(fmt.Sprintf("http://%s:%d", host, agent.DefaultPort))
+}
+
+func detectNetworkMode(meta *ecsTypes.TaskResponse) (networkMode, error) {
+	if len(meta.Containers) == 0 {
+		return "", errors.New("there are no containers")
+	}
+
+	if len(meta.Containers[0].Networks) == 0 {
+		return "", errors.New("there are no networks")
+	}
+
+	nm := meta.Containers[0].Networks[0].NetworkMode
+	switch nm {
+	case "default", "bridge":
+		return bridgeNetworkMode, nil
+	case "host":
+		return hostNetworkMode, nil
+	case "awsvpc":
+		return awsvpcNetworkMode, nil
+	default:
+		return "", fmt.Errorf("unsupported NetworkMode: %v", nm)
+	}
+}
+
+func getTaskMetadata(ctx context.Context, client TaskMetadataGetter, interval time.Duration) (*ecsTypes.TaskResponse, error) {
+	// GetTaskMetadata will return an error until all containers associated with the task have been created.
+	// To avoid exiting with this error, retry until GetTaskMetadata succeeds.
+	for {
+		meta, err := client.GetTaskMetadata(ctx)
+		if err == nil {
+			return meta, nil
+		}
+
+		logger.Infof("wait for the task API to be ready: %q", err)
+
+		select {
+		case <-time.After(interval):
+			continue
+		case <-ctx.Done():
+			return nil, ctx.Err()
+		}
+	}
 }

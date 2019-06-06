@@ -9,28 +9,21 @@ import (
 
 	"github.com/mackerelio/mackerel-container-agent/platform"
 	"github.com/mackerelio/mackerel-container-agent/platform/ecs"
-	ecsInstance "github.com/mackerelio/mackerel-container-agent/platform/ecs/instance"
-	"github.com/mackerelio/mackerel-container-agent/platform/ecsawsvpc"
-	"github.com/mackerelio/mackerel-container-agent/platform/ecsv3"
 	"github.com/mackerelio/mackerel-container-agent/platform/kubernetes"
 	"github.com/mackerelio/mackerel-container-agent/platform/kubernetes/kubelet"
 )
 
 // NewPlatform creates a new container platform
 func NewPlatform(ctx context.Context, ignoreContainer *regexp.Regexp) (platform.Platform, error) {
-	switch platform.Type(os.Getenv("MACKEREL_CONTAINER_PLATFORM")) {
+	p := os.Getenv("MACKEREL_CONTAINER_PLATFORM")
 
-	case platform.ECS:
-		instanceClient, err := ecsInstance.NewClient(ecsInstance.DefaultURL)
-		if err != nil {
-			return nil, err
-		}
-		return ecs.NewECSPlatform(ctx, instanceClient, ignoreContainer)
+	switch platform.Type(p) {
 
-	case platform.ECSAwsvpc:
-		return ecsawsvpc.NewECSAwsvpcPlatform(false, ignoreContainer)
+	case platform.ECSAwsvpc, platform.ECSv3:
+		logger.Warningf("%q platform is deprecated. Please use %q platform", p, platform.ECS)
+		fallthrough
 
-	case platform.ECSv3:
+	case platform.ECS, platform.Fargate:
 		metadataURI, err := getEnvValue("ECS_CONTAINER_METADATA_URI")
 		if err != nil {
 			return nil, err
@@ -39,10 +32,7 @@ func NewPlatform(ctx context.Context, ignoreContainer *regexp.Regexp) (platform.
 		if err != nil {
 			return nil, err
 		}
-		return ecsv3.NewECSPlatform(ctx, metadataURI, executionEnv, ignoreContainer)
-
-	case platform.Fargate:
-		return ecsawsvpc.NewECSAwsvpcPlatform(true, ignoreContainer)
+		return ecs.NewECSPlatform(ctx, metadataURI, executionEnv, ignoreContainer)
 
 	case platform.Kubernetes:
 		useReadOnlyPort := true

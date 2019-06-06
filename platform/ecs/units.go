@@ -1,4 +1,4 @@
-package ecsawsvpc
+package ecs
 
 const (
 	// KiB represents kibibyte

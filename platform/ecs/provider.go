@@ -1,4 +1,4 @@
-package ecsv3
+package ecs
 
 type provider string
 
