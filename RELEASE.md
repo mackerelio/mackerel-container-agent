@@ -7,5 +7,5 @@
   - Test `mackerel-container-agent:<RELEASE-VERSION>-alpha` Docker image.
 - Merge release PR
 - Tag `<RELEASE-VERSION>`
-  - Run `git tag v<RELEASE-VERSION>` and `git push --tags`.
+  - Run `git tag v$(make -s version)` and `git push --tags`.
   - `mackerel-container-agent:<RELEASE-VERSION>` Docker image is automatically pushed.
