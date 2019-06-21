@@ -53,7 +53,7 @@ func (a *agent) start(ctx context.Context) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	conf, err := config.Load(os.Getenv("MACKEREL_AGENT_CONFIG"))
+	conf, err := config.Load(ctx, os.Getenv("MACKEREL_AGENT_CONFIG"))
 	if err != nil {
 		return err
 	}

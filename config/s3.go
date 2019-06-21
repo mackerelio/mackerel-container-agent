@@ -1,6 +1,7 @@
 package config
 
 import (
+	"context"
 	"net/url"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -10,17 +11,26 @@ import (
 )
 
 type downloader interface {
-	download(u *url.URL) ([]byte, error)
+	download(context.Context, *url.URL) ([]byte, error)
 }
 
-type s3Downloader struct{}
+type s3Downloader struct {
+	regionHint string
+}
 
-func (s3Downloader) download(u *url.URL) ([]byte, error) {
+func (d s3Downloader) download(ctx context.Context, u *url.URL) ([]byte, error) {
 	sess := session.Must(session.NewSession())
+
+	r, err := s3manager.GetBucketRegion(ctx, sess, u.Host, d.regionHint)
+	if err != nil {
+		return nil, err
+	}
+	sess.Config.Region = aws.String(r)
+
 	downloader := s3manager.NewDownloader(sess)
 
 	buf := &aws.WriteAtBuffer{}
-	_, err := downloader.Download(buf, &s3.GetObjectInput{
+	_, err = downloader.Download(buf, &s3.GetObjectInput{
 		Bucket: aws.String(u.Host),
 		Key:    aws.String(u.Path),
 	})
@@ -31,8 +41,10 @@ func (s3Downloader) download(u *url.URL) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-var s3downloader downloader = s3Downloader{}
+var s3downloader downloader = s3Downloader{
+	regionHint: "ap-notrheast-1",
+}
 
-func fetchS3(u *url.URL) ([]byte, error) {
-	return s3downloader.download(u)
+func fetchS3(ctx context.Context, u *url.URL) ([]byte, error) {
+	return s3downloader.download(ctx, u)
 }

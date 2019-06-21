@@ -1,6 +1,7 @@
 package config
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -107,13 +108,13 @@ func parseConfig(data []byte) (*Config, error) {
 }
 
 // Load loads agent configuration
-func Load(location string) (*Config, error) {
+func Load(ctx context.Context, location string) (*Config, error) {
 	var conf *Config
 
 	if location == "" {
 		conf = defaultConfig()
 	} else {
-		data, err := fetch(location)
+		data, err := fetch(ctx, location)
 		if err != nil {
 			return nil, err
 		}
@@ -159,7 +160,7 @@ func Load(location string) (*Config, error) {
 	return conf, nil
 }
 
-func fetch(location string) ([]byte, error) {
+func fetch(ctx context.Context, location string) ([]byte, error) {
 	u, err := url.Parse(location)
 	if err != nil {
 		return fetchFile(location)
@@ -169,7 +170,7 @@ func fetch(location string) ([]byte, error) {
 	case "http", "https":
 		return fetchHTTP(u)
 	case "s3":
-		return fetchS3(u)
+		return fetchS3(ctx, u)
 	default:
 		return fetchFile(u.Path)
 	}
