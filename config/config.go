@@ -168,7 +168,7 @@ func fetch(ctx context.Context, location string) ([]byte, error) {
 
 	switch u.Scheme {
 	case "http", "https":
-		return fetchHTTP(u)
+		return fetchHTTP(ctx, u)
 	case "s3":
 		return fetchS3(ctx, u)
 	default:
@@ -180,11 +180,18 @@ func fetchFile(path string) ([]byte, error) {
 	return ioutil.ReadFile(path)
 }
 
-func fetchHTTP(u *url.URL) ([]byte, error) {
+func fetchHTTP(ctx context.Context, u *url.URL) ([]byte, error) {
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	req.WithContext(ctx)
+
 	cl := http.Client{
 		Timeout: timeout,
 	}
-	resp, err := cl.Get(u.String())
+
+	resp, err := cl.Do(req)
 	if err != nil {
 		return nil, err
 	}
