@@ -38,9 +38,13 @@ func (l *Loader) Start(ctx context.Context) <-chan struct{} {
 	go func() {
 		defer close(ch)
 		if l.pollingDuration > 0 {
+			t := time.NewTicker(l.pollingDuration)
+			defer t.Stop()
 			for {
 				select {
-				case <-time.After(l.pollingDuration):
+				case <-ctx.Done():
+					return
+				case <-t.C:
 					config, err := load(l.location)
 					if err != nil {
 						logger.Warningf("failed to load config: %s", err)
@@ -48,8 +52,6 @@ func (l *Loader) Start(ctx context.Context) <-chan struct{} {
 						logger.Infof("detected config changes")
 						return
 					}
-				case <-ctx.Done():
-					return
 				}
 			}
 		} else {
