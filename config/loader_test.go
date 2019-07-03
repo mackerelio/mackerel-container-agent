@@ -112,3 +112,40 @@ plugin:
 		t.Errorf("expect %#v, got %#v", expect2, conf)
 	}
 }
+
+func TestLoaderStartCancel(t *testing.T) {
+	file, err := newConfigFile(`
+apikey: 'DUMMY APIKEY'
+root: '/tmp/mackerel-container-agent'
+`)
+	if err != nil {
+		t.Errorf("should not raise error: %v", err)
+	}
+	defer os.Remove(file.Name())
+
+	expect := &Config{
+		Apibase: "",
+		Apikey:  "DUMMY APIKEY",
+		Root:    "/tmp/mackerel-container-agent",
+	}
+
+	confLoader := NewLoader(file.Name(), 300*time.Millisecond)
+	conf, err := confLoader.Load()
+	if err != nil {
+		t.Errorf("should not raise error: %v", err)
+	}
+	if !reflect.DeepEqual(conf, expect) {
+		t.Errorf("expect %#v, got %#v", expect, conf)
+	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	confCh := confLoader.Start(ctx)
+
+	go func() {
+		time.Sleep(500 * time.Millisecond)
+		cancel()
+	}()
+
+	<-confCh // when the context is done, loader should stop the polling loop
+	<-ctx.Done()
+}
