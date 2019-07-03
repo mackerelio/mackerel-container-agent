@@ -2,10 +2,13 @@ package agent
 
 import (
 	"context"
+	"fmt"
 	"net/url"
 	"os"
 	"os/signal"
+	"strconv"
 	"syscall"
+	"time"
 
 	"github.com/mackerelio/golib/logging"
 	mackerel "github.com/mackerelio/mackerel-client-go"
@@ -53,13 +56,17 @@ func (a *agent) start(ctx context.Context) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	confLoader, err := config.NewLoader(
-		os.Getenv("MACKEREL_AGENT_CONFIG"),
-		os.Getenv("MACKEREL_AGENT_CONFIG_POLLING_DURATION_MINUTES"),
-	)
-	if err != nil {
-		return err
+	var pollingDuration time.Duration
+	if durationMinutesStr := os.Getenv(
+		"MACKEREL_AGENT_CONFIG_POLLING_DURATION_MINUTES",
+	); durationMinutesStr != "" {
+		durationMinutes, err := strconv.Atoi(durationMinutesStr)
+		if err != nil {
+			return fmt.Errorf("failed to parse config polling duration: %s", err)
+		}
+		pollingDuration = time.Duration(durationMinutes) * time.Minute
 	}
+	confLoader := config.NewLoader(os.Getenv("MACKEREL_AGENT_CONFIG"), pollingDuration)
 	conf, err := confLoader.Load()
 	if err != nil {
 		return err

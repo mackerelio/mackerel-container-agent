@@ -22,10 +22,7 @@ root: '/tmp/mackerel-container-agent'
 		Root:    "/tmp/mackerel-container-agent",
 	}
 
-	confLoader, err := NewLoader(file.Name(), "")
-	if err != nil {
-		t.Errorf("should not raise error: %v", err)
-	}
+	confLoader := NewLoader(file.Name(), 0)
 	conf, err := confLoader.Load()
 	if err != nil {
 		t.Errorf("should not raise error: %v", err)

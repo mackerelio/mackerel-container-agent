@@ -3,7 +3,6 @@ package config
 import (
 	"context"
 	"reflect"
-	"strconv"
 	"time"
 
 	"github.com/mackerelio/golib/logging"
@@ -19,19 +18,8 @@ type Loader struct {
 }
 
 // NewLoader creates a new Loader
-func NewLoader(location, pollingDurationMinutes string) (*Loader, error) {
-	var duration int
-	var err error
-	if pollingDurationMinutes != "" {
-		duration, err = strconv.Atoi(pollingDurationMinutes)
-		if err != nil {
-			return nil, err
-		}
-	}
-	return &Loader{
-		location:        location,
-		pollingDuration: time.Duration(duration) * time.Minute,
-	}, nil
+func NewLoader(location string, pollingDuration time.Duration) *Loader {
+	return &Loader{location: location, pollingDuration: pollingDuration}
 }
 
 // Load agent configuration
