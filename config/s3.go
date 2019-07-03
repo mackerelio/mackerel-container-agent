@@ -42,7 +42,7 @@ func (d s3Downloader) download(ctx context.Context, u *url.URL) ([]byte, error) 
 }
 
 var s3downloader downloader = s3Downloader{
-	regionHint: "ap-notrheast-1",
+	regionHint: "ap-northeast-1",
 }
 
 func fetchS3(ctx context.Context, u *url.URL) ([]byte, error) {
