@@ -53,7 +53,13 @@ func (a *agent) start(ctx context.Context) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	confLoader := config.NewLoader(os.Getenv("MACKEREL_AGENT_CONFIG"))
+	confLoader, err := config.NewLoader(
+		os.Getenv("MACKEREL_AGENT_CONFIG"),
+		os.Getenv("MACKEREL_AGENT_CONFIG_POLLING_DURATION_MINUTES"),
+	)
+	if err != nil {
+		return err
+	}
 	conf, err := confLoader.Load()
 	if err != nil {
 		return err
