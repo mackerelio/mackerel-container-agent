@@ -29,6 +29,7 @@ func NewManager(generators []Generator, client api.Client) *Manager {
 // Run collect and send metrics
 func (m *Manager) Run(ctx context.Context, interval time.Duration) (err error) {
 	t := time.NewTicker(interval)
+	defer t.Stop()
 	errCh := make(chan error)
 loop:
 	for {

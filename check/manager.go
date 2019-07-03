@@ -34,6 +34,7 @@ func (m *Manager) Configs() []mackerel.CheckConfig {
 // Run collect and check monitoring reports
 func (m *Manager) Run(ctx context.Context, interval time.Duration) (err error) {
 	t := time.NewTicker(interval)
+	defer t.Stop()
 	errCh := make(chan error)
 loop:
 	for {
