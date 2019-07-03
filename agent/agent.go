@@ -39,12 +39,23 @@ func (a *agent) Run(_ []string) error {
 	sigCh := make(chan os.Signal, 1)
 	signal.Notify(sigCh, syscall.SIGHUP)
 	for {
+		confLoader, err := createConfLoader()
+		if err != nil {
+			return err
+		}
+		conf, err := confLoader.Load()
+		if err != nil {
+			return err
+		}
 		errCh := make(chan error)
 		ctx, cancel := context.WithCancel(context.Background())
 		defer cancel()
-		go func() { errCh <- a.start(ctx) }()
+		go func() { errCh <- a.start(ctx, conf) }()
+		confCh := confLoader.Start(ctx)
 		select {
 		case <-sigCh:
+			cancel()
+		case <-confCh:
 			cancel()
 		case err := <-errCh:
 			return err
@@ -52,25 +63,23 @@ func (a *agent) Run(_ []string) error {
 	}
 }
 
-func (a *agent) start(ctx context.Context) error {
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
-
+func createConfLoader() (*config.Loader, error) {
 	var pollingDuration time.Duration
 	if durationMinutesStr := os.Getenv(
 		"MACKEREL_AGENT_CONFIG_POLLING_DURATION_MINUTES",
 	); durationMinutesStr != "" {
 		durationMinutes, err := strconv.Atoi(durationMinutesStr)
 		if err != nil {
-			return fmt.Errorf("failed to parse config polling duration: %s", err)
+			return nil, fmt.Errorf("failed to parse config polling duration: %s", err)
 		}
 		pollingDuration = time.Duration(durationMinutes) * time.Minute
 	}
-	confLoader := config.NewLoader(os.Getenv("MACKEREL_AGENT_CONFIG"), pollingDuration)
-	conf, err := confLoader.Load()
-	if err != nil {
-		return err
-	}
+	return config.NewLoader(os.Getenv("MACKEREL_AGENT_CONFIG"), pollingDuration), nil
+}
+
+func (a *agent) start(ctx context.Context, conf *config.Config) error {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
 
 	client := mackerel.NewClient(conf.Apikey)
 	if conf.Apibase != "" {
@@ -88,15 +97,10 @@ func (a *agent) start(ctx context.Context) error {
 	sigCh := make(chan os.Signal, 1)
 	signal.Notify(sigCh, os.Interrupt, syscall.SIGTERM, syscall.SIGQUIT)
 	defer signal.Stop(sigCh)
-
-	confCh := confLoader.Start(ctx)
-
 	var sig os.Signal
 	go func() {
 		select {
 		case sig = <-sigCh:
-			cancel()
-		case <-confCh:
 			cancel()
 		case <-ctx.Done():
 		}
