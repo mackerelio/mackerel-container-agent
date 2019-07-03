@@ -1,6 +1,7 @@
 package config
 
 import (
+	"context"
 	"strconv"
 	"time"
 )
@@ -30,4 +31,24 @@ func NewLoader(location, pollingDurationMinutes string) (*Loader, error) {
 // Load loads agent configuration
 func (l *Loader) Load() (*Config, error) {
 	return load(l.location)
+}
+
+// Start the loader loop
+func (l *Loader) Start(ctx context.Context) <-chan struct{} {
+	ch := make(chan struct{})
+	go func() {
+		defer close(ch)
+		if l.pollingDuration > 0 {
+			for {
+				select {
+				case <-time.After(l.pollingDuration):
+					ch <- struct{}{}
+					return
+				case <-ctx.Done():
+					return
+				}
+			}
+		}
+	}()
+	return ch
 }

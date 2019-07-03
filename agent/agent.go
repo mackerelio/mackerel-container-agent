@@ -81,10 +81,15 @@ func (a *agent) start(ctx context.Context) error {
 	sigCh := make(chan os.Signal, 1)
 	signal.Notify(sigCh, os.Interrupt, syscall.SIGTERM, syscall.SIGQUIT)
 	defer signal.Stop(sigCh)
+
+	confCh := confLoader.Start(ctx)
+
 	var sig os.Signal
 	go func() {
 		select {
 		case sig = <-sigCh:
+			cancel()
+		case <-confCh:
 			cancel()
 		case <-ctx.Done():
 		}
