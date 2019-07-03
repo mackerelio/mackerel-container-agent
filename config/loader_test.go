@@ -17,7 +17,7 @@ apikey: 'DUMMY APIKEY'
 root: '/tmp/mackerel-container-agent'
 `)
 	if err != nil {
-		t.Errorf("should not raise error: %v", err)
+		t.Fatalf("should not raise error: %v", err)
 	}
 	defer os.Remove(file.Name())
 
@@ -30,7 +30,7 @@ root: '/tmp/mackerel-container-agent'
 	confLoader := NewLoader(file.Name(), 0)
 	conf, err := confLoader.Load()
 	if err != nil {
-		t.Errorf("should not raise error: %v", err)
+		t.Fatalf("should not raise error: %v", err)
 	}
 	if !reflect.DeepEqual(conf, expect) {
 		t.Errorf("expect %#v, got %#v", expect, conf)
@@ -46,7 +46,7 @@ apikey: 'DUMMY APIKEY'
 root: '/tmp/mackerel-container-agent'
 `)
 	if err != nil {
-		t.Errorf("should not raise error: %v", err)
+		t.Fatalf("should not raise error: %v", err)
 	}
 	defer os.Remove(file.Name())
 
@@ -59,7 +59,7 @@ root: '/tmp/mackerel-container-agent'
 	confLoader := NewLoader(file.Name(), 300*time.Millisecond)
 	conf, err := confLoader.Load()
 	if err != nil {
-		t.Errorf("should not raise error: %v", err)
+		t.Fatalf("should not raise error: %v", err)
 	}
 	if !reflect.DeepEqual(conf, expect) {
 		t.Errorf("expect %#v, got %#v", expect, conf)
@@ -90,7 +90,7 @@ plugin:
       command: mackerel-plugin-mysql
 `), 0600)
 		if err != nil {
-			t.Errorf("should not raise error: %v", err)
+			t.Fatalf("should not raise error: %v", err)
 		}
 	}()
 
@@ -109,7 +109,7 @@ plugin:
 	<-ctx.Done()
 	conf, err = confLoader.Load()
 	if err != nil {
-		t.Errorf("should not raise error: %v", err)
+		t.Fatalf("should not raise error: %v", err)
 	}
 	if !reflect.DeepEqual(conf, expect2) {
 		t.Errorf("expect %#v, got %#v", expect2, conf)
@@ -122,7 +122,7 @@ apikey: 'DUMMY APIKEY'
 root: '/tmp/mackerel-container-agent'
 `)
 	if err != nil {
-		t.Errorf("should not raise error: %v", err)
+		t.Fatalf("should not raise error: %v", err)
 	}
 	defer os.Remove(file.Name())
 
@@ -135,7 +135,7 @@ root: '/tmp/mackerel-container-agent'
 	confLoader := NewLoader(file.Name(), 300*time.Millisecond)
 	conf, err := confLoader.Load()
 	if err != nil {
-		t.Errorf("should not raise error: %v", err)
+		t.Fatalf("should not raise error: %v", err)
 	}
 	if !reflect.DeepEqual(conf, expect) {
 		t.Errorf("expect %#v, got %#v", expect, conf)
