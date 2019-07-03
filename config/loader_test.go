@@ -81,7 +81,7 @@ root: '/tmp/mackerel-container-agent'
 
 	go func() {
 		time.Sleep(800 * time.Millisecond)
-		ioutil.WriteFile(file.Name(), []byte(`
+		err := ioutil.WriteFile(file.Name(), []byte(`
 apikey: 'DUMMY APIKEY 2'
 root: '/tmp/mackerel-container-agent'
 plugin:
@@ -89,6 +89,9 @@ plugin:
     mysql:
       command: mackerel-plugin-mysql
 `), 0600)
+		if err != nil {
+			t.Errorf("should not raise error: %v", err)
+		}
 	}()
 
 	expect2 := &Config{
