@@ -2,14 +2,20 @@ package config
 
 import (
 	"context"
+	"reflect"
 	"strconv"
 	"time"
+
+	"github.com/mackerelio/golib/logging"
 )
+
+var logger = logging.GetLogger("config")
 
 // Loader represents a config loader
 type Loader struct {
 	location        string
 	pollingDuration time.Duration
+	lastConfig      *Config
 }
 
 // NewLoader creates a new Loader
@@ -28,9 +34,14 @@ func NewLoader(location, pollingDurationMinutes string) (*Loader, error) {
 	}, nil
 }
 
-// Load loads agent configuration
+// Load agent configuration
 func (l *Loader) Load() (*Config, error) {
-	return load(l.location)
+	config, err := load(l.location)
+	if err != nil {
+		return nil, err
+	}
+	l.lastConfig = config
+	return config, nil
 }
 
 // Start the loader loop
@@ -42,8 +53,13 @@ func (l *Loader) Start(ctx context.Context) <-chan struct{} {
 			for {
 				select {
 				case <-time.After(l.pollingDuration):
-					ch <- struct{}{}
-					return
+					config, err := load(l.location)
+					if err != nil {
+						logger.Warningf("failed to load config: %s", err)
+					} else if !reflect.DeepEqual(l.lastConfig, config) {
+						logger.Infof("detected config changes")
+						return
+					}
 				case <-ctx.Done():
 					return
 				}
