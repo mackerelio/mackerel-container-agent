@@ -52,6 +52,8 @@ func (l *Loader) Start(ctx context.Context) <-chan struct{} {
 					return
 				}
 			}
+		} else {
+			<-ctx.Done()
 		}
 	}()
 	return ch

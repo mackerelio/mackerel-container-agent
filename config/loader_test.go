@@ -36,8 +36,11 @@ root: '/tmp/mackerel-container-agent'
 		t.Errorf("expect %#v, got %#v", expect, conf)
 	}
 
-	confCh := confLoader.Start(context.Background())
-	<-confCh // loader does not start the polling loop when duration is 0
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	confCh := confLoader.Start(ctx)
+	go cancel()
+	<-confCh
 }
 
 func TestLoaderStart(t *testing.T) {
