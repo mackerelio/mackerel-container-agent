@@ -23,7 +23,7 @@ apikey: 'DUMMY APIKEY'
 
 func TestLoadDefault(t *testing.T) {
 	os.Clearenv()
-	conf, err := Load("")
+	conf, err := load("")
 	if err != nil {
 		t.Errorf("should not raise error: %v", err)
 	}
@@ -48,7 +48,7 @@ root: '/tmp/mackerel-container-agent'
 		Root:    "/tmp/mackerel-container-agent",
 	}
 
-	conf, err := Load(file.Name())
+	conf, err := load(file.Name())
 	if err != nil {
 		t.Errorf("should not raise error: %v", err)
 	}
@@ -67,7 +67,7 @@ func TestLoadHTTP(t *testing.T) {
 		Root:    "/var/tmp/mackerel-container-agent",
 	}
 
-	conf, err := Load(ts.URL)
+	conf, err := load(ts.URL)
 	if err != nil {
 		t.Errorf("should not raise error: %v", err)
 	}
@@ -89,7 +89,7 @@ func TestLoadS3(t *testing.T) {
 		Root:    "/var/tmp/mackerel-container-agent",
 	}
 
-	conf, err := Load("s3://bucket/key")
+	conf, err := load("s3://bucket/key")
 	if err != nil {
 		t.Errorf("should not raise error: %v", err)
 	}
@@ -140,7 +140,7 @@ apikey: 'DUMMY APIKEY'
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			conf, err := Load(tc.location)
+			conf, err := load(tc.location)
 			if err != nil {
 				t.Errorf("should not raise error: %v", err)
 			}
@@ -190,7 +190,7 @@ roles:
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			conf, err := Load(tc.location)
+			conf, err := load(tc.location)
 			if err != nil {
 				t.Errorf("should not raise error: %v", err)
 			}
@@ -240,7 +240,7 @@ ignoreContainer: "^mackerel-.+$"
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			conf, err := Load(tc.location)
+			conf, err := load(tc.location)
 			if err != nil {
 				t.Errorf("should not raise error: %v", err)
 			}
@@ -327,7 +327,7 @@ plugin:
 		},
 	}
 
-	conf, err := Load(file.Name())
+	conf, err := load(file.Name())
 	if err != nil {
 		t.Errorf("should not raise error: %v", err)
 	}
@@ -573,7 +573,7 @@ readinessProbe:
 			}
 			defer os.Remove(file.Name())
 
-			conf, err := Load(file.Name())
+			conf, err := load(file.Name())
 			if err != nil && !tc.shouldErr {
 				t.Fatalf("should not raise error: %v", err)
 			}
@@ -680,7 +680,7 @@ hostStatusOnStart: working
 			}
 			defer os.Remove(file.Name())
 
-			conf, err := Load(file.Name())
+			conf, err := load(file.Name())
 			if err != nil && !tc.shouldErr {
 				t.Fatalf("should not raise error: %v", err)
 			}

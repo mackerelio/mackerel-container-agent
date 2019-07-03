@@ -12,5 +12,5 @@ func NewLoader(location string) *Loader {
 
 // Load loads agent configuration
 func (l *Loader) Load() (*Config, error) {
-	return Load(l.location)
+	return load(l.location)
 }

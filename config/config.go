@@ -106,8 +106,7 @@ func parseConfig(data []byte) (*Config, error) {
 	return &conf.Config, nil
 }
 
-// Load loads agent configuration
-func Load(location string) (*Config, error) {
+func load(location string) (*Config, error) {
 	var conf *Config
 
 	if location == "" {
