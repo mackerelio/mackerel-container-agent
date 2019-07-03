@@ -66,6 +66,7 @@ root: '/tmp/mackerel-container-agent'
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 	confCh := confLoader.Start(ctx)
 	go func() {
 		for {
@@ -142,6 +143,7 @@ root: '/tmp/mackerel-container-agent'
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 	confCh := confLoader.Start(ctx)
 
 	go func() {
