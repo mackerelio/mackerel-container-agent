@@ -119,7 +119,7 @@ func TestAgentRun_RetryMetricPost(t *testing.T) {
 	checkManager := check.NewManager(createMockCheckGenerators(), client)
 	specManager := spec.NewManager(createMockSpecGenerators(), client)
 
-	err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf)
+	_, err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf)
 	if err != nil {
 		t.Errorf("err should be nil but got: %+v", err)
 	}
@@ -173,7 +173,7 @@ func TestAgentRun_ResolveHostIdLazy(t *testing.T) {
 	checkManager := check.NewManager(createMockCheckGenerators(), client)
 	specManager := spec.NewManager(createMockSpecGenerators(), client)
 
-	err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf)
+	_, err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf)
 	if err != nil {
 		t.Errorf("err should be nil but got: %+v", err)
 	}
@@ -215,7 +215,7 @@ func TestAgentRun_NoRetryBadRequest(t *testing.T) {
 	checkManager := check.NewManager(createMockCheckGenerators(), client)
 	specManager := spec.NewManager(createMockSpecGenerators(), client)
 
-	err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf)
+	_, err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf)
 	if err == nil {
 		t.Errorf("err should not be nil but got: %+v", err)
 	}
@@ -225,8 +225,8 @@ func TestAgentRun_NoRetryBadRequest(t *testing.T) {
 	}
 }
 
-func TestAgentRun_AutoRetirement(t *testing.T) {
-	dir, _ := ioutil.TempDir("", "mackerel-container-agent-run-test-auto-retirement")
+func TestAgentRun_Retire(t *testing.T) {
+	dir, _ := ioutil.TempDir("", "mackerel-container-agent-run-test-retire")
 	defer os.Remove(dir)
 	conf := &config.Config{Root: dir}
 	hostID := "abcde"
@@ -254,17 +254,18 @@ func TestAgentRun_AutoRetirement(t *testing.T) {
 		time.Sleep(200 * time.Millisecond)
 		cancel()
 	}()
-	err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf)
+	retire, err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf)
 	if err != nil {
 		t.Errorf("err should be nil but got: %+v", err)
 	}
+	retire()
 	if !retired {
 		t.Errorf("host should be retired")
 	}
 }
 
-func TestAgentRun_AutoRetirement_Retry(t *testing.T) {
-	dir, _ := ioutil.TempDir("", "mackerel-container-agent-run-test-auto-retirement-retry")
+func TestAgentRun_Retire_Retry(t *testing.T) {
+	dir, _ := ioutil.TempDir("", "mackerel-container-agent-run-test-retire-retry")
 	defer os.Remove(dir)
 	conf := &config.Config{Root: dir}
 	hostID := "abcde"
@@ -300,17 +301,18 @@ func TestAgentRun_AutoRetirement_Retry(t *testing.T) {
 		time.Sleep(200 * time.Millisecond)
 		cancel()
 	}()
-	err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf)
+	retire, err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf)
 	if err != nil {
 		t.Errorf("err should be nil but got: %+v", err)
 	}
+	retire()
 	if !retired {
 		t.Errorf("host should be retired")
 	}
 }
 
-func TestAgentRun_AutoRetirement_HostIDError(t *testing.T) {
-	dir, _ := ioutil.TempDir("", "mackerel-container-agent-run-test-auto-retirement-error")
+func TestAgentRun_Retire_HostIDError(t *testing.T) {
+	dir, _ := ioutil.TempDir("", "mackerel-container-agent-run-test-retire-hostid-error")
 	defer os.Remove(dir)
 	conf := &config.Config{Root: dir}
 
@@ -337,10 +339,11 @@ func TestAgentRun_AutoRetirement_HostIDError(t *testing.T) {
 		time.Sleep(200 * time.Millisecond)
 		cancel()
 	}()
-	err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf)
+	retire, err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf)
 	if err != nil {
 		t.Errorf("err should be nil but got: %+v", err)
 	}
+	retire() // fails because host id is not resolved
 	if retired {
 		t.Errorf("host should not be retired")
 	}
@@ -383,7 +386,7 @@ func TestAgentRun_MetricPlugin(t *testing.T) {
 	checkManager := check.NewManager(nil, client)
 	specManager := spec.NewManager(createMockSpecGenerators(), client)
 
-	err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf)
+	_, err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf)
 	if err != nil {
 		t.Errorf("err should be nil but got: %+v", err)
 	}
@@ -434,7 +437,7 @@ func TestAgentRun_CustomIdentifier(t *testing.T) {
 	checkManager := check.NewManager(createMockCheckGenerators(), client)
 	specManager := spec.NewManager(createMockSpecGenerators(), client).WithCustomIdentifier(customIdentifier)
 
-	err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf)
+	_, err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf)
 	if err != nil {
 		t.Errorf("err should be nil but got: %+v", err)
 	}
@@ -478,7 +481,7 @@ func TestAgentRun_CustomIdentifier_CreateHost(t *testing.T) {
 	checkManager := check.NewManager(createMockCheckGenerators(), client)
 	specManager := spec.NewManager(createMockSpecGenerators(), client).WithCustomIdentifier(customIdentifier)
 
-	err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf)
+	_, err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf)
 	if err != nil {
 		t.Errorf("err should be nil but got: %+v", err)
 	}
@@ -545,7 +548,7 @@ func TestAgentRun_StatusRunning(t *testing.T) {
 	checkManager := check.NewManager(createMockCheckGenerators(), client)
 	specManager := spec.NewManager([]spec.Generator{&mockSpecGeneratorStatus{pform}}, client)
 
-	err := run(ctx, client, metricManager, checkManager, specManager, pform, conf)
+	_, err := run(ctx, client, metricManager, checkManager, specManager, pform, conf)
 	if err != nil {
 		t.Errorf("err should be nil but got: %+v", err)
 	}
@@ -581,7 +584,7 @@ func TestAgentRun_ReadinessProbe(t *testing.T) {
 	metricManager := metric.NewManager(createMockMetricGenerators(), client)
 	checkManager := check.NewManager(createMockCheckGenerators(), client)
 	specManager := spec.NewManager(createMockSpecGenerators(), client)
-	err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf)
+	_, err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf)
 	if err != nil {
 		t.Errorf("err should be nil but got: %+v", err)
 	}
@@ -612,7 +615,7 @@ func TestAgentRun_ReadinessProbe_SleepLong(t *testing.T) {
 	metricManager := metric.NewManager(createMockMetricGenerators(), client)
 	checkManager := check.NewManager(createMockCheckGenerators(), client)
 	specManager := spec.NewManager(createMockSpecGenerators(), client)
-	err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf)
+	_, err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf)
 	if err != nil {
 		t.Errorf("err should be nil but got: %+v", err)
 	}
@@ -645,7 +648,7 @@ func TestAgentRun_HostStatusOnStart(t *testing.T) {
 	metricManager := metric.NewManager(createMockMetricGenerators(), client)
 	checkManager := check.NewManager(createMockCheckGenerators(), client)
 	specManager := spec.NewManager(createMockSpecGenerators(), client)
-	err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf)
+	_, err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf)
 	if err != nil {
 		t.Errorf("err should be nil but got: %+v", err)
 	}
