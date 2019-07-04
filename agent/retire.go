@@ -17,6 +17,7 @@ func retire(client api.Client, hostResolver *hostResolver) error {
 		}
 		return err
 	}
+	logger.Infof("retire: host id = %s", hostID)
 	err = retry.Retry(3, 3*time.Second, func() error {
 		return client.RetireHost(hostID)
 	})

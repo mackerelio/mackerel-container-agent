@@ -65,7 +65,8 @@ func (a *agent) Run(_ []string) error {
 		}()
 		confCh := confLoader.Start(ctx)
 		select {
-		case <-sigCh:
+		case sig := <-sigCh:
+			logger.Infof("reload config: signal = %s", sig)
 			cancel()
 		case <-confCh:
 			cancel()
