@@ -33,7 +33,7 @@ func run(
 	specManager *spec.Manager,
 	pform platform.Platform,
 	conf *config.Config,
-) error {
+) (func(), error) {
 	specManager.SetChecks(checkManager.Configs())
 	eg, ctx := errgroup.WithContext(ctx)
 
@@ -121,10 +121,9 @@ func run(
 		return specManager.Run(ctx, specInitialInterval, specInterval)
 	})
 
-	err := eg.Wait()
-	if err := retire(client, hostResolver); err != nil {
-		logger.Warningf("failed to retire: %s", err)
-	}
-
-	return err
+	return func() {
+		if err := retire(client, hostResolver); err != nil {
+			logger.Warningf("failed to retire: %s", err)
+		}
+	}, eg.Wait()
 }
