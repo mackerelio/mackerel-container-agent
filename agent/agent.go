@@ -43,13 +43,13 @@ func (a *agent) Run(_ []string) error {
 		return err
 	}
 	for {
-		conf, err := confLoader.Load()
+		ctx, cancel := context.WithCancel(context.Background())
+		defer cancel()
+		conf, err := confLoader.Load(ctx)
 		if err != nil {
 			return err
 		}
 		errCh := make(chan error)
-		ctx, cancel := context.WithCancel(context.Background())
-		defer cancel()
 		go func() { errCh <- a.start(ctx, conf) }()
 		confCh := confLoader.Start(ctx)
 		select {

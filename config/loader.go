@@ -23,8 +23,8 @@ func NewLoader(location string, pollingDuration time.Duration) *Loader {
 }
 
 // Load agent configuration
-func (l *Loader) Load() (*Config, error) {
-	config, err := load(l.location)
+func (l *Loader) Load(ctx context.Context) (*Config, error) {
+	config, err := load(ctx, l.location)
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +45,7 @@ func (l *Loader) Start(ctx context.Context) <-chan struct{} {
 				case <-ctx.Done():
 					return
 				case <-t.C:
-					config, err := load(l.location)
+					config, err := load(ctx, l.location)
 					if err != nil {
 						logger.Warningf("failed to load config: %s", err)
 					} else if !reflect.DeepEqual(l.lastConfig, config) {

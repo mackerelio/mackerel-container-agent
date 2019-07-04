@@ -27,8 +27,11 @@ root: '/tmp/mackerel-container-agent'
 		Root:    "/tmp/mackerel-container-agent",
 	}
 
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
 	confLoader := NewLoader(file.Name(), 0)
-	conf, err := confLoader.Load()
+	conf, err := confLoader.Load(ctx)
 	if err != nil {
 		t.Fatalf("should not raise error: %v", err)
 	}
@@ -36,8 +39,6 @@ root: '/tmp/mackerel-container-agent'
 		t.Errorf("expect %#v, got %#v", expect, conf)
 	}
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
 	confCh := confLoader.Start(ctx)
 	go cancel()
 	<-confCh
@@ -59,8 +60,11 @@ root: '/tmp/mackerel-container-agent'
 		Root:    "/tmp/mackerel-container-agent",
 	}
 
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
 	confLoader := NewLoader(file.Name(), 300*time.Millisecond)
-	conf, err := confLoader.Load()
+	conf, err := confLoader.Load(ctx)
 	if err != nil {
 		t.Fatalf("should not raise error: %v", err)
 	}
@@ -68,8 +72,6 @@ root: '/tmp/mackerel-container-agent'
 		t.Errorf("expect %#v, got %#v", expect, conf)
 	}
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
 	confCh := confLoader.Start(ctx)
 	go func() {
 		for {
@@ -111,7 +113,7 @@ plugin:
 	}
 
 	<-ctx.Done()
-	conf, err = confLoader.Load()
+	conf, err = confLoader.Load(ctx)
 	if err != nil {
 		t.Fatalf("should not raise error: %v", err)
 	}
@@ -136,8 +138,11 @@ root: '/tmp/mackerel-container-agent'
 		Root:    "/tmp/mackerel-container-agent",
 	}
 
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
 	confLoader := NewLoader(file.Name(), 300*time.Millisecond)
-	conf, err := confLoader.Load()
+	conf, err := confLoader.Load(ctx)
 	if err != nil {
 		t.Fatalf("should not raise error: %v", err)
 	}
@@ -145,8 +150,6 @@ root: '/tmp/mackerel-container-agent'
 		t.Errorf("expect %#v, got %#v", expect, conf)
 	}
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
 	confCh := confLoader.Start(ctx)
 
 	go func() {

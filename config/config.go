@@ -1,6 +1,7 @@
 package config
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -106,13 +107,13 @@ func parseConfig(data []byte) (*Config, error) {
 	return &conf.Config, nil
 }
 
-func load(location string) (*Config, error) {
+func load(ctx context.Context, location string) (*Config, error) {
 	var conf *Config
 
 	if location == "" {
 		conf = defaultConfig()
 	} else {
-		data, err := fetch(location)
+		data, err := fetch(ctx, location)
 		if err != nil {
 			return nil, err
 		}
@@ -158,7 +159,7 @@ func load(location string) (*Config, error) {
 	return conf, nil
 }
 
-func fetch(location string) ([]byte, error) {
+func fetch(ctx context.Context, location string) ([]byte, error) {
 	u, err := url.Parse(location)
 	if err != nil {
 		return fetchFile(location)
@@ -166,9 +167,9 @@ func fetch(location string) ([]byte, error) {
 
 	switch u.Scheme {
 	case "http", "https":
-		return fetchHTTP(u)
+		return fetchHTTP(ctx, u)
 	case "s3":
-		return fetchS3(u)
+		return fetchS3(ctx, u)
 	default:
 		return fetchFile(u.Path)
 	}
@@ -178,11 +179,18 @@ func fetchFile(path string) ([]byte, error) {
 	return ioutil.ReadFile(path)
 }
 
-func fetchHTTP(u *url.URL) ([]byte, error) {
+func fetchHTTP(ctx context.Context, u *url.URL) ([]byte, error) {
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	req.WithContext(ctx)
+
 	cl := http.Client{
 		Timeout: timeout,
 	}
-	resp, err := cl.Get(u.String())
+
+	resp, err := cl.Do(req)
 	if err != nil {
 		return nil, err
 	}
