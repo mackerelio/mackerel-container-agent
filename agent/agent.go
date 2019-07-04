@@ -38,11 +38,11 @@ type agent struct {
 func (a *agent) Run(_ []string) error {
 	sigCh := make(chan os.Signal, 1)
 	signal.Notify(sigCh, syscall.SIGHUP)
+	confLoader, err := createConfLoader()
+	if err != nil {
+		return err
+	}
 	for {
-		confLoader, err := createConfLoader()
-		if err != nil {
-			return err
-		}
 		conf, err := confLoader.Load()
 		if err != nil {
 			return err
