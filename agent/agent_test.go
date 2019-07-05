@@ -165,7 +165,7 @@ func TestAgentRun_ResolveHostIdLazy(t *testing.T) {
 		}),
 	)
 	go func() {
-		time.Sleep(700 * time.Millisecond)
+		time.Sleep(500 * time.Millisecond)
 		client.ApplyOption(
 			api.MockCreateHost(func(param *mackerel.CreateHostParam) (string, error) {
 				createParam = param
