@@ -2,10 +2,13 @@ package agent
 
 import (
 	"context"
+	"fmt"
 	"net/url"
 	"os"
 	"os/signal"
+	"strconv"
 	"syscall"
+	"time"
 
 	"github.com/mackerelio/golib/logging"
 	mackerel "github.com/mackerelio/mackerel-client-go"
@@ -35,13 +38,24 @@ type agent struct {
 func (a *agent) Run(_ []string) error {
 	sigCh := make(chan os.Signal, 1)
 	signal.Notify(sigCh, syscall.SIGHUP)
+	confLoader, err := createConfLoader()
+	if err != nil {
+		return err
+	}
 	for {
-		errCh := make(chan error)
 		ctx, cancel := context.WithCancel(context.Background())
 		defer cancel()
-		go func() { errCh <- a.start(ctx) }()
+		conf, err := confLoader.Load(ctx)
+		if err != nil {
+			return err
+		}
+		errCh := make(chan error)
+		go func() { errCh <- a.start(ctx, conf) }()
+		confCh := confLoader.Start(ctx)
 		select {
 		case <-sigCh:
+			cancel()
+		case <-confCh:
 			cancel()
 		case err := <-errCh:
 			return err
@@ -49,14 +63,23 @@ func (a *agent) Run(_ []string) error {
 	}
 }
 
-func (a *agent) start(ctx context.Context) error {
+func createConfLoader() (*config.Loader, error) {
+	var pollingDuration time.Duration
+	if durationMinutesStr := os.Getenv(
+		"MACKEREL_AGENT_CONFIG_POLLING_DURATION_MINUTES",
+	); durationMinutesStr != "" {
+		durationMinutes, err := strconv.Atoi(durationMinutesStr)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse config polling duration: %s", err)
+		}
+		pollingDuration = time.Duration(durationMinutes) * time.Minute
+	}
+	return config.NewLoader(os.Getenv("MACKEREL_AGENT_CONFIG"), pollingDuration), nil
+}
+
+func (a *agent) start(ctx context.Context, conf *config.Config) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
-
-	conf, err := config.Load(ctx, os.Getenv("MACKEREL_AGENT_CONFIG"))
-	if err != nil {
-		return err
-	}
 
 	client := mackerel.NewClient(conf.Apikey)
 	if conf.Apibase != "" {
