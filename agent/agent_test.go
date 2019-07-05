@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"path/filepath"
 	"reflect"
 	"testing"
 	"time"
@@ -78,7 +79,7 @@ func init() {
 	metricsInterval = 200 * time.Millisecond
 	checkInterval = 200 * time.Millisecond
 	specInterval = 500 * time.Millisecond
-	specInitialInterval = 500 * time.Millisecond
+	specInitialInterval = 600 * time.Millisecond
 	waitStatusRunningInterval = 200 * time.Millisecond
 	hostIDInitialRetryInterval = 100 * time.Millisecond
 }
@@ -150,7 +151,10 @@ func TestAgentRun_ResolveHostIdLazy(t *testing.T) {
 		api.MockFindHost(func(id string) (*mackerel.Host, error) {
 			return &mackerel.Host{ID: id}, nil
 		}),
-		api.MockUpdateHost(func(_ string, param *mackerel.UpdateHostParam) (string, error) {
+		api.MockUpdateHost(func(id string, param *mackerel.UpdateHostParam) (string, error) {
+			if id != hostID {
+				return "", errors.New("invalid hostID")
+			}
 			updateParam = param
 			updatedCount++
 			return hostID, nil
@@ -411,6 +415,7 @@ func TestAgentRun_CustomIdentifier(t *testing.T) {
 	conf := &config.Config{Root: dir}
 	hostID := "abcde"
 	customIdentifier := "custom-identifier-abcde"
+	var updatedCount int
 	var postedMetricValues []*mackerel.MetricValue
 
 	ctx, cancel := context.WithTimeout(context.Background(), 500*time.Millisecond)
@@ -424,6 +429,13 @@ func TestAgentRun_CustomIdentifier(t *testing.T) {
 		}),
 		api.MockFindHost(func(id string) (*mackerel.Host, error) {
 			return nil, errors.New("error")
+		}),
+		api.MockUpdateHost(func(id string, param *mackerel.UpdateHostParam) (string, error) {
+			if id != hostID {
+				return "", errors.New("invalid hostID")
+			}
+			updatedCount++
+			return hostID, nil
 		}),
 		api.MockPostHostMetricValuesByHostID(func(id string, metricValues []*mackerel.MetricValue) error {
 			if id != hostID {
@@ -441,6 +453,9 @@ func TestAgentRun_CustomIdentifier(t *testing.T) {
 	if err != nil {
 		t.Errorf("err should be nil but got: %+v", err)
 	}
+	if expected := 1; updatedCount != expected {
+		t.Errorf("update host api is called %d times (expected: %d times)", updatedCount, expected)
+	}
 	if expected := 3 * 2; len(postedMetricValues) != expected {
 		t.Errorf("metric values should have size %d but got: %d", expected, len(postedMetricValues))
 	}
@@ -453,6 +468,7 @@ func TestAgentRun_CustomIdentifier_CreateHost(t *testing.T) {
 	hostID := "abcde"
 	customIdentifier := "custom-identifier-abcde"
 	var postedMetricValues []*mackerel.MetricValue
+	var updatedCount int
 
 	ctx, cancel := context.WithTimeout(context.Background(), 500*time.Millisecond)
 	defer cancel()
@@ -469,6 +485,13 @@ func TestAgentRun_CustomIdentifier_CreateHost(t *testing.T) {
 		api.MockFindHost(func(id string) (*mackerel.Host, error) {
 			return &mackerel.Host{ID: id}, nil
 		}),
+		api.MockUpdateHost(func(id string, param *mackerel.UpdateHostParam) (string, error) {
+			if id != hostID {
+				return "", errors.New("invalid hostID")
+			}
+			updatedCount++
+			return hostID, nil
+		}),
 		api.MockPostHostMetricValuesByHostID(func(id string, metricValues []*mackerel.MetricValue) error {
 			if id != hostID {
 				return errors.New("invalid hostID")
@@ -485,8 +508,57 @@ func TestAgentRun_CustomIdentifier_CreateHost(t *testing.T) {
 	if err != nil {
 		t.Errorf("err should be nil but got: %+v", err)
 	}
+	if expected := 1; updatedCount != expected {
+		t.Errorf("update host api is called %d times (expected: %d times)", updatedCount, expected)
+	}
 	if expected := 3 * 2; len(postedMetricValues) != expected {
 		t.Errorf("metric values should have size %d but got: %d", expected, len(postedMetricValues))
+	}
+}
+
+func TestAgentRun_HostIDFile(t *testing.T) {
+	dir, _ := ioutil.TempDir("", "mackerel-container-agent-run-test-lazy")
+	defer os.Remove(dir)
+	conf := &config.Config{Root: dir}
+	hostID := "abcde"
+	var updatedCount int
+	var postedReports []*mackerel.CheckReports
+
+	ioutil.WriteFile(filepath.Join(dir, "id"), []byte(hostID), 0600)
+	ctx, cancel := context.WithTimeout(context.Background(), 300*time.Millisecond)
+	defer cancel()
+	client := api.NewMockClient(
+		api.MockCreateHost(func(param *mackerel.CreateHostParam) (string, error) {
+			return "", &mackerel.APIError{StatusCode: http.StatusInternalServerError}
+		}),
+		api.MockFindHosts(func(param *mackerel.FindHostsParam) ([]*mackerel.Host, error) {
+			return nil, &mackerel.APIError{StatusCode: http.StatusInternalServerError}
+		}),
+		api.MockFindHost(func(id string) (*mackerel.Host, error) {
+			return &mackerel.Host{ID: id}, nil
+		}),
+		api.MockUpdateHost(func(id string, param *mackerel.UpdateHostParam) (string, error) {
+			if id != hostID {
+				return "", errors.New("invalid hostID")
+			}
+			updatedCount++
+			return hostID, nil
+		}),
+		api.MockPostCheckReports(func(reports *mackerel.CheckReports) error {
+			postedReports = append(postedReports, reports)
+			return nil
+		}),
+	)
+	metricManager := metric.NewManager(createMockMetricGenerators(), client)
+	checkManager := check.NewManager(createMockCheckGenerators(), client)
+	specManager := spec.NewManager(createMockSpecGenerators(), client)
+
+	_, err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf)
+	if err != nil {
+		t.Errorf("err should be nil but got: %+v", err)
+	}
+	if expected := 1; updatedCount != expected {
+		t.Errorf("update host api is called %d times (expected: %d times)", updatedCount, expected)
 	}
 }
 
@@ -641,6 +713,9 @@ func TestAgentRun_HostStatusOnStart(t *testing.T) {
 			return &mackerel.Host{ID: id, Status: mackerel.HostStatusStandby}, nil
 		}),
 		api.MockUpdateHostStatus(func(id string, status string) error {
+			if id != hostID {
+				return errors.New("invalid hostID")
+			}
 			postedStatus = status
 			return nil
 		}),
