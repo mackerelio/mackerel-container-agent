@@ -48,6 +48,10 @@ func (r *hostResolver) getHost(hostParam *mackerel.CreateHostParam) (*mackerel.H
 				}
 				if len(hosts) > 0 {
 					host = hosts[0]
+					_, err = r.client.UpdateHost(host.ID, (*mackerel.UpdateHostParam)(hostParam))
+					if err != nil {
+						return nil, retryFromError(err), errors.Wrap(err, "failed to update host for id = "+host.ID)
+					}
 					return host, false, r.saveHostID(host.ID)
 				}
 			}
@@ -74,6 +78,10 @@ func (r *hostResolver) getHost(hostParam *mackerel.CreateHostParam) (*mackerel.H
 	host, err = r.client.FindHost(hostID)
 	if err != nil {
 		return nil, retryFromError(err), errors.Wrap(err, "failed to find host for id = "+hostID)
+	}
+	_, err = r.client.UpdateHost(host.ID, (*mackerel.UpdateHostParam)(hostParam))
+	if err != nil {
+		return nil, retryFromError(err), errors.Wrap(err, "failed to update host for id = "+hostID)
 	}
 	return host, false, nil
 }

@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"path/filepath"
 	"reflect"
 	"testing"
 	"time"
@@ -78,7 +79,7 @@ func init() {
 	metricsInterval = 200 * time.Millisecond
 	checkInterval = 200 * time.Millisecond
 	specInterval = 500 * time.Millisecond
-	specInitialInterval = 500 * time.Millisecond
+	specInitialInterval = 600 * time.Millisecond
 	waitStatusRunningInterval = 200 * time.Millisecond
 	hostIDInitialRetryInterval = 100 * time.Millisecond
 }
@@ -119,7 +120,7 @@ func TestAgentRun_RetryMetricPost(t *testing.T) {
 	checkManager := check.NewManager(createMockCheckGenerators(), client)
 	specManager := spec.NewManager(createMockSpecGenerators(), client)
 
-	err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf)
+	_, err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf)
 	if err != nil {
 		t.Errorf("err should be nil but got: %+v", err)
 	}
@@ -150,7 +151,10 @@ func TestAgentRun_ResolveHostIdLazy(t *testing.T) {
 		api.MockFindHost(func(id string) (*mackerel.Host, error) {
 			return &mackerel.Host{ID: id}, nil
 		}),
-		api.MockUpdateHost(func(_ string, param *mackerel.UpdateHostParam) (string, error) {
+		api.MockUpdateHost(func(id string, param *mackerel.UpdateHostParam) (string, error) {
+			if id != hostID {
+				return "", errors.New("invalid hostID")
+			}
 			updateParam = param
 			updatedCount++
 			return hostID, nil
@@ -161,7 +165,7 @@ func TestAgentRun_ResolveHostIdLazy(t *testing.T) {
 		}),
 	)
 	go func() {
-		time.Sleep(700 * time.Millisecond)
+		time.Sleep(500 * time.Millisecond)
 		client.ApplyOption(
 			api.MockCreateHost(func(param *mackerel.CreateHostParam) (string, error) {
 				createParam = param
@@ -173,7 +177,7 @@ func TestAgentRun_ResolveHostIdLazy(t *testing.T) {
 	checkManager := check.NewManager(createMockCheckGenerators(), client)
 	specManager := spec.NewManager(createMockSpecGenerators(), client)
 
-	err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf)
+	_, err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf)
 	if err != nil {
 		t.Errorf("err should be nil but got: %+v", err)
 	}
@@ -215,7 +219,7 @@ func TestAgentRun_NoRetryBadRequest(t *testing.T) {
 	checkManager := check.NewManager(createMockCheckGenerators(), client)
 	specManager := spec.NewManager(createMockSpecGenerators(), client)
 
-	err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf)
+	_, err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf)
 	if err == nil {
 		t.Errorf("err should not be nil but got: %+v", err)
 	}
@@ -225,8 +229,8 @@ func TestAgentRun_NoRetryBadRequest(t *testing.T) {
 	}
 }
 
-func TestAgentRun_AutoRetirement(t *testing.T) {
-	dir, _ := ioutil.TempDir("", "mackerel-container-agent-run-test-auto-retirement")
+func TestAgentRun_Retire(t *testing.T) {
+	dir, _ := ioutil.TempDir("", "mackerel-container-agent-run-test-retire")
 	defer os.Remove(dir)
 	conf := &config.Config{Root: dir}
 	hostID := "abcde"
@@ -254,17 +258,18 @@ func TestAgentRun_AutoRetirement(t *testing.T) {
 		time.Sleep(200 * time.Millisecond)
 		cancel()
 	}()
-	err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf)
+	retire, err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf)
 	if err != nil {
 		t.Errorf("err should be nil but got: %+v", err)
 	}
+	retire()
 	if !retired {
 		t.Errorf("host should be retired")
 	}
 }
 
-func TestAgentRun_AutoRetirement_Retry(t *testing.T) {
-	dir, _ := ioutil.TempDir("", "mackerel-container-agent-run-test-auto-retirement-retry")
+func TestAgentRun_Retire_Retry(t *testing.T) {
+	dir, _ := ioutil.TempDir("", "mackerel-container-agent-run-test-retire-retry")
 	defer os.Remove(dir)
 	conf := &config.Config{Root: dir}
 	hostID := "abcde"
@@ -300,17 +305,18 @@ func TestAgentRun_AutoRetirement_Retry(t *testing.T) {
 		time.Sleep(200 * time.Millisecond)
 		cancel()
 	}()
-	err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf)
+	retire, err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf)
 	if err != nil {
 		t.Errorf("err should be nil but got: %+v", err)
 	}
+	retire()
 	if !retired {
 		t.Errorf("host should be retired")
 	}
 }
 
-func TestAgentRun_AutoRetirement_HostIDError(t *testing.T) {
-	dir, _ := ioutil.TempDir("", "mackerel-container-agent-run-test-auto-retirement-error")
+func TestAgentRun_Retire_HostIDError(t *testing.T) {
+	dir, _ := ioutil.TempDir("", "mackerel-container-agent-run-test-retire-hostid-error")
 	defer os.Remove(dir)
 	conf := &config.Config{Root: dir}
 
@@ -337,10 +343,11 @@ func TestAgentRun_AutoRetirement_HostIDError(t *testing.T) {
 		time.Sleep(200 * time.Millisecond)
 		cancel()
 	}()
-	err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf)
+	retire, err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf)
 	if err != nil {
 		t.Errorf("err should be nil but got: %+v", err)
 	}
+	retire() // fails because host id is not resolved
 	if retired {
 		t.Errorf("host should not be retired")
 	}
@@ -383,7 +390,7 @@ func TestAgentRun_MetricPlugin(t *testing.T) {
 	checkManager := check.NewManager(nil, client)
 	specManager := spec.NewManager(createMockSpecGenerators(), client)
 
-	err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf)
+	_, err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf)
 	if err != nil {
 		t.Errorf("err should be nil but got: %+v", err)
 	}
@@ -408,6 +415,7 @@ func TestAgentRun_CustomIdentifier(t *testing.T) {
 	conf := &config.Config{Root: dir}
 	hostID := "abcde"
 	customIdentifier := "custom-identifier-abcde"
+	var updatedCount int
 	var postedMetricValues []*mackerel.MetricValue
 
 	ctx, cancel := context.WithTimeout(context.Background(), 500*time.Millisecond)
@@ -422,6 +430,13 @@ func TestAgentRun_CustomIdentifier(t *testing.T) {
 		api.MockFindHost(func(id string) (*mackerel.Host, error) {
 			return nil, errors.New("error")
 		}),
+		api.MockUpdateHost(func(id string, param *mackerel.UpdateHostParam) (string, error) {
+			if id != hostID {
+				return "", errors.New("invalid hostID")
+			}
+			updatedCount++
+			return hostID, nil
+		}),
 		api.MockPostHostMetricValuesByHostID(func(id string, metricValues []*mackerel.MetricValue) error {
 			if id != hostID {
 				return errors.New("invalid hostID")
@@ -434,9 +449,12 @@ func TestAgentRun_CustomIdentifier(t *testing.T) {
 	checkManager := check.NewManager(createMockCheckGenerators(), client)
 	specManager := spec.NewManager(createMockSpecGenerators(), client).WithCustomIdentifier(customIdentifier)
 
-	err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf)
+	_, err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf)
 	if err != nil {
 		t.Errorf("err should be nil but got: %+v", err)
+	}
+	if expected := 1; updatedCount != expected {
+		t.Errorf("update host api is called %d times (expected: %d times)", updatedCount, expected)
 	}
 	if expected := 3 * 2; len(postedMetricValues) != expected {
 		t.Errorf("metric values should have size %d but got: %d", expected, len(postedMetricValues))
@@ -450,6 +468,7 @@ func TestAgentRun_CustomIdentifier_CreateHost(t *testing.T) {
 	hostID := "abcde"
 	customIdentifier := "custom-identifier-abcde"
 	var postedMetricValues []*mackerel.MetricValue
+	var updatedCount int
 
 	ctx, cancel := context.WithTimeout(context.Background(), 500*time.Millisecond)
 	defer cancel()
@@ -466,6 +485,13 @@ func TestAgentRun_CustomIdentifier_CreateHost(t *testing.T) {
 		api.MockFindHost(func(id string) (*mackerel.Host, error) {
 			return &mackerel.Host{ID: id}, nil
 		}),
+		api.MockUpdateHost(func(id string, param *mackerel.UpdateHostParam) (string, error) {
+			if id != hostID {
+				return "", errors.New("invalid hostID")
+			}
+			updatedCount++
+			return hostID, nil
+		}),
 		api.MockPostHostMetricValuesByHostID(func(id string, metricValues []*mackerel.MetricValue) error {
 			if id != hostID {
 				return errors.New("invalid hostID")
@@ -478,12 +504,61 @@ func TestAgentRun_CustomIdentifier_CreateHost(t *testing.T) {
 	checkManager := check.NewManager(createMockCheckGenerators(), client)
 	specManager := spec.NewManager(createMockSpecGenerators(), client).WithCustomIdentifier(customIdentifier)
 
-	err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf)
+	_, err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf)
 	if err != nil {
 		t.Errorf("err should be nil but got: %+v", err)
 	}
+	if expected := 1; updatedCount != expected {
+		t.Errorf("update host api is called %d times (expected: %d times)", updatedCount, expected)
+	}
 	if expected := 3 * 2; len(postedMetricValues) != expected {
 		t.Errorf("metric values should have size %d but got: %d", expected, len(postedMetricValues))
+	}
+}
+
+func TestAgentRun_HostIDFile(t *testing.T) {
+	dir, _ := ioutil.TempDir("", "mackerel-container-agent-run-test-lazy")
+	defer os.Remove(dir)
+	conf := &config.Config{Root: dir}
+	hostID := "abcde"
+	var updatedCount int
+	var postedReports []*mackerel.CheckReports
+
+	ioutil.WriteFile(filepath.Join(dir, "id"), []byte(hostID), 0600)
+	ctx, cancel := context.WithTimeout(context.Background(), 300*time.Millisecond)
+	defer cancel()
+	client := api.NewMockClient(
+		api.MockCreateHost(func(param *mackerel.CreateHostParam) (string, error) {
+			return "", &mackerel.APIError{StatusCode: http.StatusInternalServerError}
+		}),
+		api.MockFindHosts(func(param *mackerel.FindHostsParam) ([]*mackerel.Host, error) {
+			return nil, &mackerel.APIError{StatusCode: http.StatusInternalServerError}
+		}),
+		api.MockFindHost(func(id string) (*mackerel.Host, error) {
+			return &mackerel.Host{ID: id}, nil
+		}),
+		api.MockUpdateHost(func(id string, param *mackerel.UpdateHostParam) (string, error) {
+			if id != hostID {
+				return "", errors.New("invalid hostID")
+			}
+			updatedCount++
+			return hostID, nil
+		}),
+		api.MockPostCheckReports(func(reports *mackerel.CheckReports) error {
+			postedReports = append(postedReports, reports)
+			return nil
+		}),
+	)
+	metricManager := metric.NewManager(createMockMetricGenerators(), client)
+	checkManager := check.NewManager(createMockCheckGenerators(), client)
+	specManager := spec.NewManager(createMockSpecGenerators(), client)
+
+	_, err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf)
+	if err != nil {
+		t.Errorf("err should be nil but got: %+v", err)
+	}
+	if expected := 1; updatedCount != expected {
+		t.Errorf("update host api is called %d times (expected: %d times)", updatedCount, expected)
 	}
 }
 
@@ -545,7 +620,7 @@ func TestAgentRun_StatusRunning(t *testing.T) {
 	checkManager := check.NewManager(createMockCheckGenerators(), client)
 	specManager := spec.NewManager([]spec.Generator{&mockSpecGeneratorStatus{pform}}, client)
 
-	err := run(ctx, client, metricManager, checkManager, specManager, pform, conf)
+	_, err := run(ctx, client, metricManager, checkManager, specManager, pform, conf)
 	if err != nil {
 		t.Errorf("err should be nil but got: %+v", err)
 	}
@@ -581,7 +656,7 @@ func TestAgentRun_ReadinessProbe(t *testing.T) {
 	metricManager := metric.NewManager(createMockMetricGenerators(), client)
 	checkManager := check.NewManager(createMockCheckGenerators(), client)
 	specManager := spec.NewManager(createMockSpecGenerators(), client)
-	err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf)
+	_, err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf)
 	if err != nil {
 		t.Errorf("err should be nil but got: %+v", err)
 	}
@@ -612,7 +687,7 @@ func TestAgentRun_ReadinessProbe_SleepLong(t *testing.T) {
 	metricManager := metric.NewManager(createMockMetricGenerators(), client)
 	checkManager := check.NewManager(createMockCheckGenerators(), client)
 	specManager := spec.NewManager(createMockSpecGenerators(), client)
-	err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf)
+	_, err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf)
 	if err != nil {
 		t.Errorf("err should be nil but got: %+v", err)
 	}
@@ -638,6 +713,9 @@ func TestAgentRun_HostStatusOnStart(t *testing.T) {
 			return &mackerel.Host{ID: id, Status: mackerel.HostStatusStandby}, nil
 		}),
 		api.MockUpdateHostStatus(func(id string, status string) error {
+			if id != hostID {
+				return errors.New("invalid hostID")
+			}
 			postedStatus = status
 			return nil
 		}),
@@ -645,7 +723,7 @@ func TestAgentRun_HostStatusOnStart(t *testing.T) {
 	metricManager := metric.NewManager(createMockMetricGenerators(), client)
 	checkManager := check.NewManager(createMockCheckGenerators(), client)
 	specManager := spec.NewManager(createMockSpecGenerators(), client)
-	err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf)
+	_, err := run(ctx, client, metricManager, checkManager, specManager, &mockPlatform{}, conf)
 	if err != nil {
 		t.Errorf("err should be nil but got: %+v", err)
 	}

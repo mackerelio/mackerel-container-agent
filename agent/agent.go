@@ -38,6 +38,12 @@ type agent struct {
 func (a *agent) Run(_ []string) error {
 	sigCh := make(chan os.Signal, 1)
 	signal.Notify(sigCh, syscall.SIGHUP)
+	retires := make([]func(), 0, 1)
+	defer func() {
+		for _, retire := range retires {
+			retire()
+		}
+	}()
 	confLoader, err := createConfLoader()
 	if err != nil {
 		return err
@@ -50,10 +56,17 @@ func (a *agent) Run(_ []string) error {
 			return err
 		}
 		errCh := make(chan error)
-		go func() { errCh <- a.start(ctx, conf) }()
+		go func() {
+			retire, err := a.start(ctx, conf)
+			if retire != nil {
+				retires = append(retires, retire)
+			}
+			errCh <- err
+		}()
 		confCh := confLoader.Start(ctx)
 		select {
-		case <-sigCh:
+		case sig := <-sigCh:
+			logger.Infof("reload config: signal = %s", sig)
 			cancel()
 		case <-confCh:
 			cancel()
@@ -77,7 +90,7 @@ func createConfLoader() (*config.Loader, error) {
 	return config.NewLoader(os.Getenv("MACKEREL_AGENT_CONFIG"), pollingDuration), nil
 }
 
-func (a *agent) start(ctx context.Context, conf *config.Config) error {
+func (a *agent) start(ctx context.Context, conf *config.Config) (func(), error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -85,7 +98,7 @@ func (a *agent) start(ctx context.Context, conf *config.Config) error {
 	if conf.Apibase != "" {
 		baseURL, err := url.Parse(conf.Apibase)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		client.BaseURL = baseURL
 	}
@@ -113,7 +126,7 @@ func (a *agent) start(ctx context.Context, conf *config.Config) error {
 
 	pform, err := NewPlatform(ctx, conf.IgnoreContainer.Regexp)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	customIdentifier, err := pform.GetCustomIdentifier(ctx)
