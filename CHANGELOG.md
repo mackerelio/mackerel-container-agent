@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.0 (2019-07-16)
+
+* add mackerel-plugin-json to Docker image #51 (hayajo)
+* Delay host retirement for hangup signal and config reload #49 (itchyny)
+* Implement polling duration for reloading agent config #47 (itchyny)
+* Fix missing region error when using S3 for config path #46 (hayajo)
+
+
 ## 0.1.0 (2019-06-12)
 
 * integrate ECS platforms #43 (hayajo)
