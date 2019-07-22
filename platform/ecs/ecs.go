@@ -93,6 +93,7 @@ func (p *ecsPlatform) GetMetricGenerators() []metric.Generator {
 func (p *ecsPlatform) GetSpecGenerators() []spec.Generator {
 	return []spec.Generator{
 		newSpecGenerator(p.client, p.provider),
+		&spec.CPUGenerator{},
 	}
 }
 

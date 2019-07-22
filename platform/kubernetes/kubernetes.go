@@ -85,6 +85,7 @@ func (p *kubernetesPlatform) GetMetricGenerators() []metric.Generator {
 func (p *kubernetesPlatform) GetSpecGenerators() []spec.Generator {
 	return []spec.Generator{
 		newSpecGenerator(p.client),
+		&spec.CPUGenerator{},
 	}
 }
 
