@@ -31,6 +31,8 @@ func (c *collector) collect(ctx context.Context) (mackerel.HostMeta, string, err
 		case *CloudHostname:
 			ret.Cloud = v.Cloud
 			hostname = v.Hostname
+		case mackerel.CPU:
+			ret.CPU = v
 		default:
 		}
 	}
