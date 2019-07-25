@@ -15,7 +15,6 @@ import (
 type CPUGenerator struct {
 }
 
-// TODO: タグこれでいいのかな
 var cpuLogger = logging.GetLogger("spec.cpu")
 
 func (g *CPUGenerator) generate(file io.Reader) (interface{}, error) {
@@ -55,6 +54,8 @@ func (g *CPUGenerator) generate(file io.Reader) (interface{}, error) {
 	}
 
 	if err := scanner.Err(); err != nil {
+		// Don't return error to prevent stop agent
+		// caused by failing on scanning /proc/cpuinfo
 		cpuLogger.Errorf("failed (on scanning /proc/cpuinfo): %s", err)
 		return nil, nil
 	}
@@ -73,6 +74,8 @@ func (g *CPUGenerator) generate(file io.Reader) (interface{}, error) {
 func (g *CPUGenerator) Generate(ctx context.Context) (interface{}, error) {
 	file, err := os.Open("/proc/cpuinfo")
 	if err != nil {
+		// Don't return error to prevent stop agent
+		// caused by failing on scanning /proc/cpuinfo
 		cpuLogger.Errorf("failed (skip this spec): %s", err)
 		return nil, nil
 	}
