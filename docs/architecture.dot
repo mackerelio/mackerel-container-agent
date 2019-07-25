@@ -1,0 +1,64 @@
+digraph {
+  rankdir=LR;
+
+  "agent.Run" -> "metric.Manager";
+  "agent.Run" -> "spec.Manager";
+  "agent.Run" -> "check.Manager";
+  "agent.Run" -> "config.Loader";
+  "agent.Run" -> "probe.Probe";
+  "agent.Run" -> "platform.Platform";
+  "agent.Run" -> "agent.hostResolver";
+  "agent.hostResolver" -> "api.Client";
+
+  subgraph check {
+    label="check";
+    "check.Manager" -> "check.collector" [dir=back label="[]*check.Result"];
+    "check.collector" -> "[]check.Generator" [dir=back label="*check.Result"];
+    "check.Manager" -> "check.sender" [label="[]*mackerel.CheckReport"];
+  }
+
+  subgraph metric {
+    label="metric";
+    "metric.Manager" -> "metric.collector" [dir=back label="metric.Values"];
+    "metric.collector" -> "[]metric.Generator" [dir=back label="metric.Values"];
+    "metric.Manager" -> "metric.sender" [label="[]*mackerel.MetricValue"];
+  }
+
+  subgraph spec {
+    label="spec";
+    "spec.Manager" -> "spec.collector" [dir=back label="mackerel.HostMeta"];
+    "spec.collector" -> "[]spec.Generator" [dir=back label="interface{}"];
+    "spec.Manager" -> "spec.sender" [label="*mackerel.UpdateHostParam"];
+  }
+
+  subgraph config {
+    label="config";
+    "config.Loader" -> "config.Config" [label="Load"];
+    "config.Config" -> configMetricGenerator [label="MetricPlugins"];
+    configMetricGenerator [label="[]metric.Generator"];
+    "config.Config" -> configCheckGenerator [label="CheckPlugins"];
+    configCheckGenerator[label="[]check.Generator"];
+  }
+
+  subgraph probe {
+    label="probe";
+    "config.Config" -> "probe.Probe" [label="ReadinessProbe"];
+  }
+
+  subgraph platform {
+    label="platform";
+    "platform.Platform" -> platformMetricGenerator [label="GetMetricGenerators"];
+    platformMetricGenerator [label="[]metric.Generator"];
+    "platform.Platform" -> platformSpecGenerator [label="GetSpecGenerators"];
+    platformSpecGenerator [label="[]spec.Generator"];
+  }
+
+  { rank=same; "[]metric.Generator"; configMetricGenerator; platformMetricGenerator; }
+  { rank=same; "[]check.Generator"; configCheckGenerator; }
+  { rank=same; "[]spec.Generator"; platformSpecGenerator; }
+
+  "check.sender" -> "api.Client";
+  "metric.sender" -> "api.Client";
+  "spec.sender" -> "api.Client";
+  "api.Client" -> "Mackerel API";
+}
