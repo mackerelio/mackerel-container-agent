@@ -75,7 +75,7 @@ func (g *CPUGenerator) Generate(ctx context.Context) (interface{}, error) {
 	file, err := os.Open("/proc/cpuinfo")
 	if err != nil {
 		// Don't return error to prevent stop agent
-		// caused by failing on scanning /proc/cpuinfo
+		// caused by failing on opening /proc/cpuinfo
 		cpuLogger.Errorf("failed (skip this spec): %s", err)
 		return nil, nil
 	}
