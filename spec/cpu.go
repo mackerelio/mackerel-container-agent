@@ -21,7 +21,7 @@ func (g *CPUGenerator) generate(file io.Reader) (interface{}, error) {
 	scanner := bufio.NewScanner(file)
 
 	var results mackerel.CPU
-	var cur map[string]interface{}
+	var cpuinfo map[string]interface{}
 	var modelName string
 
 	for scanner.Scan() {
@@ -35,21 +35,21 @@ func (g *CPUGenerator) generate(file io.Reader) (interface{}, error) {
 
 		switch key {
 		case "processor":
-			cur = make(map[string]interface{})
+			cpuinfo = make(map[string]interface{})
 			if modelName != "" {
-				cur["model_name"] = modelName
+				cpuinfo["model_name"] = modelName
 			}
-			results = append(results, cur)
+			results = append(results, cpuinfo)
 		case "Processor", "system type":
 			modelName = val
 		case "vendor_id", "model", "stepping", "physical id", "core id", "model name", "cache size":
-			cur[strings.Replace(key, " ", "_", -1)] = val
+			cpuinfo[strings.Replace(key, " ", "_", -1)] = val
 		case "cpu family":
-			cur["family"] = val
+			cpuinfo["family"] = val
 		case "cpu cores":
-			cur["cores"] = val
+			cpuinfo["cores"] = val
 		case "cpu MHz":
-			cur["mhz"] = val
+			cpuinfo["mhz"] = val
 		}
 	}
 
@@ -62,9 +62,9 @@ func (g *CPUGenerator) generate(file io.Reader) (interface{}, error) {
 
 	// Old kernels with CONFIG_SMP disabled has no "processor: " line
 	if len(results) == 0 && modelName != "" {
-		cur = make(map[string]interface{})
-		cur["model_name"] = modelName
-		results = append(results, cur)
+		cpuinfo = make(map[string]interface{})
+		cpuinfo["model_name"] = modelName
+		results = append(results, cpuinfo)
 	}
 
 	return results, nil
