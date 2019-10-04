@@ -11,8 +11,8 @@ import (
 	"regexp"
 
 	cadvisorTypes "github.com/google/cadvisor/info/v1"
+	kubeletTypes "github.com/mackerelio/mackerel-container-agent/local-apis/stats/v1alpha1"
 	kubernetesTypes "k8s.io/api/core/v1"
-	kubeletTypes "k8s.io/kubernetes/pkg/kubelet/apis/stats/v1alpha1"
 )
 
 // Client interface gets metadata and stats

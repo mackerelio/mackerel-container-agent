@@ -53,7 +53,6 @@ require (
 	golang.org/x/sync v0.0.0-20190412183630-56d357773e84
 	golang.org/x/sys v0.0.0-20190416152802-12500544f89f // indirect
 	golang.org/x/time v0.0.0-20190308202827-9d24e82272b4 // indirect
-	google.golang.org/appengine v1.4.0 // indirect
 	google.golang.org/genproto v0.0.0-20190415143225-d1146b9035b9 // indirect
 	google.golang.org/grpc v1.20.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
@@ -61,5 +60,4 @@ require (
 	k8s.io/api v0.0.0-20190416052506-9eb4726e83e4
 	k8s.io/apimachinery v0.0.0-20190416092415-3370b4aef5d6
 	k8s.io/klog v0.3.0 // indirect
-	k8s.io/kubernetes v1.14.1
 )

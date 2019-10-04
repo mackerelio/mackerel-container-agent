@@ -8,9 +8,9 @@ import (
 	"testing"
 
 	cadvisorTypes "github.com/google/cadvisor/info/v1"
+	kubeletTypes "github.com/mackerelio/mackerel-container-agent/local-apis/stats/v1alpha1"
 	kubernetesTypes "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
-	kubeletTypes "k8s.io/kubernetes/pkg/kubelet/apis/stats/v1alpha1"
 
 	"github.com/mackerelio/mackerel-container-agent/metric"
 	"github.com/mackerelio/mackerel-container-agent/platform/kubernetes/kubelet"
