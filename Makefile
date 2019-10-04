@@ -63,5 +63,6 @@ release: check-release-deps
 
 .PHONY: update
 update:
+	./local-apis/update.sh
 	go get -u ./...
 	go mod tidy
