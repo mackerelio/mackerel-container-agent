@@ -2,6 +2,7 @@
 
 set -eu
 
+cd $(dirname $0)
 d=$(mktemp -d)
 trap 'rm -rf $d; exit 1' 1 2 3 15
 
