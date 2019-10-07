@@ -40,7 +40,7 @@ func TestManagerRun(t *testing.T) {
 	manager := NewManager(createMockSpecGenerators(), client).WithVersion("x.y.z", "abc")
 	manager.SetHostID(hostID)
 
-	ctx, cancel := context.WithTimeout(context.Background(), 450*time.Millisecond)
+	ctx, cancel := context.WithTimeout(context.Background(), 480*time.Millisecond)
 	defer cancel()
 	err := manager.Run(ctx, 10*time.Millisecond, 100*time.Millisecond)
 	if err != nil {
@@ -74,7 +74,7 @@ func TestManagerRun_LazyHostID(t *testing.T) {
 	)
 	manager := NewManager(createMockSpecGenerators(), client).WithVersion("x.y.z", "abc")
 
-	ctx, cancel := context.WithTimeout(context.Background(), 450*time.Millisecond)
+	ctx, cancel := context.WithTimeout(context.Background(), 480*time.Millisecond)
 	defer cancel()
 	go func() {
 		time.Sleep(140 * time.Millisecond)
