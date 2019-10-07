@@ -4,7 +4,7 @@ import (
 	"context"
 
 	cadvisorTypes "github.com/google/cadvisor/info/v1"
-	kubeletTypes "github.com/mackerelio/mackerel-container-agent/local-apis/stats/v1alpha1"
+	kubeletTypes "github.com/mackerelio/mackerel-container-agent/internal/k8s-apis/stats/v1alpha1"
 	kubernetesTypes "k8s.io/api/core/v1"
 )
 
