@@ -8,6 +8,7 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"path"
 	"regexp"
 	"strings"
 	"time"
@@ -58,6 +59,43 @@ func NewKubernetesPlatform(kubeletHost, kubeletPort string, useReadOnlyPort, ins
 	}
 
 	httpClient := createHTTPClient(caCert, insecureTLS)
+
+	c, err := kubelet.NewClient(
+		httpClient,
+		string(token),
+		baseURL.String(),
+		namespace,
+		podName,
+		ignoreContainer,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &kubernetesPlatform{client: c}, nil
+}
+
+// NewEKSOnFargatePlatform creates a new Platform
+func NewEKSOnFargatePlatform(kubeletHost, kubeletPort string, namespace, podName string, nodeName string, ignoreContainer *regexp.Regexp) (platform.Platform, error) {
+	var caCert, token []byte
+	var err error
+
+	baseURL := &url.URL{
+		Scheme: "https",
+		Host:   net.JoinHostPort(kubeletHost, kubeletPort),
+		Path:   path.Join("api", "v1", "nodes", nodeName, "proxy"),
+	}
+
+	caCert, err = ioutil.ReadFile(caCertificateFile)
+	if err != nil {
+		return nil, err
+	}
+
+	token, err = ioutil.ReadFile(tokenFile)
+	if err != nil {
+		return nil, err
+	}
+
+	httpClient := createHTTPClient(caCert, false)
 
 	c, err := kubelet.NewClient(
 		httpClient,
