@@ -66,6 +66,29 @@ func NewPlatform(ctx context.Context, ignoreContainer *regexp.Regexp) (platform.
 		}
 		return kubernetes.NewKubernetesPlatform(host, port, useReadOnlyPort, insecureTLS, namespace, podName, ignoreContainer)
 
+	case platform.EKSOnFargate:
+		host, err := getEnvValue("KUBERNETES_SERVICE_HOST")
+		if err != nil {
+			return nil, err
+		}
+		port, err := getEnvValue("KUBERNETES_SERVICE_PORT")
+		if err != nil {
+			port = "443"
+		}
+		namespace, err := getEnvValue("MACKEREL_KUBERNETES_NAMESPACE")
+		if err != nil {
+			return nil, err
+		}
+		podName, err := getEnvValue("MACKEREL_KUBERNETES_POD_NAME")
+		if err != nil {
+			return nil, err
+		}
+		nodeName, err := getEnvValue("MACKEREL_KUBERNETES_NODE_NAME")
+		if err != nil {
+			return nil, err
+		}
+		return kubernetes.NewEKSOnFargatePlatform(host, port, namespace, podName, nodeName, ignoreContainer)
+
 	default:
 		return nil, errors.New("platform not specified")
 	}
