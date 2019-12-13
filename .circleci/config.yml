@@ -76,9 +76,6 @@ jobs:
       - attach_workspace:
           at: /tmp/workspace
 
-      - setup_remote_docker:
-          docker_layer_caching: true
-
       - run:
           name: Login to DockerHub
           command: docker login --username $DOCKER_USER --password $DOCKER_PASSWORD
@@ -110,9 +107,6 @@ jobs:
     steps:
       - attach_workspace:
           at: /tmp/workspace
-
-      - setup_remote_docker:
-          docker_layer_caching: true
 
       - run:
           name: Login to DockerHub
