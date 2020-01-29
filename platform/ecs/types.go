@@ -29,7 +29,7 @@ type containerSpec struct {
 	KnownStatus   string            `json:"known_status,omitempty"`
 	ExitCode      *int              `json:"exit_code,omitempty"`
 	Limits        limitSpec         `json:"limits,omitempty"`
-	CreatedAt     *time.Time        `json:"crated_at,omitempty"`
+	CreatedAt     *time.Time        `json:"created_at,omitempty"`
 	StartedAt     *time.Time        `json:"started_at,omitempty"`
 	FinishedAt    *time.Time        `json:"finished_at,omitempty"`
 	Type          string            `json:"type,omitempty"`
