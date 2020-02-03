@@ -6,10 +6,12 @@ This is a monitoring agent of [Mackerel](https://mackerel.io/) for containers on
 Please use [mackerel-agent](https://github.com/mackerelio/mackerel-agent) for non-container environment.
 
 ## Features, usage and supported environments
+
 Please refer to [Monitoring Containers](https://mackerel.io/docs/entry/howto/container-agent).
 
 ## LICENSE
-```
+
+```plaintext
 Copyright 2018-2019 Hatena Co., Ltd.
 
 Licensed under the Apache License, Version 2.0 (the "License");

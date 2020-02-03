@@ -1,7 +1,9 @@
+# Release Runbook
+
 - Merge PRs to master
 - Create release PR
-    - Run `make release`.
-    - `mackerel-container-agent:<RELEASE-VERSION>-alpha` Docker image is automatically pushed.
+  - Run `make release`.
+  - `mackerel-container-agent:<RELEASE-VERSION>-alpha` Docker image is automatically pushed.
 - Check release PR
   - Check CHANGELOG.
   - Test `mackerel-container-agent:<RELEASE-VERSION>-alpha` Docker image.
