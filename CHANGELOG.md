@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.3.0 (2020-02-07)
+
+* Fix typo: crated_at -> created_at #64 (aereal)
+* add support Amazon EKS on Amazon Fargate(BETA) #58 (yseto)
+* Remove a dependency on k8s.io/kubernetes #55 (lufia)
+* Add cpu spec generator #54 (tanatana)
+* Add design document #53 (itchyny)
+
+
 ## 0.2.0 (2019-07-16)
 
 * add mackerel-plugin-json to Docker image #51 (hayajo)
