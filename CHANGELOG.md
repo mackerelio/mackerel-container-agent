@@ -3,9 +3,7 @@
 ## 0.3.0 (2020-02-07)
 
 * Fix typo: crated_at -> created_at #64 (aereal)
-* update CircleCI config #62 (yseto)
-* update CircleCI config #60 (yseto)
-* add support Amazon EKS on Amazon Fargate #58 (yseto)
+* add support Amazon EKS on Amazon Fargate(BETA) #58 (yseto)
 * Remove a dependency on k8s.io/kubernetes #55 (lufia)
 * Add cpu spec generator #54 (tanatana)
 * Add design document #53 (itchyny)
