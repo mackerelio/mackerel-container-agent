@@ -38,7 +38,7 @@ loop:
 			break loop
 		case <-t.C:
 			go func() {
-				if err := m.collectAndPostValues(ctx); err != nil {
+				if err := m.collectAndPostValues(context.Background()); err != nil {
 					errCh <- err
 				}
 			}()

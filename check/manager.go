@@ -43,7 +43,7 @@ loop:
 			break loop
 		case <-t.C:
 			go func() {
-				if err := m.collectAndPostCheckReports(ctx); err != nil {
+				if err := m.collectAndPostCheckReports(context.Background()); err != nil {
 					errCh <- err
 				}
 			}()
