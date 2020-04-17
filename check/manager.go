@@ -43,7 +43,10 @@ loop:
 			break loop
 		case <-t.C:
 			go func() {
-				if err := m.collectAndPostCheckReports(context.Background()); err != nil {
+				d := time.Now().Add(time.Minute)
+				ctx, cancel := context.WithDeadline(context.Background(), d)
+				defer cancel()
+				if err := m.collectAndPostCheckReports(ctx); err != nil {
 					errCh <- err
 				}
 			}()
