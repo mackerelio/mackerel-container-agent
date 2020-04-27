@@ -38,6 +38,8 @@ loop:
 			break loop
 		case <-t.C:
 			go func() {
+				ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
+				defer cancel()
 				if err := m.collectAndPostValues(ctx); err != nil {
 					errCh <- err
 				}
