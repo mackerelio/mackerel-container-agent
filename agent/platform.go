@@ -90,6 +90,7 @@ func NewPlatform(ctx context.Context, ignoreContainer *regexp.Regexp) (platform.
 		}
 		return kubernetes.NewEKSOnFargatePlatform(host, port, namespace, podName, nodeName, ignoreContainer)
 
+	// for testing & debugging on local machine
 	case platform.None:
 		return none.NewNonePlatform()
 
