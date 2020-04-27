@@ -11,6 +11,7 @@ import (
 	"github.com/mackerelio/mackerel-container-agent/platform/ecs"
 	"github.com/mackerelio/mackerel-container-agent/platform/kubernetes"
 	"github.com/mackerelio/mackerel-container-agent/platform/kubernetes/kubelet"
+	"github.com/mackerelio/mackerel-container-agent/platform/none"
 )
 
 // NewPlatform creates a new container platform
@@ -88,6 +89,10 @@ func NewPlatform(ctx context.Context, ignoreContainer *regexp.Regexp) (platform.
 			return nil, err
 		}
 		return kubernetes.NewEKSOnFargatePlatform(host, port, namespace, podName, nodeName, ignoreContainer)
+
+	// for testing & debugging on local machine
+	case platform.None:
+		return none.NewNonePlatform()
 
 	default:
 		return nil, errors.New("platform not specified")

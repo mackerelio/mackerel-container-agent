@@ -11,4 +11,5 @@ const (
 	Fargate      Type = "fargate"
 	Kubernetes   Type = "kubernetes"
 	EKSOnFargate Type = "eks_fargate"
+	None         Type = "none"
 )
