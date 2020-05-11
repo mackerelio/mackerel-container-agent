@@ -2,8 +2,7 @@
 
 ## 0.3.1 (2020-05-11)
 
-* fix config reload interrupts collecting metrics / check reports #70 (susisu)
-* add "none" platform #71 (susisu)
+* fix reloading config interrupts collecting metrics / check reports #70 (susisu)
 
 
 ## 0.3.0 (2020-02-07)
