@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.1 (2020-05-11)
+
+* fix reloading config interrupts collecting metrics / check reports #70 (susisu)
+
+
 ## 0.3.0 (2020-02-07)
 
 * Fix typo: crated_at -> created_at #64 (aereal)
