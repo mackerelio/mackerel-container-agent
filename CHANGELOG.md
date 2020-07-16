@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.0 (2020-07-16)
+
+
+
 ## 0.3.1 (2020-05-11)
 
 * fix reloading config interrupts collecting metrics / check reports #70 (susisu)
