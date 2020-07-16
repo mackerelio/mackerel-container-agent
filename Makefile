@@ -48,7 +48,7 @@ version:
 .PHONY: check-release-deps
 check-release-deps:
 	@have_error=0; \
-	for command in cpanm hub ghch; do \
+	for command in cpanm hub ghch gobump; do \
 	  if ! command -v $$command > /dev/null; then \
 	    have_error=1; \
 	    echo "\`$$command\` command is required for releasing"; \
