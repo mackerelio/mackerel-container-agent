@@ -75,13 +75,14 @@ func NewKubernetesPlatform(kubeletHost, kubeletPort string, useReadOnlyPort, ins
 }
 
 // NewEKSOnFargatePlatform creates a new Platform
-func NewEKSOnFargatePlatform(kubeletHost, kubeletPort string, namespace, podName string, nodeName string, ignoreContainer *regexp.Regexp) (platform.Platform, error) {
+func NewEKSOnFargatePlatform(kubernetesServiceHost, kubernetesServicePort string, namespace, podName string, nodeName string, ignoreContainer *regexp.Regexp) (platform.Platform, error) {
 	var caCert, token []byte
 	var err error
 
+	// Access to kubelet via /api/v1/nodes/{nodeName}/proxy
 	baseURL := &url.URL{
 		Scheme: "https",
-		Host:   net.JoinHostPort(kubeletHost, kubeletPort),
+		Host:   net.JoinHostPort(kubernetesServiceHost, kubernetesServicePort),
 		Path:   path.Join("api", "v1", "nodes", nodeName, "proxy"),
 	}
 
