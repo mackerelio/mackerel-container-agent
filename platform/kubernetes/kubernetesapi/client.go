@@ -15,6 +15,7 @@ import (
 // Client interface gets metadata and stats
 type Client interface {
 	GetNode(context.Context) (*kubernetesTypes.Node, error)
+	NodeProxyURL() *url.URL
 }
 
 const (
@@ -41,6 +42,15 @@ func NewClient(httpClient *http.Client, token, baseURL, nodeName string) (Client
 		token:      token,
 		nodeName:   nodeName,
 	}, nil
+}
+
+// NodeProxyURL returns url which can be used for kubelet base url
+func (c *client) NodeProxyURL() *url.URL {
+	return &url.URL{
+		Scheme: "https",
+		Host:   c.url.Host,
+		Path:   path.Join(basePath, nodePath, c.nodeName, "proxy"),
+	}
 }
 
 // GetNode gets node spec

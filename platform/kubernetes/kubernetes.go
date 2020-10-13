@@ -8,7 +8,6 @@ import (
 	"net"
 	"net/http"
 	"net/url"
-	"path"
 	"regexp"
 	"strings"
 	"time"
@@ -99,13 +98,6 @@ func NewEKSOnFargatePlatform(kubernetesServiceHost, kubernetesServicePort string
 		Host:   net.JoinHostPort(kubernetesServiceHost, kubernetesServicePort),
 	}
 
-	// Access to kubelet via /api/v1/nodes/{nodeName}/proxy
-	kubeletBaseURL := &url.URL{
-		Scheme: "https",
-		Host:   net.JoinHostPort(kubernetesServiceHost, kubernetesServicePort),
-		Path:   path.Join("api", "v1", "nodes", nodeName, "proxy"),
-	}
-
 	caCert, err = ioutil.ReadFile(caCertificateFile)
 	if err != nil {
 		return nil, err
@@ -128,6 +120,8 @@ func NewEKSOnFargatePlatform(kubernetesServiceHost, kubernetesServicePort string
 		return nil, err
 	}
 
+	// access kubelet via proxy
+	kubeletBaseURL := sc.NodeProxyURL()
 	c, err := kubelet.NewClient(
 		httpClient,
 		string(token),
