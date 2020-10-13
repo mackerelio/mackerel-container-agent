@@ -16,7 +16,9 @@ import (
 
 func TestStatusRunning(t *testing.T) {
 	mockClient := kubelet.NewMockClient()
-	pform := kubernetesPlatform{mockClient}
+	pform := kubernetesPlatform{
+		client: mockClient,
+	}
 
 	tests := []struct {
 		status string

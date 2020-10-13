@@ -18,6 +18,7 @@ import (
 	"github.com/mackerelio/mackerel-container-agent/metric"
 	"github.com/mackerelio/mackerel-container-agent/platform"
 	"github.com/mackerelio/mackerel-container-agent/platform/kubernetes/kubelet"
+	"github.com/mackerelio/mackerel-container-agent/platform/kubernetes/kubernetesapi"
 	"github.com/mackerelio/mackerel-container-agent/spec"
 )
 
@@ -30,7 +31,8 @@ var (
 )
 
 type kubernetesPlatform struct {
-	client kubelet.Client
+	client    kubelet.Client // TODO rename to something like `kubeletClient` ?
+	apiClient kubernetesapi.Client
 }
 
 // NewKubernetesPlatform creates a new Platform
@@ -79,8 +81,13 @@ func NewEKSOnFargatePlatform(kubernetesServiceHost, kubernetesServicePort string
 	var caCert, token []byte
 	var err error
 
-	// Access to kubelet via /api/v1/nodes/{nodeName}/proxy
 	baseURL := &url.URL{
+		Scheme: "https",
+		Host:   net.JoinHostPort(kubernetesServiceHost, kubernetesServicePort),
+	}
+
+	// Access to kubelet via /api/v1/nodes/{nodeName}/proxy
+	kubeletBaseURL := &url.URL{
 		Scheme: "https",
 		Host:   net.JoinHostPort(kubernetesServiceHost, kubernetesServicePort),
 		Path:   path.Join("api", "v1", "nodes", nodeName, "proxy"),
@@ -98,10 +105,20 @@ func NewEKSOnFargatePlatform(kubernetesServiceHost, kubernetesServicePort string
 
 	httpClient := createHTTPClient(caCert, false)
 
-	c, err := kubelet.NewClient(
+	sc, err := kubernetesapi.NewClient(
 		httpClient,
 		string(token),
 		baseURL.String(),
+		nodeName,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	c, err := kubelet.NewClient(
+		httpClient,
+		string(token),
+		kubeletBaseURL.String(),
 		namespace,
 		podName,
 		ignoreContainer,
@@ -109,7 +126,7 @@ func NewEKSOnFargatePlatform(kubernetesServiceHost, kubernetesServicePort string
 	if err != nil {
 		return nil, err
 	}
-	return &kubernetesPlatform{client: c}, nil
+	return &kubernetesPlatform{client: c, apiClient: sc}, nil
 }
 
 // GetMetricGenerators gets metric generators
