@@ -139,6 +139,7 @@ func (c *client) GetPodStats(ctx context.Context) (*kubeletTypes.PodStats, error
 }
 
 // GetPodStats gets pod spec
+// NOTICE: this API is deprecated and will be removed in Kubernetes 1.20
 func (c *client) GetSpec(ctx context.Context) (*cadvisorTypes.MachineInfo, error) {
 	req, err := c.newRequest(specPath)
 	if err != nil {
