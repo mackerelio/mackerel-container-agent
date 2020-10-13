@@ -36,36 +36,49 @@ type kubernetesPlatform struct {
 }
 
 // NewKubernetesPlatform creates a new Platform
-func NewKubernetesPlatform(kubeletHost, kubeletPort string, useReadOnlyPort, insecureTLS bool, namespace, podName string, ignoreContainer *regexp.Regexp) (platform.Platform, error) {
+func NewKubernetesPlatform(kubernetesServiceHost, kubernetesServicePort, kubeletHost, kubeletPort string, useReadOnlyPort, insecureTLS bool, namespace, podName string, nodeName string, ignoreContainer *regexp.Regexp) (platform.Platform, error) {
 	var caCert, token []byte
+	var err error
 
 	baseURL := &url.URL{
+		Scheme: "https",
+		Host:   net.JoinHostPort(kubernetesServiceHost, kubernetesServicePort),
+	}
+
+	kubeletBaseURL := &url.URL{
 		Scheme: "http",
 		Host:   net.JoinHostPort(kubeletHost, kubeletPort),
 	}
 
 	if !useReadOnlyPort {
-		baseURL.Scheme = "https"
+		kubeletBaseURL.Scheme = "https"
+	}
 
-		var err error
+	caCert, err = ioutil.ReadFile(caCertificateFile)
+	if err != nil {
+		return nil, err
+	}
 
-		caCert, err = ioutil.ReadFile(caCertificateFile)
-		if err != nil {
-			return nil, err
-		}
-
-		token, err = ioutil.ReadFile(tokenFile)
-		if err != nil {
-			return nil, err
-		}
+	token, err = ioutil.ReadFile(tokenFile)
+	if err != nil {
+		return nil, err
 	}
 
 	httpClient := createHTTPClient(caCert, insecureTLS)
 
-	c, err := kubelet.NewClient(
+	sc, err := kubernetesapi.NewClient(
 		httpClient,
 		string(token),
 		baseURL.String(),
+		nodeName,
+	)
+	if err != nil {
+		return nil, err
+	}
+	c, err := kubelet.NewClient(
+		httpClient,
+		string(token),
+		kubeletBaseURL.String(),
 		namespace,
 		podName,
 		ignoreContainer,
@@ -73,7 +86,7 @@ func NewKubernetesPlatform(kubeletHost, kubeletPort string, useReadOnlyPort, ins
 	if err != nil {
 		return nil, err
 	}
-	return &kubernetesPlatform{client: c}, nil
+	return &kubernetesPlatform{client: c, apiClient: sc}, nil
 }
 
 // NewEKSOnFargatePlatform creates a new Platform

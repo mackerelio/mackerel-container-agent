@@ -38,19 +38,27 @@ func NewPlatform(ctx context.Context, ignoreContainer *regexp.Regexp) (platform.
 	case platform.Kubernetes:
 		useReadOnlyPort := true
 		insecureTLS := false
-		host, err := getEnvValue("MACKEREL_KUBERNETES_KUBELET_HOST")
+		serviceHost, err := getEnvValue("KUBERNETES_SERVICE_HOST")
 		if err != nil {
 			return nil, err
 		}
-		port, err := getEnvValue("MACKEREL_KUBERNETES_KUBELET_READ_ONLY_PORT")
+		servicePort, err := getEnvValue("KUBERNETES_SERVICE_PORT")
 		if err != nil {
-			port = kubelet.DefaultReadOnlyPort
+			servicePort = "443"
 		}
-		if port == "0" {
+		kubeletHost, err := getEnvValue("MACKEREL_KUBERNETES_KUBELET_HOST")
+		if err != nil {
+			return nil, err
+		}
+		kubeletPort, err := getEnvValue("MACKEREL_KUBERNETES_KUBELET_READ_ONLY_PORT")
+		if err != nil {
+			kubeletPort = kubelet.DefaultReadOnlyPort
+		}
+		if kubeletPort == "0" {
 			useReadOnlyPort = false
-			port, err = getEnvValue("MACKEREL_KUBERNETES_KUBELET_PORT")
+			kubeletPort, err = getEnvValue("MACKEREL_KUBERNETES_KUBELET_PORT")
 			if err != nil {
-				port = kubelet.DefaultPort
+				kubeletPort = kubelet.DefaultPort
 			}
 			_, err := getEnvValue("MACKEREL_KUBERNETES_KUBELET_INSECURE_TLS")
 			if err == nil {
@@ -65,16 +73,20 @@ func NewPlatform(ctx context.Context, ignoreContainer *regexp.Regexp) (platform.
 		if err != nil {
 			return nil, err
 		}
-		return kubernetes.NewKubernetesPlatform(host, port, useReadOnlyPort, insecureTLS, namespace, podName, ignoreContainer)
-
-	case platform.EKSOnFargate:
-		host, err := getEnvValue("KUBERNETES_SERVICE_HOST")
+		nodeName, err := getEnvValue("MACKEREL_KUBERNETES_NODE_NAME")
 		if err != nil {
 			return nil, err
 		}
-		port, err := getEnvValue("KUBERNETES_SERVICE_PORT")
+		return kubernetes.NewKubernetesPlatform(serviceHost, servicePort, kubeletHost, kubeletPort, useReadOnlyPort, insecureTLS, namespace, podName, nodeName, ignoreContainer)
+
+	case platform.EKSOnFargate:
+		serviceHost, err := getEnvValue("KUBERNETES_SERVICE_HOST")
 		if err != nil {
-			port = "443"
+			return nil, err
+		}
+		servicePort, err := getEnvValue("KUBERNETES_SERVICE_PORT")
+		if err != nil {
+			servicePort = "443"
 		}
 		namespace, err := getEnvValue("MACKEREL_KUBERNETES_NAMESPACE")
 		if err != nil {
@@ -88,7 +100,7 @@ func NewPlatform(ctx context.Context, ignoreContainer *regexp.Regexp) (platform.
 		if err != nil {
 			return nil, err
 		}
-		return kubernetes.NewEKSOnFargatePlatform(host, port, namespace, podName, nodeName, ignoreContainer)
+		return kubernetes.NewEKSOnFargatePlatform(serviceHost, servicePort, namespace, podName, nodeName, ignoreContainer)
 
 	// for testing & debugging on local machine
 	case platform.None:
