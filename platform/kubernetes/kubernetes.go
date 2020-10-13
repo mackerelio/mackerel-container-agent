@@ -145,7 +145,7 @@ func NewEKSOnFargatePlatform(kubernetesServiceHost, kubernetesServicePort string
 // GetMetricGenerators gets metric generators
 func (p *kubernetesPlatform) GetMetricGenerators() []metric.Generator {
 	return []metric.Generator{
-		newMetricGenerator(p.client),
+		newMetricGenerator(p.client, p.apiClient),
 		metric.NewInterfaceGenerator(),
 	}
 }

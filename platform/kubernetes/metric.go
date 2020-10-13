@@ -12,19 +12,22 @@ import (
 
 	"github.com/mackerelio/mackerel-container-agent/metric"
 	"github.com/mackerelio/mackerel-container-agent/platform/kubernetes/kubelet"
+	"github.com/mackerelio/mackerel-container-agent/platform/kubernetes/kubernetesapi"
 )
 
 type metricGenerator struct {
 	client       kubelet.Client
+	apiClient    kubernetesapi.Client
 	hostMemTotal *float64
 	hostNumCores *float64
 	prevStats    *kubeletTypes.PodStats
 	prevTime     time.Time
 }
 
-func newMetricGenerator(client kubelet.Client) *metricGenerator {
+func newMetricGenerator(client kubelet.Client, apiClient kubernetesapi.Client) *metricGenerator {
 	return &metricGenerator{
-		client: client,
+		client:    client,
+		apiClient: apiClient,
 	}
 }
 
@@ -35,6 +38,18 @@ func (g *metricGenerator) Generate(ctx context.Context) (metric.Values, error) {
 	}
 	if g.hostMemTotal == nil || g.hostNumCores == nil {
 		machineInfo, err := g.client.GetSpec(ctx)
+		if err == kubelet.ErrNotFound {
+			// TODO error handling
+			nodeInfo, _ := g.apiClient.GetNode(ctx)
+
+			coresInt, _ := nodeInfo.Status.Capacity.Cpu().AsInt64()
+			cores := float64(coresInt)
+			g.hostNumCores = &cores
+
+			memInt, _ := nodeInfo.Status.Capacity.Memory().AsInt64()
+			mem := float64(memInt)
+			g.hostMemTotal = &mem
+		}
 		if err != nil {
 			return nil, err
 		}

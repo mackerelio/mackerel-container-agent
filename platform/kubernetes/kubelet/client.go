@@ -138,6 +138,9 @@ func (c *client) GetPodStats(ctx context.Context) (*kubeletTypes.PodStats, error
 	return stats, nil
 }
 
+// ErrNotFound shows that underlying HTTP request was 404 Not found
+var ErrNotFound error
+
 // GetPodStats gets pod spec
 // NOTICE: this API is deprecated and will be removed in Kubernetes 1.20
 func (c *client) GetSpec(ctx context.Context) (*cadvisorTypes.MachineInfo, error) {
@@ -148,6 +151,9 @@ func (c *client) GetSpec(ctx context.Context) (*cadvisorTypes.MachineInfo, error
 	resp, err := c.httpClient.Do(req.WithContext(ctx))
 	if err != nil {
 		return nil, err
+	}
+	if resp.StatusCode == http.StatusNotFound {
+		return nil, ErrNotFound
 	}
 	var info cadvisorTypes.MachineInfo
 	if err = decodeBody(resp, &info); err != nil {

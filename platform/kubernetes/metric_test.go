@@ -63,8 +63,8 @@ func TestGenerateStats(t *testing.T) {
 			return &info, nil
 		}),
 	)
-	generator := newMetricGenerator(client)
-	_, err := generator.Generate(ctx) // Store metrics to generator.prevStats.
+	generator := newMetricGenerator(client, nil) // XXX
+	_, err := generator.Generate(ctx)            // Store metrics to generator.prevStats.
 	if err != nil {
 		t.Errorf("Generate() should not raise error: %v", err)
 	}
