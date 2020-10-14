@@ -14,6 +14,7 @@ import (
 
 	"github.com/mackerelio/mackerel-container-agent/metric"
 	"github.com/mackerelio/mackerel-container-agent/platform/kubernetes/kubelet"
+	"github.com/mackerelio/mackerel-container-agent/platform/kubernetes/kubernetesapi"
 )
 
 func TestGenerateStats(t *testing.T) {
@@ -63,8 +64,9 @@ func TestGenerateStats(t *testing.T) {
 			return &info, nil
 		}),
 	)
-	generator := newMetricGenerator(client, nil) // XXX
-	_, err := generator.Generate(ctx)            // Store metrics to generator.prevStats.
+	serviceClient := kubernetesapi.NewMockClient()
+	generator := newMetricGenerator(client, serviceClient)
+	_, err := generator.Generate(ctx) // Store metrics to generator.prevStats.
 	if err != nil {
 		t.Errorf("Generate() should not raise error: %v", err)
 	}
