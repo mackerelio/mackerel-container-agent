@@ -70,18 +70,16 @@ func NewKubernetesPlatform(kubernetesServiceHost, kubernetesServicePort, kubelet
 	if err != nil {
 		if !useReadOnlyPort {
 			return nil, err
-		} else {
-			logger.Warningf("failed to read service account certification file, %w", err)
 		}
+		logger.Warningf("failed to read service account certification file, %w", err)
 	}
 
 	token, err = ioutil.ReadFile(tokenFile)
 	if err != nil {
 		if !useReadOnlyPort {
 			return nil, err
-		} else {
-			logger.Warningf("failed to read service account token file, %w", err)
 		}
+		logger.Warningf("failed to read service account token file, %w", err)
 	}
 
 	httpClient := createHTTPClient(caCert, insecureTLS)
