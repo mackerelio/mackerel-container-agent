@@ -2,6 +2,7 @@ package kubernetes
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 	"time"
 
@@ -31,34 +32,56 @@ func newMetricGenerator(client kubelet.Client, apiClient kubernetesapi.Client) *
 	}
 }
 
+// getHostCapacityFromKubelet may not work on newer Kubernetes (1.18+), due to API deprecation.
+func (g *metricGenerator) getHostCapacityFromKubelet(ctx context.Context) (numCores, memTotal float64, err error) {
+	machineInfo, err := g.client.GetSpec(ctx)
+	if err != nil {
+		return 0, 0, err
+	}
+	return float64(machineInfo.NumCores), float64(machineInfo.MemoryCapacity), nil
+}
+
+func (g *metricGenerator) getHostCapacityFromKubernetesAPI(ctx context.Context) (numCores, memTotal float64, err error) {
+	nodeInfo, err := g.apiClient.GetNode(ctx)
+	if err != nil {
+		return 0, 0, err
+	}
+
+	cores := nodeInfo.Status.Capacity.Cpu()
+	coresInt, ok := cores.AsInt64()
+	if !ok {
+		return 0, 0, fmt.Errorf("failed to parse CPU cores %s", cores)
+	}
+
+	mem := nodeInfo.Status.Capacity.Memory()
+	memInt, ok := mem.AsInt64()
+	if !ok {
+		return 0, 0, fmt.Errorf("failed to parse memory %s", mem)
+	}
+
+	return float64(coresInt), float64(memInt), nil
+}
+
 func (g *metricGenerator) Generate(ctx context.Context) (metric.Values, error) {
 	stats, err := g.client.GetPodStats(ctx)
 	if err != nil {
 		return nil, err
 	}
 	if g.hostMemTotal == nil || g.hostNumCores == nil {
-		machineInfo, err := g.client.GetSpec(ctx)
+		var cores, total float64
+		cores, total, err = g.getHostCapacityFromKubelet(ctx)
 		if err == kubelet.ErrNotFound {
-			// TODO error handling
-			nodeInfo, _ := g.apiClient.GetNode(ctx)
-
-			coresInt, _ := nodeInfo.Status.Capacity.Cpu().AsInt64()
-			cores := float64(coresInt)
-			g.hostNumCores = &cores
-
-			memInt, _ := nodeInfo.Status.Capacity.Memory().AsInt64()
-			mem := float64(memInt)
-			g.hostMemTotal = &mem
-		}
-		if err != nil {
+			cores, total, err = g.getHostCapacityFromKubernetesAPI(ctx)
+			if err != nil {
+				return nil, err
+			}
+		} else if err != nil {
 			return nil, err
 		}
 		if g.hostMemTotal == nil {
-			total := float64(machineInfo.MemoryCapacity)
 			g.hostMemTotal = &total
 		}
 		if g.hostNumCores == nil {
-			cores := float64(machineInfo.NumCores)
 			g.hostNumCores = &cores
 		}
 	}
