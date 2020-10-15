@@ -173,6 +173,28 @@ func TestGetSpec(t *testing.T) {
 	}
 }
 
+func TestGetSpec_NotFound(t *testing.T) {
+	token := "foobar"
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if token != "" && r.Header.Get("Authorization") != "Bearer "+token {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+		w.WriteHeader(http.StatusNotFound)
+	}))
+
+	ctx := context.Background()
+	defer ts.Close()
+	c, err := NewClient(ts.Client(), token, ts.URL, "default", "myapp", nil)
+	if err != nil {
+		t.Errorf("should not raise error: %v", err)
+	}
+	_, err = c.GetSpec(ctx)
+	if err != ErrNotFound {
+		t.Errorf("GetSpec() should raise ErrNotFound error: %v", err)
+	}
+}
+
 func TestIgnoreContainer(t *testing.T) {
 	ts := newServer("")
 	defer ts.Close()
