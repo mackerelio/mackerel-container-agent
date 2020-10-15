@@ -75,8 +75,8 @@ func TestGenerateStats(t *testing.T) {
 		t.Errorf("Generate() should not raise error: %v", err)
 	}
 	expected := metric.Values{
-		"container.cpu.mackerel-container-agent.usage":    0.0, // Rsult is 0 because use the same data.
-		"container.cpu.nginx.usage":                       0.0, // Rsult is 0 because use the same data.
+		"container.cpu.mackerel-container-agent.usage":    0.0, // Result is 0 because use the same data.
+		"container.cpu.nginx.usage":                       0.0, // Result is 0 because use the same data.
 		"container.cpu.mackerel-container-agent.limit":    25.0,
 		"container.cpu.nginx.limit":                       200.0,
 		"container.memory.mackerel-container-agent.usage": 2.6529792e+07,
