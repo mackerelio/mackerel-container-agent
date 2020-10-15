@@ -17,7 +17,6 @@ func newServer(token string) *httptest.Server {
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
-		fmt.Println(r.URL.RequestURI())
 		// only /api/v1/nodes/VALID-NODE is valid
 		switch r.URL.RequestURI() {
 		case validNodePath:
