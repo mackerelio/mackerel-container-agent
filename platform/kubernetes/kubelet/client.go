@@ -3,6 +3,7 @@ package kubelet
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -139,7 +140,7 @@ func (c *client) GetPodStats(ctx context.Context) (*kubeletTypes.PodStats, error
 }
 
 // ErrNotFound shows that underlying HTTP request was 404 Not found
-var ErrNotFound error
+var ErrNotFound = errors.New("http not found")
 
 // GetPodStats gets pod spec
 // NOTICE: this API is deprecated and will be removed in Kubernetes 1.20
