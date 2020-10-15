@@ -143,7 +143,7 @@ func (c *client) GetPodStats(ctx context.Context) (*kubeletTypes.PodStats, error
 var ErrNotFound = errors.New("http not found")
 
 // GetPodStats gets pod spec
-// NOTICE: this API is deprecated and will be removed in Kubernetes 1.20
+// Deprecated: this API is deprecated in Kubernetes 1.18 (and disabled by default), and will be removed in Kubernetes 1.20
 func (c *client) GetSpec(ctx context.Context) (*cadvisorTypes.MachineInfo, error) {
 	req, err := c.newRequest(specPath)
 	if err != nil {
