@@ -53,14 +53,35 @@ func NewKubernetesPlatform(kubernetesServiceHost, kubernetesServicePort, kubelet
 		kubeletBaseURL.Scheme = "https"
 	}
 
+	// caCert and token are:
+	// - necessary when useReadOnlyPort == true with Kubernetes 1.18+
+	//   - in this case we use them to access Kubernetes API
+	// - NOT necessary when useReadOnlyPort == true with Kubernets < 1.18
+	//   - in this case we don't access Kubernetes API
+	// - necessary when useReadOnlyPort == false, regardless Kubernetes version
+	//   - in this case we use them to access Kubelet
+	//   - additionaly, on Kubernetes 1.18+ they are also used to access Kubernetes API
+	// therefore:
+	// - will return err when we cannot load them and useReadOnlyPort == true
+	// - will NOT return err when we cannot load them and useReadOnlyPort == false
+	//   - instead we just log
+	// TODO: return err even useReadOnlyPort after we drop Kubernetes < 1.18
 	caCert, err = ioutil.ReadFile(caCertificateFile)
 	if err != nil {
-		return nil, err
+		if !useReadOnlyPort {
+			return nil, err
+		} else {
+			logger.Warningf("failed to read service account certification file, %w", err)
+		}
 	}
 
 	token, err = ioutil.ReadFile(tokenFile)
 	if err != nil {
-		return nil, err
+		if !useReadOnlyPort {
+			return nil, err
+		} else {
+			logger.Warningf("failed to read service account token file, %w", err)
+		}
 	}
 
 	httpClient := createHTTPClient(caCert, insecureTLS)
