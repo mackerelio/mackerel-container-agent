@@ -2,12 +2,14 @@ package kubernetes
 
 import (
 	"context"
+	"runtime"
 	"strconv"
 	"time"
 
 	kubeletTypes "github.com/mackerelio/mackerel-container-agent/internal/k8s-apis/stats/v1alpha1"
 	kubernetesTypes "k8s.io/api/core/v1"
 
+	"github.com/mackerelio/go-osstat/memory"
 	mackerel "github.com/mackerelio/mackerel-client-go"
 
 	"github.com/mackerelio/mackerel-container-agent/metric"
@@ -34,16 +36,16 @@ func (g *metricGenerator) Generate(ctx context.Context) (metric.Values, error) {
 		return nil, err
 	}
 	if g.hostMemTotal == nil || g.hostNumCores == nil {
-		machineInfo, err := g.client.GetSpec(ctx)
+		memory, err := memory.Get()
 		if err != nil {
 			return nil, err
 		}
 		if g.hostMemTotal == nil {
-			total := float64(machineInfo.MemoryCapacity)
+			total := float64(memory.Total)
 			g.hostMemTotal = &total
 		}
 		if g.hostNumCores == nil {
-			cores := float64(machineInfo.NumCores)
+			cores := float64(runtime.NumCPU())
 			g.hostNumCores = &cores
 		}
 	}
