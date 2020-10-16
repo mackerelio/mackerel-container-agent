@@ -11,23 +11,23 @@ import (
 	mackerel "github.com/mackerelio/mackerel-client-go"
 
 	"github.com/mackerelio/mackerel-container-agent/metric"
+	"github.com/mackerelio/mackerel-container-agent/metric/hostinfo"
 	"github.com/mackerelio/mackerel-container-agent/platform/kubernetes/kubelet"
-	"github.com/mackerelio/mackerel-container-agent/platform/kubernetes/nodeinfo"
 )
 
 type metricGenerator struct {
 	client            kubelet.Client
-	hostInfoGenerator nodeinfo.Generator
+	hostInfoGenerator hostinfo.Generator
 	hostMemTotal      *float64
 	hostNumCores      *float64
 	prevStats         *kubeletTypes.PodStats
 	prevTime          time.Time
 }
 
-func newMetricGenerator(client kubelet.Client, nodeInfoGen nodeinfo.Generator) *metricGenerator {
+func newMetricGenerator(client kubelet.Client, hostinfoGenerator hostinfo.Generator) *metricGenerator {
 	return &metricGenerator{
 		client:            client,
-		hostInfoGenerator: nodeInfoGen,
+		hostInfoGenerator: hostinfoGenerator,
 	}
 }
 

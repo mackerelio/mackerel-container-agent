@@ -16,9 +16,9 @@ import (
 	"github.com/mackerelio/golib/logging"
 
 	"github.com/mackerelio/mackerel-container-agent/metric"
+	"github.com/mackerelio/mackerel-container-agent/metric/hostinfo"
 	"github.com/mackerelio/mackerel-container-agent/platform"
 	"github.com/mackerelio/mackerel-container-agent/platform/kubernetes/kubelet"
-	"github.com/mackerelio/mackerel-container-agent/platform/kubernetes/nodeinfo"
 	"github.com/mackerelio/mackerel-container-agent/spec"
 )
 
@@ -115,7 +115,7 @@ func NewEKSOnFargatePlatform(kubeletHost, kubeletPort string, namespace, podName
 // GetMetricGenerators gets metric generators
 func (p *kubernetesPlatform) GetMetricGenerators() []metric.Generator {
 	return []metric.Generator{
-		newMetricGenerator(p.client, nodeinfo.NewGenerator()),
+		newMetricGenerator(p.client, hostinfo.NewGenerator()),
 		metric.NewInterfaceGenerator(),
 	}
 }

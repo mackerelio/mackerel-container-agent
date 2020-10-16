@@ -1,4 +1,4 @@
-package nodeinfo
+package hostinfo
 
 // MockGenerator is mock for testing
 type MockGenerator struct {

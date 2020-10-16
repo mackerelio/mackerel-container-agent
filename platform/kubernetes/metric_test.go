@@ -12,8 +12,8 @@ import (
 	"k8s.io/apimachinery/pkg/api/resource"
 
 	"github.com/mackerelio/mackerel-container-agent/metric"
+	"github.com/mackerelio/mackerel-container-agent/metric/hostinfo"
 	"github.com/mackerelio/mackerel-container-agent/platform/kubernetes/kubelet"
-	"github.com/mackerelio/mackerel-container-agent/platform/kubernetes/nodeinfo"
 )
 
 func TestGenerateStats(t *testing.T) {
@@ -52,7 +52,7 @@ func TestGenerateStats(t *testing.T) {
 			return nil, nil
 		}),
 	)
-	generator := newMetricGenerator(client, nodeinfo.NewMockGenerator(3876802560.0, 8.0, nil))
+	generator := newMetricGenerator(client, hostinfo.NewMockGenerator(3876802560.0, 8.0, nil))
 	_, err := generator.Generate(ctx) // Store metrics to generator.prevStats.
 	if err != nil {
 		t.Errorf("Generate() should not raise error: %v", err)

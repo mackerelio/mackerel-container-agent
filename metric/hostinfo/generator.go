@@ -1,4 +1,4 @@
-package nodeinfo
+package hostinfo
 
 import (
 	"runtime"
@@ -6,12 +6,12 @@ import (
 	"github.com/mackerelio/go-osstat/memory"
 )
 
-// Generator interface gets node information
+// Generator interface gets host information
 type Generator interface {
 	Generate() (memTotal float64, cpuCores float64, err error)
 }
 
-// NewGenerator returns node info generator
+// NewGenerator returns host info generator
 func NewGenerator() Generator {
 	return &generator{}
 }
