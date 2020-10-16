@@ -12,15 +12,15 @@ type Generator interface {
 }
 
 // NewGenerator returns node info generator
-func NewGenerator() *RealGenerator {
-	return &RealGenerator{}
+func NewGenerator() Generator {
+	return &generator{}
 }
 
-// RealGenerator is a real Generator
-type RealGenerator struct{}
+// generator is a real Generator
+type generator struct{}
 
 // Generate retrieves information and return it
-func (r *RealGenerator) Generate() (memTotal float64, cpuCores float64, err error) {
+func (r *generator) Generate() (memTotal float64, cpuCores float64, err error) {
 	memory, err := memory.Get()
 	if err != nil {
 		return 0, 0, err
@@ -41,7 +41,7 @@ func (m *MockGenerator) Generate() (float64, float64, error) {
 }
 
 // NewMockGenerator is constructor for mock
-func NewMockGenerator(mockMemTotal float64, mockCPUCores float64, mockErr error) *MockGenerator {
+func NewMockGenerator(mockMemTotal float64, mockCPUCores float64, mockErr error) Generator {
 	return &MockGenerator{
 		mockCPUCores: mockCPUCores,
 		mockMemTotal: mockMemTotal,
