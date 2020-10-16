@@ -8,7 +8,7 @@ import (
 
 // Generator interface gets node information
 type Generator interface {
-	GetInfo() (memTotal float64, cpuCores float64, err error)
+	Generate() (memTotal float64, cpuCores float64, err error)
 }
 
 // NewGenerator returns node info generator
@@ -19,8 +19,8 @@ func NewGenerator() *RealGenerator {
 // RealGenerator is a real Generator
 type RealGenerator struct{}
 
-// GetInfo retrieves information and return it
-func (r *RealGenerator) GetInfo() (memTotal float64, cpuCores float64, err error) {
+// Generate retrieves information and return it
+func (r *RealGenerator) Generate() (memTotal float64, cpuCores float64, err error) {
 	memory, err := memory.Get()
 	if err != nil {
 		return 0, 0, err
@@ -35,8 +35,8 @@ type MockGenerator struct {
 	mockErr      error
 }
 
-// GetInfo returns mock response
-func (m *MockGenerator) GetInfo() (float64, float64, error) {
+// Generate returns mock response
+func (m *MockGenerator) Generate() (float64, float64, error) {
 	return m.mockMemTotal, m.mockCPUCores, m.mockErr
 }
 

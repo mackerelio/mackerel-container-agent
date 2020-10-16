@@ -37,7 +37,7 @@ func (g *metricGenerator) Generate(ctx context.Context) (metric.Values, error) {
 		return nil, err
 	}
 	if g.hostMemTotal == nil || g.hostNumCores == nil {
-		memTotal, cpuCores, err := g.hostInfoGenerator.GetInfo()
+		memTotal, cpuCores, err := g.hostInfoGenerator.Generate()
 		if err != nil {
 			return nil, err
 		}
