@@ -14,6 +14,7 @@ import (
 
 	"github.com/mackerelio/mackerel-container-agent/metric"
 	"github.com/mackerelio/mackerel-container-agent/platform/kubernetes/kubelet"
+	"github.com/mackerelio/mackerel-container-agent/platform/kubernetes/nodeinfo"
 )
 
 func TestGenerateStats(t *testing.T) {
@@ -63,7 +64,7 @@ func TestGenerateStats(t *testing.T) {
 			return &info, nil
 		}),
 	)
-	generator := newMetricGenerator(client)
+	generator := newMetricGenerator(client, nodeinfo.NewMockGenerator(3876802560.0, 8.0, nil))
 	_, err := generator.Generate(ctx) // Store metrics to generator.prevStats.
 	if err != nil {
 		t.Errorf("Generate() should not raise error: %v", err)
@@ -76,11 +77,11 @@ func TestGenerateStats(t *testing.T) {
 		"container.cpu.mackerel-container-agent.usage":    0.0, // Result is 0 because use the same data.
 		"container.cpu.nginx.usage":                       0.0, // Result is 0 because use the same data.
 		"container.cpu.mackerel-container-agent.limit":    25.0,
-		"container.cpu.nginx.limit":                       200.0,
+		"container.cpu.nginx.limit":                       800.0, // mockCpuCores * 100
 		"container.memory.mackerel-container-agent.usage": 2.6529792e+07,
 		"container.memory.nginx.usage":                    1.949696e+06,
-		"container.memory.mackerel-container-agent.limit": 134217728.0, // 128MiB
-		"container.memory.nginx.limit":                    2096058368.0,
+		"container.memory.mackerel-container-agent.limit": 134217728.0,  // 128MiB
+		"container.memory.nginx.limit":                    3876802560.0, // mockMemTotal
 	}
 	if !reflect.DeepEqual(expected, got) {
 		t.Errorf("Generate() expected %v, got %v", expected, got)

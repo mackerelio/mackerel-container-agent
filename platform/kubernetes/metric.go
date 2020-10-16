@@ -2,31 +2,32 @@ package kubernetes
 
 import (
 	"context"
-	"runtime"
 	"strconv"
 	"time"
 
 	kubeletTypes "github.com/mackerelio/mackerel-container-agent/internal/k8s-apis/stats/v1alpha1"
 	kubernetesTypes "k8s.io/api/core/v1"
 
-	"github.com/mackerelio/go-osstat/memory"
 	mackerel "github.com/mackerelio/mackerel-client-go"
 
 	"github.com/mackerelio/mackerel-container-agent/metric"
 	"github.com/mackerelio/mackerel-container-agent/platform/kubernetes/kubelet"
+	"github.com/mackerelio/mackerel-container-agent/platform/kubernetes/nodeinfo"
 )
 
 type metricGenerator struct {
-	client       kubelet.Client
-	hostMemTotal *float64
-	hostNumCores *float64
-	prevStats    *kubeletTypes.PodStats
-	prevTime     time.Time
+	client            kubelet.Client
+	hostInfoGenerator nodeinfo.Generator
+	hostMemTotal      *float64
+	hostNumCores      *float64
+	prevStats         *kubeletTypes.PodStats
+	prevTime          time.Time
 }
 
-func newMetricGenerator(client kubelet.Client) *metricGenerator {
+func newMetricGenerator(client kubelet.Client, nodeInfoGen nodeinfo.Generator) *metricGenerator {
 	return &metricGenerator{
-		client: client,
+		client:            client,
+		hostInfoGenerator: nodeInfoGen,
 	}
 }
 
@@ -36,17 +37,15 @@ func (g *metricGenerator) Generate(ctx context.Context) (metric.Values, error) {
 		return nil, err
 	}
 	if g.hostMemTotal == nil || g.hostNumCores == nil {
-		memory, err := memory.Get()
+		memTotal, cpuCores, err := g.hostInfoGenerator.GetInfo()
 		if err != nil {
 			return nil, err
 		}
 		if g.hostMemTotal == nil {
-			total := float64(memory.Total)
-			g.hostMemTotal = &total
+			g.hostMemTotal = &memTotal
 		}
 		if g.hostNumCores == nil {
-			cores := float64(runtime.NumCPU())
-			g.hostNumCores = &cores
+			g.hostNumCores = &cpuCores
 		}
 	}
 
