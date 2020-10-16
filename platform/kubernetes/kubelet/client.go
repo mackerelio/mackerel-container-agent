@@ -10,7 +10,6 @@ import (
 	"path"
 	"regexp"
 
-	cadvisorTypes "github.com/google/cadvisor/info/v1"
 	kubeletTypes "github.com/mackerelio/mackerel-container-agent/internal/k8s-apis/stats/v1alpha1"
 	kubernetesTypes "k8s.io/api/core/v1"
 )
@@ -19,7 +18,6 @@ import (
 type Client interface {
 	GetPod(context.Context) (*kubernetesTypes.Pod, error)
 	GetPodStats(context.Context) (*kubeletTypes.PodStats, error)
-	GetSpec(context.Context) (*cadvisorTypes.MachineInfo, error)
 }
 
 const (
@@ -136,24 +134,6 @@ func (c *client) GetPodStats(ctx context.Context) (*kubeletTypes.PodStats, error
 	}
 
 	return stats, nil
-}
-
-// GetPodStats gets pod spec
-// Deprecated: this API is deprecated in Kubernetes 1.18 (and disabled by default), and will be removed in Kubernetes 1.20
-func (c *client) GetSpec(ctx context.Context) (*cadvisorTypes.MachineInfo, error) {
-	req, err := c.newRequest(specPath)
-	if err != nil {
-		return nil, err
-	}
-	resp, err := c.httpClient.Do(req.WithContext(ctx))
-	if err != nil {
-		return nil, err
-	}
-	var info cadvisorTypes.MachineInfo
-	if err = decodeBody(resp, &info); err != nil {
-		return nil, err
-	}
-	return &info, err
 }
 
 func (c *client) newRequest(endpoint string) (*http.Request, error) {

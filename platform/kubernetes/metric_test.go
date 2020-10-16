@@ -7,7 +7,6 @@ import (
 	"reflect"
 	"testing"
 
-	cadvisorTypes "github.com/google/cadvisor/info/v1"
 	kubeletTypes "github.com/mackerelio/mackerel-container-agent/internal/k8s-apis/stats/v1alpha1"
 	kubernetesTypes "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -51,17 +50,6 @@ func TestGenerateStats(t *testing.T) {
 				}
 			}
 			return nil, nil
-		}),
-		kubelet.MockGetSpec(func(context.Context) (*cadvisorTypes.MachineInfo, error) {
-			raw, err := ioutil.ReadFile("kubelet/testdata/spec.json")
-			if err != nil {
-				return nil, err
-			}
-			var info cadvisorTypes.MachineInfo
-			if err := json.Unmarshal(raw, &info); err != nil {
-				return nil, err
-			}
-			return &info, nil
 		}),
 	)
 	generator := newMetricGenerator(client, nodeinfo.NewMockGenerator(3876802560.0, 8.0, nil))
