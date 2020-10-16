@@ -2,16 +2,15 @@ package ecs
 
 import (
 	"context"
-	"runtime"
 	"time"
 
 	ecsTypes "github.com/aws/amazon-ecs-agent/agent/handlers/v2"
 	dockerTypes "github.com/docker/docker/api/types"
 
-	"github.com/mackerelio/go-osstat/memory"
 	mackerel "github.com/mackerelio/mackerel-client-go"
 
 	"github.com/mackerelio/mackerel-container-agent/metric"
+	"github.com/mackerelio/mackerel-container-agent/metric/hostinfo"
 )
 
 // TaskStatsGetter interface fetch ECS task stats
@@ -20,15 +19,18 @@ type TaskStatsGetter interface {
 }
 
 type metricGenerator struct {
-	client       TaskMetadataEndpointClient
-	hostMemTotal *float64
-	prevStats    map[string]*dockerTypes.StatsJSON
-	prevTime     time.Time
+	client            TaskMetadataEndpointClient
+	hostInfoGenerator hostinfo.Generator
+	hostMemTotal      *float64
+	hostNumCores      *float64
+	prevStats         map[string]*dockerTypes.StatsJSON
+	prevTime          time.Time
 }
 
-func newMetricGenerator(client TaskMetadataEndpointClient) *metricGenerator {
+func newMetricGenerator(client TaskMetadataEndpointClient, hostinfoGenerator hostinfo.Generator) *metricGenerator {
 	return &metricGenerator{
-		client: client,
+		client:            client,
+		hostInfoGenerator: hostinfoGenerator,
 	}
 }
 
@@ -39,13 +41,17 @@ func (g *metricGenerator) Generate(ctx context.Context) (metric.Values, error) {
 		return nil, err
 	}
 
-	if g.hostMemTotal == nil {
-		memory, err := memory.Get()
+	if g.hostMemTotal == nil || g.hostNumCores == nil {
+		memTotal, cpuCores, err := g.hostInfoGenerator.Generate()
 		if err != nil {
 			return nil, err
 		}
-		total := float64(memory.Total)
-		g.hostMemTotal = &total
+		if g.hostMemTotal == nil {
+			g.hostMemTotal = &memTotal
+		}
+		if g.hostNumCores == nil {
+			g.hostNumCores = &cpuCores
+		}
 	}
 
 	now := time.Now()
@@ -74,7 +80,7 @@ func (g *metricGenerator) Generate(ctx context.Context) (metric.Values, error) {
 
 		name := metric.SanitizeMetricKey(c.Name)
 		metricValues["container.cpu."+name+".usage"] = calculateCPUMetrics(prev, curr, timeDelta)
-		metricValues["container.cpu."+name+".limit"] = getCPULimit(meta)
+		metricValues["container.cpu."+name+".limit"] = g.getCPULimit(meta)
 		metricValues["container.memory."+name+".usage"] = calculateMemoryMetrics(curr)
 		metricValues["container.memory."+name+".limit"] = g.getMemoryLimit(&c, meta)
 
@@ -101,12 +107,12 @@ func (g *metricGenerator) getMemoryLimit(c *ecsTypes.ContainerResponse, meta *ec
 	return *g.hostMemTotal
 }
 
-func getCPULimit(meta *ecsTypes.TaskResponse) float64 {
+func (g *metricGenerator) getCPULimit(meta *ecsTypes.TaskResponse) float64 {
 	// Return Task CPU Limit or Host CPU Limit because Container CPU Limit means `cpu.shares`.
 	if meta.Limits != nil && meta.Limits.CPU != nil && *meta.Limits.CPU != 0.0 {
 		return *meta.Limits.CPU * 100
 	}
-	return float64(runtime.NumCPU() * 100)
+	return *g.hostNumCores * 100
 }
 
 func calculateCPUMetrics(prev, curr *dockerTypes.StatsJSON, timeDelta time.Duration) float64 {

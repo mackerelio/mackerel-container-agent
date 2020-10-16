@@ -12,6 +12,7 @@ import (
 	"github.com/mackerelio/golib/logging"
 
 	"github.com/mackerelio/mackerel-container-agent/metric"
+	"github.com/mackerelio/mackerel-container-agent/metric/hostinfo"
 	"github.com/mackerelio/mackerel-container-agent/platform"
 	"github.com/mackerelio/mackerel-container-agent/platform/ecs/taskmetadata"
 	"github.com/mackerelio/mackerel-container-agent/spec"
@@ -79,7 +80,7 @@ func NewECSPlatform(ctx context.Context, metadataURI string, executionEnv string
 // GetMetricGenerators gets metric generators
 func (p *ecsPlatform) GetMetricGenerators() []metric.Generator {
 	g := []metric.Generator{
-		newMetricGenerator(p.client),
+		newMetricGenerator(p.client, hostinfo.NewGenerator()),
 	}
 
 	if p.networkMode != bridgeNetworkMode {

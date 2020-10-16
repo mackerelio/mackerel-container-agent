@@ -9,6 +9,8 @@ import (
 
 	ecsTypes "github.com/aws/amazon-ecs-agent/agent/handlers/v2"
 	dockerTypes "github.com/docker/docker/api/types"
+
+	"github.com/mackerelio/mackerel-container-agent/metric/hostinfo"
 )
 
 type mockTaskMetadataEndpointClient struct {
@@ -60,7 +62,7 @@ func TestGenerateMetric(t *testing.T) {
 	for _, tc := range tests {
 		mock.metadataPath = fmt.Sprintf("taskmetadata/testdata/metadata_%s.json", tc.mode)
 		mock.statsPath = fmt.Sprintf("taskmetadata/testdata/stats_%s.json", tc.mode)
-		g := newMetricGenerator(mock)
+		g := newMetricGenerator(mock, hostinfo.NewMockGenerator(3876802560.0, 8.0, nil))
 
 		_, err := g.Generate(ctx)
 		if err != nil {
