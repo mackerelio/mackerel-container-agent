@@ -28,7 +28,6 @@ const (
 
 	podsPath  = "/pods"
 	statsPath = "/stats/summary"
-	specPath  = "/spec/"
 )
 
 type client struct {
