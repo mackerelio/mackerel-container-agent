@@ -11,20 +11,23 @@ import (
 	mackerel "github.com/mackerelio/mackerel-client-go"
 
 	"github.com/mackerelio/mackerel-container-agent/metric"
+	"github.com/mackerelio/mackerel-container-agent/metric/hostinfo"
 	"github.com/mackerelio/mackerel-container-agent/platform/kubernetes/kubelet"
 )
 
 type metricGenerator struct {
-	client       kubelet.Client
-	hostMemTotal *float64
-	hostNumCores *float64
-	prevStats    *kubeletTypes.PodStats
-	prevTime     time.Time
+	client            kubelet.Client
+	hostInfoGenerator hostinfo.Generator
+	hostMemTotal      *float64
+	hostNumCores      *float64
+	prevStats         *kubeletTypes.PodStats
+	prevTime          time.Time
 }
 
-func newMetricGenerator(client kubelet.Client) *metricGenerator {
+func newMetricGenerator(client kubelet.Client, hostinfoGenerator hostinfo.Generator) *metricGenerator {
 	return &metricGenerator{
-		client: client,
+		client:            client,
+		hostInfoGenerator: hostinfoGenerator,
 	}
 }
 
@@ -34,17 +37,15 @@ func (g *metricGenerator) Generate(ctx context.Context) (metric.Values, error) {
 		return nil, err
 	}
 	if g.hostMemTotal == nil || g.hostNumCores == nil {
-		machineInfo, err := g.client.GetSpec(ctx)
+		memTotal, cpuCores, err := g.hostInfoGenerator.Generate()
 		if err != nil {
 			return nil, err
 		}
 		if g.hostMemTotal == nil {
-			total := float64(machineInfo.MemoryCapacity)
-			g.hostMemTotal = &total
+			g.hostMemTotal = &memTotal
 		}
 		if g.hostNumCores == nil {
-			cores := float64(machineInfo.NumCores)
-			g.hostNumCores = &cores
+			g.hostNumCores = &cpuCores
 		}
 	}
 

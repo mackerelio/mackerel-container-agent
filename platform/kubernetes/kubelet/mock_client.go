@@ -3,7 +3,6 @@ package kubelet
 import (
 	"context"
 
-	cadvisorTypes "github.com/google/cadvisor/info/v1"
 	kubeletTypes "github.com/mackerelio/mackerel-container-agent/internal/k8s-apis/stats/v1alpha1"
 	kubernetesTypes "k8s.io/api/core/v1"
 )
@@ -12,7 +11,6 @@ import (
 type MockClient struct {
 	getPodCallback      func(context.Context) (*kubernetesTypes.Pod, error)
 	getPodStatsCallback func(context.Context) (*kubeletTypes.PodStats, error)
-	getSpecCallback     func(context.Context) (*cadvisorTypes.MachineInfo, error)
 }
 
 // MockClientOption represents an option of mock client of Kubelet APIs
@@ -65,20 +63,5 @@ func (c *MockClient) GetPodStats(ctx context.Context) (*kubeletTypes.PodStats, e
 func MockGetPodStats(callback func(context.Context) (*kubeletTypes.PodStats, error)) MockClientOption {
 	return func(c *MockClient) {
 		c.getPodStatsCallback = callback
-	}
-}
-
-// GetSpec ...
-func (c *MockClient) GetSpec(ctx context.Context) (*cadvisorTypes.MachineInfo, error) {
-	if c.getSpecCallback != nil {
-		return c.getSpecCallback(ctx)
-	}
-	return nil, errCallbackNotFound("GetSpec")
-}
-
-// MockGetSpec returns an option to set the callback of GetSpec
-func MockGetSpec(callback func(context.Context) (*cadvisorTypes.MachineInfo, error)) MockClientOption {
-	return func(c *MockClient) {
-		c.getSpecCallback = callback
 	}
 }

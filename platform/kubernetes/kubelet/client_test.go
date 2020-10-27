@@ -22,12 +22,6 @@ func newServer(token string) *httptest.Server {
 			http.ServeFile(w, r, "testdata/pods.json")
 		case statsPath:
 			http.ServeFile(w, r, "testdata/summary.json")
-		case specPath:
-			http.ServeFile(w, r, "testdata/spec.json")
-		case "/spec":
-			w.Header().Set("Content-Type", "text/html")
-			w.Header().Set("location", specPath)
-			w.WriteHeader(http.StatusMovedPermanently)
 		}
 	})
 	return httptest.NewServer(handler)
@@ -159,20 +153,6 @@ func TestGetPodStats(t *testing.T) {
 	}
 }
 
-func TestGetSpec(t *testing.T) {
-	ctx := context.Background()
-	ts := newServer("")
-	defer ts.Close()
-	c, err := NewClient(ts.Client(), "", ts.URL, "default", "myapp", nil)
-	if err != nil {
-		t.Errorf("should not raise error: %v", err)
-	}
-	_, err = c.GetSpec(ctx)
-	if err != nil {
-		t.Errorf("GetSpec() should not raise error: %v", err)
-	}
-}
-
 func TestIgnoreContainer(t *testing.T) {
 	ts := newServer("")
 	defer ts.Close()
@@ -227,7 +207,7 @@ func TestRequestToken(t *testing.T) {
 		t.Errorf("NewClient() should not raise error: %v", err)
 	}
 
-	_, err = c.GetSpec(ctx)
+	_, err = c.GetPod(ctx)
 	if err != nil {
 		t.Errorf("newRequest() should not raise error: %v", err)
 	}
