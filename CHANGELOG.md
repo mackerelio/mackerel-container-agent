@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.0 (2020-10-27)
+
+* [Kubernetes] Retrieve node CPU/memory capacity from local information, not from kubelet /spec #80 (astj)
+* add dependent: gobump #74 (lufia)
+
+
 ## 0.4.0 (2020-07-16)
 
 * disable HTTP/2 #73 (lufia)
