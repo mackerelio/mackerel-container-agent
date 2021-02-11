@@ -30,7 +30,7 @@ func (d s3Downloader) download(ctx context.Context, u *url.URL) ([]byte, error) 
 	downloader := s3manager.NewDownloader(sess)
 
 	buf := &aws.WriteAtBuffer{}
-	_, err = downloader.Download(buf, &s3.GetObjectInput{
+	_, err = downloader.DownloadWithContext(ctx, buf, &s3.GetObjectInput{
 		Bucket: aws.String(u.Host),
 		Key:    aws.String(u.Path),
 	})
