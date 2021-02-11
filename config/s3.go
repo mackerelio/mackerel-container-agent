@@ -2,6 +2,7 @@ package config
 
 import (
 	"context"
+	"fmt"
 	"net/url"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -23,7 +24,7 @@ func (d s3Downloader) download(ctx context.Context, u *url.URL) ([]byte, error) 
 
 	r, err := s3manager.GetBucketRegion(ctx, sess, u.Host, d.regionHint)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to get bucket region for %s: %w", u.Host, err)
 	}
 	sess.Config.Region = aws.String(r)
 
@@ -35,7 +36,7 @@ func (d s3Downloader) download(ctx context.Context, u *url.URL) ([]byte, error) 
 		Key:    aws.String(u.Path),
 	})
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to download config from %s: %w", u, err)
 	}
 
 	return buf.Bytes(), nil
