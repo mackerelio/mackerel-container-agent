@@ -66,7 +66,7 @@ func (p *probeHTTP) Check(ctx context.Context) error {
 
 	res, err := client.Do(req.WithContext(ctx))
 	if err != nil {
-		return fmt.Errorf("http probe failed (%s %s): %s", method, u, err)
+		return fmt.Errorf("http probe failed (%s %s): %w", method, u, err)
 	}
 	defer res.Body.Close()
 

@@ -30,7 +30,7 @@ func (p *probeTCP) Check(ctx context.Context) error {
 	d := net.Dialer{Timeout: timeout}
 	conn, err := d.DialContext(ctx, "tcp", addr)
 	if err != nil {
-		return fmt.Errorf("tcp probe failed (%s): %s", addr, err)
+		return fmt.Errorf("tcp probe failed (%s): %w", addr, err)
 	}
 	defer conn.Close()
 

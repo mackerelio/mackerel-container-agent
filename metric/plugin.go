@@ -37,7 +37,7 @@ func (g *pluginGenerator) Generate(ctx context.Context) (Values, error) {
 		logger.Infof("plugin %s (%s): %q", g.Name, g.Command, stderr)
 	}
 	if err != nil {
-		return nil, fmt.Errorf("plugin %s (%s): %s", g.Name, g.Command, err)
+		return nil, fmt.Errorf("plugin %s (%s): %w", g.Name, g.Command, err)
 	}
 
 	values := make(Values)
@@ -79,7 +79,7 @@ func (g *pluginGenerator) GetGraphDefs(ctx context.Context) ([]*mackerel.GraphDe
 		logger.Infof("plugin %s (%s): %q", g.Name, g.Command, stderr)
 	}
 	if err != nil {
-		return nil, fmt.Errorf("plugin %s (%s): %s", g.Name, g.Command, err)
+		return nil, fmt.Errorf("plugin %s (%s): %w", g.Name, g.Command, err)
 	}
 
 	xs := strings.SplitN(stdout, "\n", 2)
@@ -90,7 +90,7 @@ func (g *pluginGenerator) GetGraphDefs(ctx context.Context) ([]*mackerel.GraphDe
 
 	var conf pluginMeta
 	if err = json.Unmarshal([]byte(xs[1]), &conf); err != nil {
-		return nil, fmt.Errorf("plugin %s: failed to decode plugin meta: %s", g.Name, err)
+		return nil, fmt.Errorf("plugin %s: failed to decode plugin meta: %w", g.Name, err)
 	}
 
 	var graphDefs []*mackerel.GraphDefsParam
