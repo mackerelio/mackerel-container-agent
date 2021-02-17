@@ -7,8 +7,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/pkg/errors"
-
 	mackerel "github.com/mackerelio/mackerel-client-go"
 
 	"github.com/mackerelio/mackerel-container-agent/api"
@@ -44,13 +42,13 @@ func (r *hostResolver) getHost(hostParam *mackerel.CreateHostParam) (*mackerel.H
 					},
 				})
 				if err != nil {
-					return nil, retryFromError(err), errors.Wrap(err, "failed to find host for custom identifier = "+hostParam.CustomIdentifier)
+					return nil, retryFromError(err), fmt.Errorf("failed to find host for custom identifier = %s: %w", hostParam.CustomIdentifier, err)
 				}
 				if len(hosts) > 0 {
 					host = hosts[0]
 					_, err = r.client.UpdateHost(host.ID, (*mackerel.UpdateHostParam)(hostParam))
 					if err != nil {
-						return nil, retryFromError(err), errors.Wrap(err, "failed to update host for id = "+host.ID)
+						return nil, retryFromError(err), fmt.Errorf("failed to update host for id = %s: %w", host.ID, err)
 					}
 					return host, false, r.saveHostID(host.ID)
 				}
@@ -58,14 +56,14 @@ func (r *hostResolver) getHost(hostParam *mackerel.CreateHostParam) (*mackerel.H
 			// create a new host
 			hostID, err := r.client.CreateHost(hostParam)
 			if err != nil {
-				return nil, retryFromError(err), errors.Wrap(err, "failed to create a new host")
+				return nil, retryFromError(err), fmt.Errorf("failed to create a new host: %w", err)
 			}
 			if err := r.saveHostID(hostID); err != nil {
 				return nil, false, err
 			}
 			host, err = r.client.FindHost(hostID)
 			if err != nil {
-				return nil, retryFromError(err), errors.Wrap(err, "failed to find host for id = "+hostID)
+				return nil, retryFromError(err), fmt.Errorf("failed to find host for id = %s: %w", hostID, err)
 			}
 			return host, false, nil
 		}
@@ -77,11 +75,11 @@ func (r *hostResolver) getHost(hostParam *mackerel.CreateHostParam) (*mackerel.H
 	}
 	host, err = r.client.FindHost(hostID)
 	if err != nil {
-		return nil, retryFromError(err), errors.Wrap(err, "failed to find host for id = "+hostID)
+		return nil, retryFromError(err), fmt.Errorf("failed to find host for id = %s: %w", hostID, err)
 	}
 	_, err = r.client.UpdateHost(host.ID, (*mackerel.UpdateHostParam)(hostParam))
 	if err != nil {
-		return nil, retryFromError(err), errors.Wrap(err, "failed to update host for id = "+hostID)
+		return nil, retryFromError(err), fmt.Errorf("failed to update host for id = %s: %w", hostID, err)
 	}
 	return host, false, nil
 }

@@ -83,7 +83,7 @@ func createConfLoader() (*config.Loader, error) {
 	); durationMinutesStr != "" {
 		durationMinutes, err := strconv.Atoi(durationMinutesStr)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse config polling duration: %s", err)
+			return nil, fmt.Errorf("failed to parse config polling duration: %w", err)
 		}
 		pollingDuration = time.Duration(durationMinutes) * time.Minute
 	}

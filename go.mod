@@ -1,6 +1,6 @@
 module github.com/mackerelio/mackerel-container-agent
 
-go 1.12
+go 1.15
 
 require (
 	github.com/Azure/go-ansiterm v0.0.0-20170929234023-d6e3b3328b78 // indirect
@@ -41,7 +41,6 @@ require (
 	github.com/opencontainers/image-spec v1.0.1 // indirect
 	github.com/opencontainers/runtime-spec v0.1.2-0.20190408193819-a1b50f621a48 // indirect
 	github.com/pborman/uuid v1.2.0 // indirect
-	github.com/pkg/errors v0.8.1
 	github.com/prometheus/client_golang v0.9.3-0.20190127221311-3c4408c8b829 // indirect
 	github.com/prometheus/client_model v0.0.0-20190129233127-fd36f4220a90 // indirect
 	github.com/prometheus/common v0.3.0 // indirect
