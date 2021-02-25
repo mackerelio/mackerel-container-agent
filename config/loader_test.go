@@ -85,9 +85,10 @@ root: '/tmp/mackerel-container-agent'
 		}
 	}()
 
+	errCh := make(chan error)
 	go func() {
 		time.Sleep(800 * time.Millisecond)
-		err := ioutil.WriteFile(file.Name(), []byte(`
+		errCh <- ioutil.WriteFile(file.Name(), []byte(`
 apikey: 'DUMMY APIKEY 2'
 root: '/tmp/mackerel-container-agent'
 plugin:
@@ -95,9 +96,6 @@ plugin:
     mysql:
       command: mackerel-plugin-mysql
 `), 0600)
-		if err != nil {
-			t.Fatalf("should not raise error: %v", err)
-		}
 	}()
 
 	expect2 := &Config{
@@ -113,6 +111,10 @@ plugin:
 	}
 
 	<-ctx.Done()
+	if err := <-errCh; err != nil {
+		t.Fatalf("should not raise error (failed to write new config file): %v", err)
+	}
+
 	conf, err = confLoader.Load(ctx)
 	if err != nil {
 		t.Fatalf("should not raise error: %v", err)
