@@ -76,7 +76,7 @@ func NewKubernetesPlatform(kubeletHost, kubeletPort string, useReadOnlyPort, ins
 }
 
 // NewEKSOnFargatePlatform creates a new Platform
-// on this playform, agent accesses Kubelet via Kubernetes API (/api/v1/nodes/{nodeName}/proxy)
+// on this platform, agent accesses Kubelet via Kubernetes API (/api/v1/nodes/{nodeName}/proxy)
 func NewEKSOnFargatePlatform(kubernetesHost, kubernetesPort string, namespace, podName string, nodeName string, ignoreContainer *regexp.Regexp) (platform.Platform, error) {
 	var caCert, token []byte
 	var err error
