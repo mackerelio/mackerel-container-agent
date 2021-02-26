@@ -27,8 +27,14 @@ func TestManagerRun(t *testing.T) {
 		t.Errorf("err should be nil but got: %+v", err)
 	}
 	metricValues := client.PostedMetricValues()
-	if expected := 9 * 4; len(metricValues[hostID]) != expected {
-		t.Errorf("metric values should have size %d but got: %#v", expected, metricValues[hostID])
+
+	const (
+		metricNum   = 9
+		expected    = 4 * metricNum
+		expectedMin = 1 * metricNum
+	)
+	if n := len(metricValues[hostID]); n < expectedMin || n > expected {
+		t.Errorf("metric values should have size %d but got: %d", expected, n)
 	}
 	graphDefs := client.PostedGraphDefs()
 	if expected := 2; len(graphDefs) != expected {
