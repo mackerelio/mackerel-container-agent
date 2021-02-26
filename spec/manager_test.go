@@ -46,9 +46,7 @@ func TestManagerRun(t *testing.T) {
 	if err != nil {
 		t.Errorf("err should be nil but got: %+v", err)
 	}
-	if expected := 5; updatedCount != expected {
-		t.Errorf("update host api is called %d times (expected: %d times)", updatedCount, expected)
-	}
+	testRunAccuracy(t, updatedCount, 5, 1)
 }
 
 func TestManagerRun_LazyHostID(t *testing.T) {
@@ -84,8 +82,17 @@ func TestManagerRun_LazyHostID(t *testing.T) {
 	if err != nil {
 		t.Errorf("err should be nil but got: %+v", err)
 	}
-	if expected := 3; updatedCount != expected {
-		t.Errorf("update host api is called %d times (expected: %d times)", updatedCount, expected)
+	testRunAccuracy(t, updatedCount, 3, 1)
+}
+
+func testRunAccuracy(t testing.TB, count, want, accuracy int) {
+	t.Helper()
+	switch {
+	case count == want:
+	case count == want+accuracy:
+	case count == want-accuracy:
+	default:
+		t.Errorf("update host api is called %d times (expected: %d times with accuracy %d)", count, want, accuracy)
 	}
 }
 
