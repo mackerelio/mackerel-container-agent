@@ -28,6 +28,7 @@ func TestManagerRun(t *testing.T) {
 	}
 	metricValues := client.PostedMetricValues()
 
+	// This test is flaky so we should check the count with an accuracy.
 	const (
 		metricNum   = 9
 		expected    = 4 * metricNum

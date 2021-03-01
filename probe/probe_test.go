@@ -99,18 +99,11 @@ func TestProbe_Wait(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.Background(), tc.duration)
 			defer cancel()
 			Wait(ctx, p)
-			testWaitAccuracy(t, p.count, tc.count, tc.accuracy)
-		})
-	}
-}
 
-func testWaitAccuracy(t testing.TB, count, want, accuracy int) {
-	t.Helper()
-	switch {
-	case count == want:
-	case count == want+accuracy:
-	case count == want-accuracy:
-	default:
-		t.Errorf("Wait should check %d times with accuracy %d but got %d", want, accuracy, count)
+			// This test is flaky so we should check the count with an accuracy.
+			if p.count < tc.count-tc.accuracy || p.count > tc.count+tc.accuracy {
+				t.Errorf("Wait should check %d times with accuracy %d but got %d", tc.count, tc.accuracy, p.count)
+			}
+		})
 	}
 }
