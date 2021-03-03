@@ -87,16 +87,32 @@ func TestManagerRun_Retry(t *testing.T) {
 	manager := NewManager(createMockGenerators(), client)
 	manager.SetHostID(hostID)
 
-	ctx, cancel := context.WithTimeout(context.Background(), 190*time.Millisecond)
-	defer cancel()
-	err := manager.Run(ctx, 50*time.Millisecond)
-	if err != nil {
-		t.Errorf("err should be nil but got: %+v", err)
+	// This test is flaky so we should sometimes retry.
+	expectedNums := []int{4}
+	for i := 0; i < 3; i++ {
+		ctx, cancel := context.WithTimeout(context.Background(), 190*time.Millisecond)
+		err := manager.Run(ctx, 50*time.Millisecond)
+		cancel()
+		if err != nil {
+			t.Errorf("err should be nil but got: %+v", err)
+			break
+		}
+		nums := reportCounts(postedReports)
+		if reflect.DeepEqual(nums, expectedNums) {
+			break
+		}
+		t.Logf("got %v; retry", nums)
 	}
-	if expected := 1; len(postedReports) != expected {
-		t.Errorf("posted reports should have size %d but got: %d", expected, len(postedReports))
+	nums := reportCounts(postedReports)
+	if !reflect.DeepEqual(nums, expectedNums) {
+		t.Errorf("posted reports should have size %v but got: %v", expectedNums, nums)
 	}
-	if expected := 4; len(postedReports[0].Reports) != expected {
-		t.Errorf("posted reports should have size %d but got: %d", expected, len(postedReports))
+}
+
+func reportCounts(a []*mackerel.CheckReports) []int {
+	nums := make([]int, len(a))
+	for i, r := range a {
+		nums[i] = len(r.Reports)
 	}
+	return nums
 }

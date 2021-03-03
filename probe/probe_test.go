@@ -53,6 +53,7 @@ func TestProbe_Wait(t *testing.T) {
 		initialDelay time.Duration
 		period       time.Duration
 		count        int
+		accuracy     int
 		duration     time.Duration
 	}{
 		{
@@ -71,6 +72,7 @@ func TestProbe_Wait(t *testing.T) {
 			name:     "stop by duration",
 			results:  []bool{false},
 			count:    3,
+			accuracy: 1,
 			duration: 250 * time.Millisecond,
 		},
 		{
@@ -78,6 +80,7 @@ func TestProbe_Wait(t *testing.T) {
 			results:  []bool{false},
 			period:   50 * time.Millisecond,
 			count:    4,
+			accuracy: 1,
 			duration: 170 * time.Millisecond,
 		},
 		{
@@ -85,6 +88,7 @@ func TestProbe_Wait(t *testing.T) {
 			results:      []bool{false},
 			initialDelay: 200 * time.Millisecond,
 			count:        2,
+			accuracy:     1,
 			duration:     350 * time.Millisecond,
 		},
 	}
@@ -95,8 +99,10 @@ func TestProbe_Wait(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.Background(), tc.duration)
 			defer cancel()
 			Wait(ctx, p)
-			if p.count != tc.count {
-				t.Errorf("Wait should check %v times but but got %v", tc.count, p.count)
+
+			// This test is flaky so we should check the count with an accuracy.
+			if p.count < tc.count-tc.accuracy || p.count > tc.count+tc.accuracy {
+				t.Errorf("Wait should check %d times with accuracy %d but got %d", tc.count, tc.accuracy, p.count)
 			}
 		})
 	}
