@@ -2,7 +2,7 @@
 
 - Merge PRs to master
 - Create release PR
-  - Run `make release`.
+  - Run action `Create Release PR`.
   - `mackerel-container-agent:<RELEASE-VERSION>-alpha` Docker image is automatically pushed.
 - Check release PR
   - Check CHANGELOG.
