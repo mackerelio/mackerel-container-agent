@@ -1,6 +1,6 @@
 module github.com/mackerelio/mackerel-container-agent
 
-go 1.15
+go 1.17
 
 require (
 	github.com/Azure/go-ansiterm v0.0.0-20170929234023-d6e3b3328b78 // indirect
@@ -58,4 +58,11 @@ require (
 	k8s.io/api v0.0.0-20190416052506-9eb4726e83e4
 	k8s.io/apimachinery v0.0.0-20190416092415-3370b4aef5d6
 	k8s.io/klog v0.3.0 // indirect
+)
+
+require (
+	github.com/jmespath/go-jmespath v0.0.0-20180206201540-c2b33e8439af // indirect
+	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
+	github.com/pkg/errors v0.8.1 // indirect
+	golang.org/x/text v0.3.1-0.20181227161524-e6919f6577db // indirect
 )
