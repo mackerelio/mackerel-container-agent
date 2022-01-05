@@ -23,7 +23,6 @@ jobs:
         key: go-${{ hashFiles('**/go.sum') }}
         restore-keys: |
           go-
-    - run: |
-        make lint
-        make test
+    - run: make lint
+    - run: make test
 
