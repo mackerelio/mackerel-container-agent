@@ -2,6 +2,7 @@
 name: ci
 
 on:
+  workflow_dispatch:
   pull_request: {}
   push:
     branches:
@@ -25,4 +26,84 @@ jobs:
           go-
     - run: make lint
     - run: make test
+
+  docker:
+    needs: [test]
+    # if: startsWith(github.ref, 'refs/heads/bump-version-') || startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: docker/setup-qemu-action@v1
+    - uses: docker/setup-buildx-action@v1
+    # - uses: docker/login-action@v1
+    #   with:
+    #     username: ${{ secrets.DOCKERHUB_USERNAME }}
+    #     password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    - name: Get a Bump Version Name from branch name
+      id: bump_version
+      # if: startsWith(github.ref, 'refs/heads/bump-version-')
+      # run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/heads\/bump-version-/v}
+      run: echo ::set-output name=VERSION::rehearsal
+
+    - name: Build Alpha
+      uses: docker/build-push-action@v2
+      # if: startsWith(github.ref, 'refs/heads/bump-version-')
+      with:
+        context: .
+        file: Dockerfile.multistage
+        target: container-agent
+        platforms: |
+          linux/amd64
+          linux/arm64
+        # push: true
+        tags: |
+          mackerel/mackerel-container-agent:${{ steps.bump_version.outputs.VERSION }}-alpha
+
+    - name: Build Alpha with plugins
+      uses: docker/build-push-action@v2
+      # if: startsWith(github.ref, 'refs/heads/bump-version-')
+      with:
+        context: .
+        file: Dockerfile.multistage
+        target: container-agent-with-plugins
+        platforms: |
+          linux/amd64
+          linux/arm64
+        # push: true
+        tags: |
+          mackerel/mackerel-container-agent:${{ steps.bump_version.outputs.VERSION }}-plugins-alpha
+
+#   - name: Get a Version Name from tag
+#     id: tags_version
+#     if: startsWith(github.ref, 'refs/tags/v')
+#     run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+
+#   - name: Build Release
+#     uses: docker/build-push-action@v2
+#     if: startsWith(github.ref, 'refs/tags/v')
+#     with:
+#       context: .
+#       file: Dockerfile.multistage
+#       target: container-agent
+#       platforms: |
+#         linux/amd64
+#         linux/arm64
+#       push: true
+#       tags: |
+#         mackerel/mackerel-container-agent:${{ steps.tags_version.outputs.VERSION }}
+
+#   - name: Build Release with plugins
+#     uses: docker/build-push-action@v2
+#     if: startsWith(github.ref, 'refs/tags/v')
+#     with:
+#       context: .
+#       file: Dockerfile.multistage
+#       target: container-agent-with-plugins
+#       platforms: |
+#         linux/amd64
+#         linux/arm64
+#       push: true
+#       tags: |
+#         mackerel/mackerel-container-agent:${{ steps.tags_version.outputs.VERSION }}-plugins
 
