@@ -1,0 +1,10 @@
+FROM golang:1.17-stretch
+
+WORKDIR /go/src/app
+
+COPY go.sum go.mod ./
+RUN go mod download
+
+COPY . .
+RUN make build
+
