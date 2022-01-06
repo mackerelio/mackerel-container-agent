@@ -91,6 +91,7 @@ jobs:
 #         linux/arm64
 #       push: true
 #       tags: |
+#         mackerel/mackerel-container-agent:latest
 #         mackerel/mackerel-container-agent:${{ steps.tags_version.outputs.VERSION }}
 
 #   - name: Build Release with plugins
@@ -105,5 +106,6 @@ jobs:
 #         linux/arm64
 #       push: true
 #       tags: |
+#         mackerel/mackerel-container-agent:plugins
 #         mackerel/mackerel-container-agent:${{ steps.tags_version.outputs.VERSION }}-plugins
 
