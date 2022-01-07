@@ -27,9 +27,9 @@ jobs:
     - run: make lint
     - run: make test
 
-  docker:
-    needs: [test]
+  build-and-push:
     # if: startsWith(github.ref, 'refs/heads/bump-version-') || startsWith(github.ref, 'refs/tags/v')
+    needs: [test]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -41,14 +41,14 @@ jobs:
     #     password: ${{ secrets.DOCKERHUB_TOKEN }}
 
     - name: Get a Bump Version Name from branch name
-      id: bump_version
       # if: startsWith(github.ref, 'refs/heads/bump-version-')
-      # run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/heads\/bump-version-/v}
-      run: echo ::set-output name=VERSION::rehearsal
+      id: get_alpha_version
+      # run: echo "::set-output name=VERSION::${GITHUB_REF/refs\/heads\/bump-version-/v}"
+      run: echo "::set-output name=VERSION::rehearsal"
 
     - name: Build Alpha
-      uses: docker/build-push-action@v2
       # if: startsWith(github.ref, 'refs/heads/bump-version-')
+      uses: docker/build-push-action@v2
       with:
         context: .
         file: Dockerfile.multistage
@@ -58,11 +58,11 @@ jobs:
           linux/arm64
         # push: true
         tags: |
-          mackerel/mackerel-container-agent:${{ steps.bump_version.outputs.VERSION }}-alpha
+          mackerel/mackerel-container-agent:${{ steps.get_alpha_version.outputs.VERSION }}-alpha
 
     - name: Build Alpha with plugins
-      uses: docker/build-push-action@v2
       # if: startsWith(github.ref, 'refs/heads/bump-version-')
+      uses: docker/build-push-action@v2
       with:
         context: .
         file: Dockerfile.multistage
@@ -72,16 +72,16 @@ jobs:
           linux/arm64
         # push: true
         tags: |
-          mackerel/mackerel-container-agent:${{ steps.bump_version.outputs.VERSION }}-plugins-alpha
+          mackerel/mackerel-container-agent:${{ steps.get_alpha_version.outputs.VERSION }}-plugins-alpha
 
 #   - name: Get a Version Name from tag
-#     id: tags_version
 #     if: startsWith(github.ref, 'refs/tags/v')
-#     run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+#     id: get_version
+#     run: echo "::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}"
 
 #   - name: Build Release
-#     uses: docker/build-push-action@v2
 #     if: startsWith(github.ref, 'refs/tags/v')
+#     uses: docker/build-push-action@v2
 #     with:
 #       context: .
 #       file: Dockerfile.multistage
@@ -92,11 +92,11 @@ jobs:
 #       push: true
 #       tags: |
 #         mackerel/mackerel-container-agent:latest
-#         mackerel/mackerel-container-agent:${{ steps.tags_version.outputs.VERSION }}
+#         mackerel/mackerel-container-agent:${{ steps.get_version.outputs.VERSION }}
 
 #   - name: Build Release with plugins
-#     uses: docker/build-push-action@v2
 #     if: startsWith(github.ref, 'refs/tags/v')
+#     uses: docker/build-push-action@v2
 #     with:
 #       context: .
 #       file: Dockerfile.multistage
@@ -107,5 +107,5 @@ jobs:
 #       push: true
 #       tags: |
 #         mackerel/mackerel-container-agent:plugins
-#         mackerel/mackerel-container-agent:${{ steps.tags_version.outputs.VERSION }}-plugins
+#         mackerel/mackerel-container-agent:${{ steps.get_version.outputs.VERSION }}-plugins
 
