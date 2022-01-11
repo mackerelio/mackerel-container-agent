@@ -142,21 +142,21 @@ workflows:
             tags:
               only: /.*/
 
-      - build_alpha_image:
-          requires:
-            - build
-          filters:
-            branches:
-              only: /^bump-version-[0-9.]+$/
+#     - build_alpha_image:
+#         requires:
+#           - build
+#         filters:
+#           branches:
+#             only: /^bump-version-[0-9.]+$/
 
-      - build_image:
-          requires:
-            - build
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only: /^v[0-9.]+(?:-[0-9a-z]+)?$/
+#     - build_image:
+#         requires:
+#           - build
+#         filters:
+#           branches:
+#             ignore: /.*/
+#           tags:
+#             only: /^v[0-9.]+(?:-[0-9a-z]+)?$/
 
 # Following environment variables should be set in CircleCI.
 # - DOCKER_REPOSITORY
