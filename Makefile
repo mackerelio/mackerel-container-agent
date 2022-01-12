@@ -38,8 +38,8 @@ linux:
 	GOOS=linux go build -ldflags=$(BUILD_LDFLAGS) -o build/$(BIN) ./cmd/$(BIN)/...
 
 .PHONY: docker
-docker: linux
-	docker build -t $(BIN) -t $(BIN):$(VERSION) .
+docker:
+	docker build -t $(BIN) -t $(BIN):$(VERSION) --target container-agent .
 
 .PHONY: version
 version:
