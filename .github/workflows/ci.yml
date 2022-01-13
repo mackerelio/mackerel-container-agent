@@ -2,18 +2,8 @@
 name: ci/cd
 
 permissions:
-  actions: read
-  checks: read
   contents: read
-  deployments: read
-  discussions: read
   id-token: write
-  issues: write
-  packages: read
-  pull-requests: write
-  repository-projects: read
-  security-events: read
-  statuses: read
 
 on:
   pull_request: {}
