@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.5.1 (2022-01-14)
+
+* container push to ECR Public #97 (yseto)
+* container build and push are disabled on Circle CI #96 (yseto)
+* Add a workflow to build docker images. #95 (yseto)
+* Use multi-stage builds #94 (yseto)
+* test on github actions workflow #93 (yseto)
+* remove debug on create-release-pr.yml #90 (yseto)
+* Replacing the version update process #89 (yseto)
+* upgrade to 1.17 #88 (lufia)
+* probe, spec: reduce the flakiness of tests #87 (lufia)
+* chore: pin go version in build #84 (pyto86pri)
+* improve S3 config loader error messages #82 (itchyny)
+
+
 ## 0.5.0 (2020-10-27)
 
 * [Kubernetes] Retrieve node CPU/memory capacity from local information, not from kubelet /spec #80 (astj)
