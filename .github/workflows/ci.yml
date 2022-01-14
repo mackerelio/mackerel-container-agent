@@ -10,7 +10,6 @@ on:
   push:
     branches:
     - master
-    - bump-version-*
     tags:
     - v*
 
@@ -32,7 +31,7 @@ jobs:
     - run: make test
 
   build-and-push-alpha:
-    if: startsWith(github.ref, 'refs/heads/bump-version-')
+    if: startsWith(github.head_ref, 'bump-version-')
     needs: [test]
     runs-on: ubuntu-latest
     steps:
@@ -59,7 +58,7 @@ jobs:
 
     - name: Get alpha version from branch name
       id: get_alpha_version
-      run: echo "::set-output name=VERSION::${GITHUB_REF/refs\/heads\/bump-version-/v}"
+      run: echo "::set-output name=VERSION::${GITHUB_HEAD_REF/bump-version-/v}"
 
     - name: Build and push alpha image
       uses: docker/build-push-action@v2
