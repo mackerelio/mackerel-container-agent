@@ -16,8 +16,6 @@ image="${DOCKER_REPOSITORY}:${DOCKER_IMAGE_TAG}"
 read -r -p "Docker Hub Password [${DOCKER_USER}]: " -s passwd
 echo -n "${passwd}" | docker login --username "${DOCKER_USER}" --password-stdin
 
-make linux
-
 set -x
-docker build -t "${image}" .
+docker build -t "${image}" --target container-agent .
 docker push "${image}"
