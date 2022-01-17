@@ -30,10 +30,9 @@ require (
 	github.com/gorilla/mux v1.7.1 // indirect
 	github.com/json-iterator/go v1.1.6 // indirect
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
-	github.com/kylelemons/godebug v0.0.0-20170820004349-d65d576e9348 // indirect
 	github.com/mackerelio/go-osstat v0.0.0-20190412014440-b90c0b34edef
 	github.com/mackerelio/golib v0.0.0-20190411032134-c87047ca454e
-	github.com/mackerelio/mackerel-client-go v0.2.0
+	github.com/mackerelio/mackerel-client-go v0.21.0
 	github.com/morikuni/aec v0.0.0-20170113033406-39771216ff4c // indirect
 	github.com/onsi/ginkgo v1.8.0 // indirect
 	github.com/onsi/gomega v1.5.0 // indirect
@@ -47,8 +46,8 @@ require (
 	github.com/prometheus/procfs v0.0.0-20190416084830-8368d24ba045 // indirect
 	github.com/sirupsen/logrus v1.4.1 // indirect
 	github.com/spf13/pflag v1.0.3 // indirect
-	golang.org/x/net v0.0.0-20190415214537-1da14a5a36f2 // indirect
-	golang.org/x/sync v0.0.0-20190412183630-56d357773e84
+	golang.org/x/net v0.0.0-20200226121028-0de0cce0169b // indirect
+	golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e
 	golang.org/x/sys v0.0.0-20190416152802-12500544f89f // indirect
 	golang.org/x/time v0.0.0-20190308202827-9d24e82272b4 // indirect
 	google.golang.org/genproto v0.0.0-20190415143225-d1146b9035b9 // indirect
@@ -64,5 +63,7 @@ require (
 	github.com/jmespath/go-jmespath v0.0.0-20180206201540-c2b33e8439af // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
 	github.com/pkg/errors v0.8.1 // indirect
+	golang.org/x/lint v0.0.0-20200302205851-738671d3881b // indirect
 	golang.org/x/text v0.3.1-0.20181227161524-e6919f6577db // indirect
+	golang.org/x/tools v0.0.0-20200612022331-742c5eb664c2 // indirect
 )
