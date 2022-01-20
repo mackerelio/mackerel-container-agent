@@ -9,7 +9,6 @@ import (
 	"os"
 	"reflect"
 	"regexp"
-	"sort"
 	"testing"
 	"time"
 
@@ -267,8 +266,8 @@ plugin:
       command: ruby /usr/local/bin/sample-plugin.rb
       user: "sample-user"
       env:
-        FOO: "FOO BAR"
         QUX: 'QUX QUUX'
+        FOO: "FOO BAR"
 
     sample-args:
       command:
@@ -332,12 +331,6 @@ plugin:
 	if err != nil {
 		t.Errorf("should not raise error: %v", err)
 	}
-	sort.Slice(conf.MetricPlugins, func(i, j int) bool {
-		return conf.MetricPlugins[i].Name < conf.MetricPlugins[j].Name
-	})
-	sort.Slice(conf.MetricPlugins[2].Env, func(i, j int) bool {
-		return conf.MetricPlugins[2].Env[i] < conf.MetricPlugins[2].Env[j]
-	})
 	if !reflect.DeepEqual(conf, expect) {
 		t.Errorf("expect %#v, got %#v", expect, conf)
 	}
