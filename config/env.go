@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 )
 
@@ -35,5 +36,6 @@ func buildEnv(envMap map[string]string) ([]string, error) {
 		}
 		env = append(env, k+"="+v)
 	}
+	sort.Strings(env)
 	return env, nil
 }

@@ -9,6 +9,7 @@ import (
 	"net/url"
 	"os"
 	"regexp"
+	"sort"
 	"strings"
 	"time"
 
@@ -99,6 +100,15 @@ func parseConfig(data []byte) (*Config, error) {
 			Memo:    plugin.Memo,
 		})
 	}
+
+	sort.Slice(conf.Config.MetricPlugins, func(i, j int) bool {
+		return conf.Config.MetricPlugins[i].Name < conf.Config.MetricPlugins[j].Name
+	})
+
+	sort.Slice(conf.Config.CheckPlugins, func(i, j int) bool {
+		return conf.Config.CheckPlugins[i].Name < conf.Config.CheckPlugins[j].Name
+	})
+
 	if conf.ReadinessProbe != nil {
 		if err := conf.ReadinessProbe.validate(); err != nil {
 			return nil, err
