@@ -8,7 +8,7 @@ require (
 	github.com/Songmu/retry v0.1.0
 	github.com/Songmu/timeout v0.3.1
 	github.com/Songmu/wrapcommander v0.0.0-20190209161912-6edabfc62ab9 // indirect
-	github.com/aws/amazon-ecs-agent v1.28.1
+	github.com/aws/amazon-ecs-agent v1.31.0
 	github.com/aws/aws-sdk-go v1.19.12
 	github.com/beorn7/perks v1.0.0 // indirect
 	github.com/cihub/seelog v0.0.0-20170130134532-f561c5e57575 // indirect
@@ -60,10 +60,10 @@ require (
 )
 
 require (
+	github.com/awslabs/go-config-generator-for-fluentd-and-fluentbit v0.0.0-20210308162251-8959c62cb8f9 // indirect
 	github.com/jmespath/go-jmespath v0.0.0-20180206201540-c2b33e8439af // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
 	github.com/pkg/errors v0.8.1 // indirect
-	github.com/stretchr/testify v1.7.0 // indirect
 	golang.org/x/lint v0.0.0-20200302205851-738671d3881b // indirect
 	golang.org/x/text v0.3.1-0.20181227161524-e6919f6577db // indirect
 	golang.org/x/tools v0.0.0-20200612022331-742c5eb664c2 // indirect
