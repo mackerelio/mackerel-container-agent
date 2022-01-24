@@ -8,7 +8,7 @@ require (
 	github.com/Songmu/retry v0.1.0
 	github.com/Songmu/timeout v0.3.1
 	github.com/Songmu/wrapcommander v0.0.0-20190209161912-6edabfc62ab9 // indirect
-	github.com/aws/amazon-ecs-agent v1.33.0
+	github.com/aws/amazon-ecs-agent v1.34.0
 	github.com/aws/aws-sdk-go v1.25.19
 	github.com/beorn7/perks v1.0.0 // indirect
 	github.com/cihub/seelog v0.0.0-20170130134532-f561c5e57575 // indirect
