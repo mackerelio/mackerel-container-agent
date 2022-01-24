@@ -8,8 +8,8 @@ require (
 	github.com/Songmu/retry v0.1.0
 	github.com/Songmu/timeout v0.3.1
 	github.com/Songmu/wrapcommander v0.0.0-20190209161912-6edabfc62ab9 // indirect
-	github.com/aws/amazon-ecs-agent v1.48.0
-	github.com/aws/aws-sdk-go v1.27.0
+	github.com/aws/amazon-ecs-agent v1.49.0
+	github.com/aws/aws-sdk-go v1.36.0
 	github.com/beorn7/perks v1.0.0 // indirect
 	github.com/cihub/seelog v0.0.0-20170130134532-f561c5e57575 // indirect
 	github.com/containerd/cgroups v0.0.0-20190328223300-4994991857f9 // indirect
@@ -46,7 +46,7 @@ require (
 	github.com/prometheus/procfs v0.0.0-20190416084830-8368d24ba045 // indirect
 	github.com/sirupsen/logrus v1.4.1 // indirect
 	github.com/spf13/pflag v1.0.3 // indirect
-	golang.org/x/net v0.0.0-20200226121028-0de0cce0169b // indirect
+	golang.org/x/net v0.0.0-20201110031124-69a78807bb2b // indirect
 	golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e
 	golang.org/x/sys v0.0.0-20220114195835-da31bd327af9 // indirect
 	golang.org/x/time v0.0.0-20190308202827-9d24e82272b4 // indirect
@@ -63,14 +63,14 @@ require (
 	github.com/awslabs/go-config-generator-for-fluentd-and-fluentbit v0.0.0-20210308162251-8959c62cb8f9 // indirect
 	github.com/containernetworking/plugins v0.8.6 // indirect
 	github.com/etcd-io/bbolt v1.3.5 // indirect
-	github.com/jmespath/go-jmespath v0.0.0-20180206201540-c2b33e8439af // indirect
+	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
-	github.com/pkg/errors v0.8.1 // indirect
+	github.com/pkg/errors v0.9.1 // indirect
 	github.com/vishvananda/netlink v0.0.0-20181108222139-023a6dafdcdf // indirect
 	github.com/vishvananda/netns v0.0.0-20180720170159-13995c7128cc // indirect
 	go.etcd.io/bbolt v1.3.6 // indirect
 	golang.org/x/lint v0.0.0-20200302205851-738671d3881b // indirect
-	golang.org/x/text v0.3.1-0.20181227161524-e6919f6577db // indirect
+	golang.org/x/text v0.3.3 // indirect
 	golang.org/x/tools v0.0.0-20200612022331-742c5eb664c2 // indirect
 )
 
