@@ -13,7 +13,7 @@ require (
 	github.com/beorn7/perks v1.0.0 // indirect
 	github.com/cihub/seelog v0.0.0-20170130134532-f561c5e57575 // indirect
 	github.com/containerd/cgroups v0.0.0-20190328223300-4994991857f9 // indirect
-	github.com/containernetworking/cni v0.6.0 // indirect
+	github.com/containernetworking/cni v0.7.0 // indirect
 	github.com/coreos/go-systemd v0.0.0-20190321100706-95778dfbb74e // indirect
 	github.com/docker/distribution v2.7.1+incompatible // indirect
 	github.com/docker/docker v0.7.3-0.20190413172335-9b2eaa8a5d66
