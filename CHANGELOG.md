@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.5.2 (2022-01-26)
+
+* fix parseConfig #107 (yseto)
+* Bump github.com/mackerelio/mackerel-client-go from 0.2.0 to 0.21.0 #105 (dependabot[bot])
+* added dependabot.yml #102 (yseto)
+* stop using Circle CI #101 (yseto)
+
+
 ## 0.5.1 (2022-01-14)
 
 * container push to ECR Public #97 (yseto)
