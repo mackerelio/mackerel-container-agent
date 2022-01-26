@@ -6,7 +6,7 @@ import (
 	"os"
 	"testing"
 
-	ecsTypes "github.com/aws/amazon-ecs-agent/agent/handlers/v2"
+	ecsTypes "github.com/mackerelio/mackerel-container-agent/internal/amazon-ecs-agent/agent/handlers/v2"
 	"github.com/mackerelio/mackerel-container-agent/platform/ecs/internal"
 	agentSpec "github.com/mackerelio/mackerel-container-agent/spec"
 )

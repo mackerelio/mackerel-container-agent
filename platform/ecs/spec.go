@@ -4,8 +4,8 @@ import (
 	"context"
 	"path"
 
-	ecsTypes "github.com/aws/amazon-ecs-agent/agent/handlers/v2"
 	"github.com/aws/aws-sdk-go/aws/arn"
+	ecsTypes "github.com/mackerelio/mackerel-container-agent/internal/amazon-ecs-agent/agent/handlers/v2"
 
 	mackerel "github.com/mackerelio/mackerel-client-go"
 
