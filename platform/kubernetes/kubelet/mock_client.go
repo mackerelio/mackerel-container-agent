@@ -3,9 +3,8 @@ package kubelet
 import (
 	"context"
 
-	kubeletTypes "k8s.io/kubelet/pkg/apis/stats/v1alpha1"
-
 	kubernetesTypes "k8s.io/api/core/v1"
+	kubeletTypes "k8s.io/kubelet/pkg/apis/stats/v1alpha1"
 )
 
 // MockClient represents a mock client of Kubelet APIs
