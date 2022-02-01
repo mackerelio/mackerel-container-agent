@@ -5,8 +5,8 @@ go 1.17
 require (
 	github.com/Microsoft/go-winio v0.4.12 // indirect
 	github.com/Songmu/retry v0.1.0
-	github.com/Songmu/timeout v0.3.1
-	github.com/Songmu/wrapcommander v0.0.0-20190209161912-6edabfc62ab9 // indirect
+	github.com/Songmu/timeout v0.4.0
+	github.com/Songmu/wrapcommander v0.1.0 // indirect
 	github.com/aws/amazon-ecs-agent v1.52.2
 	github.com/aws/aws-sdk-go v1.36.0
 	github.com/beorn7/perks v1.0.1 // indirect
