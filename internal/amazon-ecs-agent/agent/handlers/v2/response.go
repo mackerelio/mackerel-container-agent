@@ -81,6 +81,6 @@ type ErrorResponse struct {
 	ErrorCode    string `json:"ErrorCode,omitempty"`
 	ErrorMessage string `json:"ErrorMessage,omitempty"`
 	StatusCode   int    `json:"StatusCode,omitempty"`
-	RequestId    string `json:"RequestId,omitempty"`
+	RequestID    string `json:"RequestId,omitempty"`
 	ResourceARN  string `json:"ResourceARN,omitempty"`
 }
