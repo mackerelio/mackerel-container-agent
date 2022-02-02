@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.5.2 (2022-02-02)
+
+* use k8s.io/kubelet #113 (yseto)
+* fix parseConfig #107 (yseto)
+* Bump github.com/mackerelio/mackerel-client-go from 0.2.0 to 0.21.0 #105 (dependabot[bot])
+* Bump github.com/Songmu/timeout from 0.3.1 to 0.4.0 #104 (dependabot[bot])
+* stop using Circle CI #101 (yseto)
+
+
 ## 0.5.1 (2022-01-14)
 
 * container push to ECR Public #97 (yseto)
