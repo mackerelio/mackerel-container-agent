@@ -15,7 +15,7 @@ require (
 	github.com/google/go-cmp v0.5.5 // indirect
 	github.com/google/gofuzz v1.1.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
-	github.com/mackerelio/go-osstat v0.0.0-20190412014440-b90c0b34edef
+	github.com/mackerelio/go-osstat v0.2.1
 	github.com/mackerelio/golib v0.0.0-20190411032134-c87047ca454e
 	github.com/mackerelio/mackerel-client-go v0.21.0
 	github.com/opencontainers/go-digest v1.0.0-rc1 // indirect
