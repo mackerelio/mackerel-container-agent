@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/aws/amazon-ecs-agent/agent/containermetadata"
-	ecsTypes "github.com/aws/amazon-ecs-agent/agent/handlers/v2"
+	containermetadata "github.com/mackerelio/mackerel-container-agent/internal/amazon-ecs-agent/agent/containermetadata"
+	ecsTypes "github.com/mackerelio/mackerel-container-agent/internal/amazon-ecs-agent/agent/handlers/v2"
 
 	"github.com/mackerelio/mackerel-container-agent/platform/ecs/internal"
 )

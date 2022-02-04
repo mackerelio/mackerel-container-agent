@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 
-	ecsTypes "github.com/aws/amazon-ecs-agent/agent/handlers/v2"
+	ecsTypes "github.com/mackerelio/mackerel-container-agent/internal/amazon-ecs-agent/agent/handlers/v2"
 )
 
 // MockTaskMetadataGetter is a mock of /task API endpoint
