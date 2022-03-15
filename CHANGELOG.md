@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.5.3 (2022-03-15)
+
+* Bump github.com/docker/docker from 20.10.12+incompatible to 20.10.13+incompatible #129 (dependabot[bot])
+* Bump github.com/aws/aws-sdk-go from 1.43.7 to 1.43.17 #128 (dependabot[bot])
+* Bump github.com/aws/aws-sdk-go from 1.36.0 to 1.43.7 #126 (dependabot[bot])
+* Bump k8s.io/kubelet from 0.23.3 to 0.23.4 #124 (dependabot[bot])
+* Update github.com/docker/docker, github.com/mackerelio/go-osstat, github.com/mackerelio/golib #119 (yseto)
+* Remove dependency amazon-ecs-agent #117 (yseto)
+
+
 ## 0.5.2 (2022-02-02)
 
 * use k8s.io/kubelet #113 (yseto)
