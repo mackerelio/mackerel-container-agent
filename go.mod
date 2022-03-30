@@ -8,7 +8,7 @@ require (
 	github.com/aws/aws-sdk-go v1.43.17
 	github.com/docker/docker v20.10.13+incompatible
 	github.com/go-yaml/yaml v2.1.0+incompatible
-	github.com/mackerelio/go-osstat v0.2.1
+	github.com/mackerelio/go-osstat v0.2.2
 	github.com/mackerelio/golib v1.2.1
 	github.com/mackerelio/mackerel-client-go v0.21.0
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
@@ -34,7 +34,7 @@ require (
 	github.com/opencontainers/image-spec v1.0.2 // indirect
 	golang.org/x/lint v0.0.0-20210508222113-6edffad5e616 // indirect
 	golang.org/x/net v0.0.0-20220127200216-cd36cc0744dd // indirect
-	golang.org/x/sys v0.0.0-20211216021012-1d35b9e2eb4e // indirect
+	golang.org/x/sys v0.0.0-20220319134239-a9b59b0215f8 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/tools v0.1.6-0.20210820212750-d4cc65f0b2ff // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
