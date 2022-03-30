@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.0 (2022-03-30)
+
+* Bump github.com/mackerelio/go-osstat from 0.2.1 to 0.2.2 #137 (dependabot[bot])
+* [bug-fix] add ContainerHealthStatus json marshal/unmarshal methods #136 (pyto86pri)
+
+
 ## 0.5.3 (2022-03-15)
 
 * Bump github.com/docker/docker from 20.10.12+incompatible to 20.10.13+incompatible #129 (dependabot[bot])
