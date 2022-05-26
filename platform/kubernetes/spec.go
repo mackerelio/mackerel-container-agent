@@ -89,7 +89,6 @@ func (g *specGenerator) Generate(ctx context.Context) (interface{}, error) {
 	}
 
 	var spec = &podSpec{
-		ClusterName:    p.ObjectMeta.ClusterName,
 		Namespace:      p.ObjectMeta.Namespace,
 		Name:           p.ObjectMeta.Name,
 		UID:            string(p.ObjectMeta.UID),
