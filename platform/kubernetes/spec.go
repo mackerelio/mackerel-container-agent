@@ -13,7 +13,6 @@ import (
 
 type podSpec struct {
 	// Metadata
-	ClusterName     string            `json:"clusterName,omitempty"`
 	Namespace       string            `json:"namespace,omitempty"`
 	Name            string            `json:"name,omitempty"`
 	UID             string            `json:"uid,omitempty"`
