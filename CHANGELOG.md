@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.1 (2022-05-26)
+
+* Bump github.com/aws/aws-sdk-go from 1.43.17 to 1.44.21 #160 (dependabot[bot])
+* Bump github.com/docker/docker from 20.10.13+incompatible to 20.10.16+incompatible #157 (dependabot[bot])
+
+
 ## 0.6.0 (2022-03-30)
 
 * Bump github.com/mackerelio/go-osstat from 0.2.1 to 0.2.2 #137 (dependabot[bot])
