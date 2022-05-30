@@ -57,7 +57,6 @@ func TestGenerateSpec(t *testing.T) {
 				ResouceVersion:  "112885",
 				Labels:          map[string]string{"app": "myapp"},
 				OwnerReferences: []ownerReference(nil),
-				ClusterName:     "",
 
 				// Spec
 				HostNetwork: false,

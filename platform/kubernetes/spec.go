@@ -13,7 +13,6 @@ import (
 
 type podSpec struct {
 	// Metadata
-	ClusterName     string            `json:"clusterName,omitempty"`
 	Namespace       string            `json:"namespace,omitempty"`
 	Name            string            `json:"name,omitempty"`
 	UID             string            `json:"uid,omitempty"`
@@ -89,7 +88,6 @@ func (g *specGenerator) Generate(ctx context.Context) (interface{}, error) {
 	}
 
 	var spec = &podSpec{
-		ClusterName:    p.ObjectMeta.ClusterName,
 		Namespace:      p.ObjectMeta.Namespace,
 		Name:           p.ObjectMeta.Name,
 		UID:            string(p.ObjectMeta.UID),
