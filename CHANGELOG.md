@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.2 (2022-06-08)
+
+* Bump github.com/aws/aws-sdk-go from 1.44.21 to 1.44.27 #167 (dependabot[bot])
+* update k8s.io/api, k8s.io/apimachinery, k8s.io/kubelet #162 (yseto)
+
+
 ## 0.6.1 (2022-05-26)
 
 * Bump github.com/aws/aws-sdk-go from 1.43.17 to 1.44.21 #160 (dependabot[bot])

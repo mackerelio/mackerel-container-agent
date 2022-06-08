@@ -1,5 +1,5 @@
 BIN := mackerel-container-agent
-VERSION := 0.6.1
+VERSION := 0.6.2
 REVISION := $(shell git rev-parse --short HEAD)
 
 export GO111MODULE=on
