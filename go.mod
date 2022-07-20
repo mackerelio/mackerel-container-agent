@@ -10,7 +10,7 @@ require (
 	github.com/go-yaml/yaml v2.1.0+incompatible
 	github.com/mackerelio/go-osstat v0.2.2
 	github.com/mackerelio/golib v1.2.1
-	github.com/mackerelio/mackerel-client-go v0.21.0
+	github.com/mackerelio/mackerel-client-go v0.21.1
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 	k8s.io/api v0.24.2
 	k8s.io/apimachinery v0.24.2
