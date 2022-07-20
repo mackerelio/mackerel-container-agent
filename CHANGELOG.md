@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.6.4 (2022-07-20)
+
+* Bump github.com/aws/aws-sdk-go from 1.44.37 to 1.44.58 #185 (dependabot[bot])
+* Bump k8s.io/kubelet from 0.24.2 to 0.24.3 #184 (dependabot[bot])
+* Bump github.com/mackerelio/mackerel-client-go from 0.21.0 to 0.21.1 #177 (dependabot[bot])
+* Bump github.com/docker/docker from 20.10.16+incompatible to 20.10.17+incompatible #170 (dependabot[bot])
+
+
 ## 0.6.3 (2022-06-22)
 
 * Bump github.com/aws/aws-sdk-go from 1.44.27 to 1.44.37 #175 (dependabot[bot])
