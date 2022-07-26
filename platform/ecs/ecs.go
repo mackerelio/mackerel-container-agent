@@ -21,6 +21,9 @@ import (
 const (
 	executionEnvFargate = "AWS_ECS_FARGATE"
 	executionEnvEC2     = "AWS_ECS_EC2"
+	// experimental : on AWS ECS External Instance, `AWS_EXECUTION_ENV` is not defined.
+	// follow user's `MACKEREL_CONTAINER_PLATFORM` setting and using unique value that does not interfere with AWS.
+	executionEnvExternal = "ECS_EXTERNAL"
 )
 
 var (
