@@ -1,0 +1,49 @@
+{
+    "Cluster": "test-clusrer",
+    "TaskARN": "arn:aws:ecs:ap-northeast-1:999999999999:task/task-id",
+    "Family": "test-external",
+    "Revision": "4",
+    "DesiredStatus": "RUNNING",
+    "KnownStatus": "RUNNING",
+    "Limits": {
+      "CPU": 0.25,
+      "Memory": 256
+    },
+    "PullStartedAt": "2022-03-14T06:44:39.928830311Z",
+    "PullStoppedAt": "2022-03-14T06:44:42.387434211Z",
+    "LaunchType": "EXTERNAL",
+    "Containers": [
+      {
+        "DockerId": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+        "Name": "mackerel-container-agent",
+        "DockerName": "ecs-test-cluster-1-mackerel-container-agent-ffffffffffffffffffff",
+        "Image": "mackerel/mackerel-container-agent:latest",
+        "ImageID": "sha256:ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+        "Labels": {
+          "com.amazonaws.ecs.cluster": "test-cluster",
+          "com.amazonaws.ecs.container-name": "mackerel-container-agent",
+          "com.amazonaws.ecs.task-arn": "arn:aws:ecs:ap-northeast-1:999999999999:task/task-id",
+          "com.amazonaws.ecs.task-definition-family": "test-fargate",
+          "com.amazonaws.ecs.task-definition-version": "1"
+        },
+        "DesiredStatus": "RUNNING",
+        "KnownStatus": "RUNNING",
+        "Limits": {
+          "CPU": 0,
+          "Memory": 128
+        },
+        "CreatedAt": "2019-03-29T02:54:57.61447652Z",
+        "StartedAt": "2019-03-29T02:54:58.346799541Z",
+        "Type": "NORMAL",
+        "Networks": [
+          {
+            "NetworkMode": "awsvpc",
+            "IPv4Addresses": [
+              "172.17.0.2"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+  

@@ -20,6 +20,7 @@ func TestGenerateSpec(t *testing.T) {
 		{"taskmetadata/testdata/metadata_ec2_host.json", ecsProvider},
 		{"taskmetadata/testdata/metadata_ec2_awsvpc.json", ecsProvider},
 		{"taskmetadata/testdata/metadata_fargate.json", fargateProvider},
+		{"taskmetadata/testdata/metadata_external.json", externalProvider},
 	}
 
 	var path string
