@@ -126,6 +126,8 @@ func resolveProvider(executionEnv string) (provider, error) {
 		return fargateProvider, nil
 	case executionEnvEC2:
 		return ecsProvider, nil
+	case executionEnvExternal:
+		return externalProvider, nil
 	default:
 		return provider("UNKNOWN"), fmt.Errorf("unknown execution env: %q", executionEnv)
 	}
