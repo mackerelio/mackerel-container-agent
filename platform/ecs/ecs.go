@@ -21,9 +21,9 @@ import (
 const (
 	executionEnvFargate = "AWS_ECS_FARGATE"
 	executionEnvEC2     = "AWS_ECS_EC2"
-	// experimental : on AWS ECS External Instance, `AWS_EXECUTION_ENV` is not defined.
-	// follow user's `MACKEREL_CONTAINER_PLATFORM` setting and using unique value that does not interfere with AWS.
-	executionEnvExternal = "ECS_EXTERNAL"
+
+	// ExecutionEnvExternal : (experimental) It is a definition that is handled internally, not an environment variable.
+	ExecutionEnvExternal = "ECS_EXTERNAL"
 )
 
 var (
@@ -126,7 +126,7 @@ func resolveProvider(executionEnv string) (provider, error) {
 		return fargateProvider, nil
 	case executionEnvEC2:
 		return ecsProvider, nil
-	case executionEnvExternal:
+	case ExecutionEnvExternal:
 		return externalProvider, nil
 	default:
 		return provider("UNKNOWN"), fmt.Errorf("unknown execution env: %q", executionEnv)

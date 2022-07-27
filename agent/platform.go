@@ -42,7 +42,7 @@ func NewPlatform(ctx context.Context, ignoreContainer *regexp.Regexp) (platform.
 		if err != nil {
 			return nil, err
 		}
-		executionEnv := "ECS_EXTERNAL"
+		executionEnv := ecs.ExecutionEnvExternal
 		return ecs.NewECSPlatform(ctx, metadataURI, executionEnv, ignoreContainer)
 
 	case platform.Kubernetes:
