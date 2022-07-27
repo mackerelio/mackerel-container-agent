@@ -6,4 +6,6 @@ type provider string
 const (
 	ecsProvider     provider = "ecs"
 	fargateProvider provider = "fargate"
+	// experimental
+	externalProvider provider = "external"
 )
