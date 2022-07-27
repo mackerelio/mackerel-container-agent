@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.7.0 (2022-07-27)
+
+* add support Amazon ECS Anywhere ( experimental ) #188 (do-su-0805)
+
+
 ## 0.6.4 (2022-07-20)
 
 * Bump github.com/aws/aws-sdk-go from 1.44.37 to 1.44.58 #185 (dependabot[bot])
