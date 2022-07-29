@@ -24,25 +24,21 @@ func NewPlatform(ctx context.Context, ignoreContainer *regexp.Regexp) (platform.
 		logger.Warningf("%q platform is deprecated. Please use %q platform", p, platform.ECS)
 		fallthrough
 
-	case platform.ECS, platform.Fargate:
+	// backward compatibility: MACKEREL_CONTAINER_PLATFORM allows multiple values
+	case platform.ECS, platform.Fargate, platform.ECSAnywhere:
 		metadataURI, err := getEnvValue("ECS_CONTAINER_METADATA_URI")
 		if err != nil {
 			return nil, err
 		}
-		executionEnv, err := getEnvValue("AWS_EXECUTION_ENV")
-		if err != nil {
-			return nil, err
-		}
-		return ecs.NewECSPlatform(ctx, metadataURI, executionEnv, ignoreContainer)
 
-	// experimental : on AWS ECS Anywhere Instance, `AWS_EXECUTION_ENV` is not defined.
-	// follow user's `MACKEREL_CONTAINER_PLATFORM` setting and using unique value that does not interfere with AWS.
-	case platform.ECSAnywhere:
-		metadataURI, err := getEnvValue("ECS_CONTAINER_METADATA_URI")
-		if err != nil {
-			return nil, err
+		executionEnv := os.Getenv("AWS_EXECUTION_ENV")
+		if executionEnv == "" {
+			// experimental
+			// If there is no environment variable, the corresponding as ECS Anywhere
+			// on AWS ECS Anywhere Instance, `AWS_EXECUTION_ENV` is not defined.
+			executionEnv = ecs.ExecutionEnvECSExternal
 		}
-		executionEnv := ecs.ExecutionEnvECSExternal
+
 		return ecs.NewECSPlatform(ctx, metadataURI, executionEnv, ignoreContainer)
 
 	case platform.Kubernetes:
