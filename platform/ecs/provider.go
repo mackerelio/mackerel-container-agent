@@ -7,5 +7,5 @@ const (
 	ecsProvider     provider = "ecs"
 	fargateProvider provider = "fargate"
 	// experimental
-	externalProvider provider = "external"
+	ecsAnywhereProvider provider = "ecs-anywhere"
 )

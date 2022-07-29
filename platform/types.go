@@ -13,5 +13,5 @@ const (
 	EKSOnFargate Type = "eks_fargate"
 	None         Type = "none"
 	// experimental
-	ECSExternal Type = "ecs_external"
+	ECSAnywhere Type = "ecs_anywhere"
 )
