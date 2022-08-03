@@ -39,7 +39,7 @@ func TestResolveProvider(t *testing.T) {
 	}{
 		{"AWS_ECS_FARGATE", fargateProvider},
 		{"AWS_ECS_EC2", ecsProvider},
-		{"ECS_ANYWHERE", ecsAnywhereProvider},
+		{"ECS_EXTERNAL", ecsAnywhereProvider},
 		{"unknown", provider("UNKNOWN")},
 		{"", provider("UNKNOWN")},
 	}
