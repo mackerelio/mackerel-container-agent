@@ -35,14 +35,14 @@ func NewPlatform(ctx context.Context, ignoreContainer *regexp.Regexp) (platform.
 		}
 		return ecs.NewECSPlatform(ctx, metadataURI, executionEnv, ignoreContainer)
 
-	// experimental : on AWS ECS External Instance, `AWS_EXECUTION_ENV` is not defined.
+	// experimental : on AWS ECS Anywhere Instance, `AWS_EXECUTION_ENV` is not defined.
 	// follow user's `MACKEREL_CONTAINER_PLATFORM` setting and using unique value that does not interfere with AWS.
-	case platform.ECSExternal:
+	case platform.ECSAnywhere:
 		metadataURI, err := getEnvValue("ECS_CONTAINER_METADATA_URI")
 		if err != nil {
 			return nil, err
 		}
-		executionEnv := ecs.ExecutionEnvExternal
+		executionEnv := ecs.ExecutionEnvECSAnywhere
 		return ecs.NewECSPlatform(ctx, metadataURI, executionEnv, ignoreContainer)
 
 	case platform.Kubernetes:

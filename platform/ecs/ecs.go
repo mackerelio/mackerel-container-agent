@@ -22,8 +22,8 @@ const (
 	executionEnvFargate = "AWS_ECS_FARGATE"
 	executionEnvEC2     = "AWS_ECS_EC2"
 
-	// ExecutionEnvExternal : (experimental) It is a definition that is handled internally, not an environment variable.
-	ExecutionEnvExternal = "ECS_EXTERNAL"
+	// ExecutionEnvECSAnywhere : (experimental) It is a definition that is handled internally, not an environment variable.
+	ExecutionEnvECSAnywhere = "ECS_ANYWHERE"
 )
 
 var (
@@ -126,8 +126,8 @@ func resolveProvider(executionEnv string) (provider, error) {
 		return fargateProvider, nil
 	case executionEnvEC2:
 		return ecsProvider, nil
-	case ExecutionEnvExternal:
-		return externalProvider, nil
+	case ExecutionEnvECSAnywhere:
+		return ecsAnywhereProvider, nil
 	default:
 		return provider("UNKNOWN"), fmt.Errorf("unknown execution env: %q", executionEnv)
 	}
