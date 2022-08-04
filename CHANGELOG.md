@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.7.1 (2022-08-04)
+
+* refactoring agent/platform.go #194 (yseto)
+* [ECS Anywhere] Change to a specific name. #191 (yseto)
+* use bullseye #190 (yseto)
+
+
 ## 0.7.0 (2022-07-27)
 
 * add support Amazon ECS Anywhere ( experimental ) #188 (do-su-0805)
