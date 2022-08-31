@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"os"
@@ -186,7 +186,7 @@ func fetch(ctx context.Context, location string) ([]byte, error) {
 }
 
 func fetchFile(path string) ([]byte, error) {
-	return ioutil.ReadFile(path)
+	return os.ReadFile(path)
 }
 
 func fetchHTTP(ctx context.Context, u *url.URL) ([]byte, error) {
@@ -205,7 +205,7 @@ func fetchHTTP(ctx context.Context, u *url.URL) ([]byte, error) {
 		return nil, err
 	}
 	defer resp.Body.Close()
-	return ioutil.ReadAll(resp.Body)
+	return io.ReadAll(resp.Body)
 }
 
 func parseRoles(value string) []string {

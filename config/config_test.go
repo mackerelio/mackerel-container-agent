@@ -2,7 +2,6 @@ package config
 
 import (
 	"context"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -697,7 +696,7 @@ func newHTTPServer(content string) *httptest.Server {
 }
 
 func newConfigFile(content string) (*os.File, error) {
-	temp, err := ioutil.TempFile("", "mackerel-config-test")
+	temp, err := os.CreateTemp("", "mackerel-config-test")
 	if err != nil {
 		return nil, err
 	}
