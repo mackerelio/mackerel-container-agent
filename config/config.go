@@ -194,7 +194,7 @@ func fetchHTTP(ctx context.Context, u *url.URL) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	req.WithContext(ctx)
+	req = req.WithContext(ctx)
 
 	cl := http.Client{
 		Timeout: timeout,
