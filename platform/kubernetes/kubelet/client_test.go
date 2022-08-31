@@ -218,7 +218,9 @@ func TestErrorMessage(t *testing.T) {
 
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(body))
+		if _, err := w.Write([]byte(body)); err != nil {
+			t.Fatal(err)
+		}
 	})
 	ts := httptest.NewServer(handler)
 

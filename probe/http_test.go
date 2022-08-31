@@ -104,7 +104,6 @@ func TestProbeHTTP_Check(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			ts := newHTTPServer(t, "ok", tc.headers, tc.method, tc.path, tc.sleep, tc.status)
-			defer ts.Close()
 			u, _ := url.Parse(ts.URL)
 
 			var passedProxy bool
@@ -155,7 +154,7 @@ func TestProbeHTTP_Check(t *testing.T) {
 	}
 }
 
-func newHTTPServer(t *testing.T, content string, headers []config.Header, method, path string, sleep time.Duration, status int) *httptest.Server {
+func newHTTPServer(t testing.TB, content string, headers []config.Header, method, path string, sleep time.Duration, status int) *httptest.Server {
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if method != "" && r.Method != method {
 			t.Errorf("method should be %s but got %s", method, r.Method)
@@ -176,7 +175,11 @@ func newHTTPServer(t *testing.T, content string, headers []config.Header, method
 		}
 		time.Sleep(sleep)
 		w.WriteHeader(status)
-		w.Write([]byte(content))
+		// Below writing a content sometimes expects returning an error.
+		// A HTTP client may disconnect from the server during above time.Sleep.
+		w.Write([]byte(content)) // nolint
 	})
-	return httptest.NewServer(handler)
+	ts := httptest.NewServer(handler)
+	t.Cleanup(ts.Close)
+	return ts
 }

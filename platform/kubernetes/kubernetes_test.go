@@ -53,7 +53,10 @@ func TestCreateHTTPClient(t *testing.T) {
 	host, port, _ := net.SplitHostPort(ts.Listener.Addr().String())
 
 	caCert := &bytes.Buffer{}
-	pem.Encode(caCert, &pem.Block{Type: "CERTIFICATE", Bytes: ts.Certificate().Raw})
+	err := pem.Encode(caCert, &pem.Block{Type: "CERTIFICATE", Bytes: ts.Certificate().Raw})
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	tests := []struct {
 		caCert      []byte
