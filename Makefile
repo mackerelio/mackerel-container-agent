@@ -2,8 +2,6 @@ BIN := mackerel-container-agent
 VERSION := 0.7.1
 REVISION := $(shell git rev-parse --short HEAD)
 
-export GO111MODULE=on
-
 .PHONY: all
 all: clean build
 
@@ -44,8 +42,3 @@ docker:
 .PHONY: version
 version:
 	echo $(VERSION)
-
-.PHONY: update
-update:
-	go get -u ./...
-	go mod tidy
