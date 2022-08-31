@@ -17,14 +17,9 @@ build:
 test:
 	go test -v ./...
 
-.PHONY: lint-deps
-lint-deps:
-	GO111MODULE=off go get golang.org/x/lint/golint
-
 .PHONY: lint
-lint: lint-deps
-	go vet ./...
-	golint -set_exit_status ./...
+lint:
+	golangci-lint run
 
 .PHONY: clean
 clean:
