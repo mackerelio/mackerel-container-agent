@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	ecsTypes "github.com/mackerelio/mackerel-container-agent/internal/amazon-ecs-agent/agent/handlers/v2"
 	dockerTypes "github.com/docker/docker/api/types"
+	ecsTypes "github.com/mackerelio/mackerel-container-agent/internal/amazon-ecs-agent/agent/handlers/v2"
 
 	mackerel "github.com/mackerelio/mackerel-client-go"
 

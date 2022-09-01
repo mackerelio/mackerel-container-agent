@@ -1,7 +1,6 @@
 package cmdutil
 
 import (
-	"fmt"
 	"reflect"
 	"testing"
 
@@ -60,8 +59,8 @@ func TestCommand(t *testing.T) {
 				t.Errorf("IsEmpty(): expect %#v, got %#v", tc.isEmpty, got)
 			}
 			if !conf.Command.IsEmpty() {
-				if got := fmt.Sprintf("%s", conf.Command); got != tc.toString {
-					t.Errorf("String(): expect %#v, got %#v", tc.toString, got)
+				if s := conf.Command.String(); s != tc.toString {
+					t.Errorf("String(): expect %#v, got %#v", tc.toString, s)
 				}
 				if got := conf.Command.ToArgs(); !reflect.DeepEqual(got, tc.toArgs) {
 					t.Errorf("ToArgs(): expect %#v, got %#v", tc.toArgs, got)

@@ -8,8 +8,8 @@ import (
 	"reflect"
 	"testing"
 
-	ecsTypes "github.com/mackerelio/mackerel-container-agent/internal/amazon-ecs-agent/agent/handlers/v2"
 	dockerTypes "github.com/docker/docker/api/types"
+	ecsTypes "github.com/mackerelio/mackerel-container-agent/internal/amazon-ecs-agent/agent/handlers/v2"
 
 	"github.com/mackerelio/mackerel-container-agent/metric"
 	"github.com/mackerelio/mackerel-container-agent/metric/hostinfo"

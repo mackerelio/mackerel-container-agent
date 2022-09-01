@@ -24,7 +24,7 @@ func TestInterfaceGenerator(t *testing.T) {
 	if err != nil {
 		t.Errorf("should not raise error: %v", err)
 	}
-	if values == nil || len(values) == 0 {
+	if len(values) == 0 {
 		t.Errorf("should generate values")
 	}
 

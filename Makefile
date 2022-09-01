@@ -2,8 +2,6 @@ BIN := mackerel-container-agent
 VERSION := 0.7.1
 REVISION := $(shell git rev-parse --short HEAD)
 
-export GO111MODULE=on
-
 .PHONY: all
 all: clean build
 
@@ -19,14 +17,9 @@ build:
 test:
 	go test -v ./...
 
-.PHONY: lint-deps
-lint-deps:
-	GO111MODULE=off go get golang.org/x/lint/golint
-
 .PHONY: lint
-lint: lint-deps
-	go vet ./...
-	golint -set_exit_status ./...
+lint:
+	golangci-lint run
 
 .PHONY: clean
 clean:
@@ -44,8 +37,3 @@ docker:
 .PHONY: version
 version:
 	echo $(VERSION)
-
-.PHONY: update
-update:
-	go get -u ./...
-	go mod tidy
