@@ -2,7 +2,6 @@ package agent
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -26,7 +25,7 @@ func newHostResolver(client api.Client, root string) *hostResolver {
 
 func (r *hostResolver) getHost(hostParam *mackerel.CreateHostParam) (*mackerel.Host, bool, error) {
 	var host *mackerel.Host
-	content, err := ioutil.ReadFile(r.path)
+	content, err := os.ReadFile(r.path)
 	if err != nil {
 		if os.IsNotExist(err) {
 			// host id file not found
@@ -85,7 +84,7 @@ func (r *hostResolver) getHost(hostParam *mackerel.CreateHostParam) (*mackerel.H
 }
 
 func (r *hostResolver) getLocalHostID() (string, error) {
-	content, err := ioutil.ReadFile(r.path)
+	content, err := os.ReadFile(r.path)
 	if err != nil {
 		return "", err
 	}

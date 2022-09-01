@@ -3,7 +3,7 @@ package kubernetes
 import (
 	"context"
 	"encoding/json"
-	"io/ioutil"
+	"os"
 	"reflect"
 	"testing"
 	"time"
@@ -20,7 +20,7 @@ import (
 func TestGenerateSpec(t *testing.T) {
 	client := kubelet.NewMockClient(
 		kubelet.MockGetPod(func(context.Context) (*kubernetesTypes.Pod, error) {
-			raw, err := ioutil.ReadFile("kubelet/testdata/pods.json")
+			raw, err := os.ReadFile("kubelet/testdata/pods.json")
 			if err != nil {
 				return nil, err
 			}

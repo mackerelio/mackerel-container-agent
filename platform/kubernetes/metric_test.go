@@ -3,7 +3,7 @@ package kubernetes
 import (
 	"context"
 	"encoding/json"
-	"io/ioutil"
+	"os"
 	"reflect"
 	"testing"
 
@@ -20,7 +20,7 @@ func TestGenerateStats(t *testing.T) {
 	ctx := context.Background()
 	client := kubelet.NewMockClient(
 		kubelet.MockGetPod(func(context.Context) (*kubernetesTypes.Pod, error) {
-			raw, err := ioutil.ReadFile("kubelet/testdata/pods.json")
+			raw, err := os.ReadFile("kubelet/testdata/pods.json")
 			if err != nil {
 				return nil, err
 			}
@@ -36,7 +36,7 @@ func TestGenerateStats(t *testing.T) {
 			return nil, nil
 		}),
 		kubelet.MockGetPodStats(func(context.Context) (*kubeletTypes.PodStats, error) {
-			raw, err := ioutil.ReadFile("kubelet/testdata/summary.json")
+			raw, err := os.ReadFile("kubelet/testdata/summary.json")
 			if err != nil {
 				return nil, err
 			}

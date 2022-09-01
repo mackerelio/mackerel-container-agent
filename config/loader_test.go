@@ -2,7 +2,6 @@ package config
 
 import (
 	"context"
-	"io/ioutil"
 	"os"
 	"reflect"
 	"testing"
@@ -88,7 +87,7 @@ root: '/tmp/mackerel-container-agent'
 	errCh := make(chan error)
 	go func() {
 		time.Sleep(800 * time.Millisecond)
-		errCh <- ioutil.WriteFile(file.Name(), []byte(`
+		errCh <- os.WriteFile(file.Name(), []byte(`
 apikey: 'DUMMY APIKEY 2'
 root: '/tmp/mackerel-container-agent'
 plugin:

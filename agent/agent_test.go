@@ -3,7 +3,6 @@ package agent
 import (
 	"context"
 	"errors"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -85,8 +84,7 @@ func init() {
 }
 
 func TestAgentRun_RetryMetricPost(t *testing.T) {
-	dir, _ := ioutil.TempDir("", "mackerel-container-agent-run-test-retry")
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 	conf := &config.Config{Root: dir}
 	hostID := "abcde"
 	var postedMetricValues []*mackerel.MetricValue
@@ -130,8 +128,7 @@ func TestAgentRun_RetryMetricPost(t *testing.T) {
 }
 
 func TestAgentRun_ResolveHostIdLazy(t *testing.T) {
-	dir, _ := ioutil.TempDir("", "mackerel-container-agent-run-test-lazy")
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 	conf := &config.Config{Root: dir}
 	hostID := "abcde"
 	var updatedCount int
@@ -203,8 +200,7 @@ func TestAgentRun_ResolveHostIdLazy(t *testing.T) {
 }
 
 func TestAgentRun_NoRetryBadRequest(t *testing.T) {
-	dir, _ := ioutil.TempDir("", "mackerel-container-agent-run-test-bad-request")
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 	conf := &config.Config{Root: dir}
 	hostID := "abcde"
 
@@ -230,8 +226,7 @@ func TestAgentRun_NoRetryBadRequest(t *testing.T) {
 }
 
 func TestAgentRun_Retire(t *testing.T) {
-	dir, _ := ioutil.TempDir("", "mackerel-container-agent-run-test-retire")
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 	conf := &config.Config{Root: dir}
 	hostID := "abcde"
 
@@ -269,8 +264,7 @@ func TestAgentRun_Retire(t *testing.T) {
 }
 
 func TestAgentRun_Retire_Retry(t *testing.T) {
-	dir, _ := ioutil.TempDir("", "mackerel-container-agent-run-test-retire-retry")
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 	conf := &config.Config{Root: dir}
 	hostID := "abcde"
 
@@ -316,8 +310,7 @@ func TestAgentRun_Retire_Retry(t *testing.T) {
 }
 
 func TestAgentRun_Retire_HostIDError(t *testing.T) {
-	dir, _ := ioutil.TempDir("", "mackerel-container-agent-run-test-retire-hostid-error")
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 	conf := &config.Config{Root: dir}
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -354,8 +347,7 @@ func TestAgentRun_Retire_HostIDError(t *testing.T) {
 }
 
 func TestAgentRun_MetricPlugin(t *testing.T) {
-	dir, _ := ioutil.TempDir("", "mackerel-container-agent-run-test-metric-plugin")
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 	conf := &config.Config{
 		Root: dir,
 		MetricPlugins: []*config.MetricPlugin{
@@ -410,8 +402,7 @@ func TestAgentRun_MetricPlugin(t *testing.T) {
 }
 
 func TestAgentRun_CustomIdentifier(t *testing.T) {
-	dir, _ := ioutil.TempDir("", "mackerel-container-agent-run-test-custom-identifier")
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 	conf := &config.Config{Root: dir}
 	hostID := "abcde"
 	customIdentifier := "custom-identifier-abcde"
@@ -462,8 +453,7 @@ func TestAgentRun_CustomIdentifier(t *testing.T) {
 }
 
 func TestAgentRun_CustomIdentifier_CreateHost(t *testing.T) {
-	dir, _ := ioutil.TempDir("", "mackerel-container-agent-run-test-custom-identifier-create-host")
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 	conf := &config.Config{Root: dir}
 	hostID := "abcde"
 	customIdentifier := "custom-identifier-abcde"
@@ -517,14 +507,15 @@ func TestAgentRun_CustomIdentifier_CreateHost(t *testing.T) {
 }
 
 func TestAgentRun_HostIDFile(t *testing.T) {
-	dir, _ := ioutil.TempDir("", "mackerel-container-agent-run-test-lazy")
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 	conf := &config.Config{Root: dir}
 	hostID := "abcde"
 	var updatedCount int
 	var postedReports []*mackerel.CheckReports
 
-	ioutil.WriteFile(filepath.Join(dir, "id"), []byte(hostID), 0600)
+	if err := os.WriteFile(filepath.Join(dir, "id"), []byte(hostID), 0600); err != nil {
+		t.Fatal(err)
+	}
 	ctx, cancel := context.WithTimeout(context.Background(), 300*time.Millisecond)
 	defer cancel()
 	client := api.NewMockClient(
@@ -596,8 +587,7 @@ func (g *mockSpecGeneratorStatus) Generate(context.Context) (interface{}, error)
 }
 
 func TestAgentRun_StatusRunning(t *testing.T) {
-	dir, _ := ioutil.TempDir("", "mackerel-container-agent-run-test-status-running")
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 	conf := &config.Config{Root: dir}
 	hostID := "abcde"
 	pform := &mockPlatformStatusRunning{count: 2}
@@ -627,8 +617,7 @@ func TestAgentRun_StatusRunning(t *testing.T) {
 }
 
 func TestAgentRun_ReadinessProbe(t *testing.T) {
-	dir, _ := ioutil.TempDir("", "mackerel-container-agent-run-test-readiness-probe")
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 	conf := &config.Config{
 		Root: dir,
 		ReadinessProbe: &config.Probe{
@@ -666,8 +655,7 @@ func TestAgentRun_ReadinessProbe(t *testing.T) {
 }
 
 func TestAgentRun_ReadinessProbe_SleepLong(t *testing.T) {
-	dir, _ := ioutil.TempDir("", "mackerel-container-agent-run-test-readiness-probe-sleep-long")
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 	conf := &config.Config{
 		Root: dir,
 		ReadinessProbe: &config.Probe{
@@ -694,8 +682,7 @@ func TestAgentRun_ReadinessProbe_SleepLong(t *testing.T) {
 }
 
 func TestAgentRun_HostStatusOnStart(t *testing.T) {
-	dir, _ := ioutil.TempDir("", "mackerel-container-agent-run-test-host-status-on-start")
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 	conf := &config.Config{
 		Root:              dir,
 		HostStatusOnStart: mackerel.HostStatusWorking,

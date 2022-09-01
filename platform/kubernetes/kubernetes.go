@@ -4,10 +4,10 @@ import (
 	"context"
 	"crypto/tls"
 	"crypto/x509"
-	"io/ioutil"
 	"net"
 	"net/http"
 	"net/url"
+	"os"
 	"path"
 	"regexp"
 	"strings"
@@ -48,12 +48,12 @@ func NewKubernetesPlatform(kubeletHost, kubeletPort string, useReadOnlyPort, ins
 
 		var err error
 
-		caCert, err = ioutil.ReadFile(caCertificateFile)
+		caCert, err = os.ReadFile(caCertificateFile)
 		if err != nil {
 			return nil, err
 		}
 
-		token, err = ioutil.ReadFile(tokenFile)
+		token, err = os.ReadFile(tokenFile)
 		if err != nil {
 			return nil, err
 		}
@@ -87,12 +87,12 @@ func NewEKSOnFargatePlatform(kubernetesHost, kubernetesPort string, namespace, p
 		Path:   path.Join("api", "v1", "nodes", nodeName, "proxy"),
 	}
 
-	caCert, err = ioutil.ReadFile(caCertificateFile)
+	caCert, err = os.ReadFile(caCertificateFile)
 	if err != nil {
 		return nil, err
 	}
 
-	token, err = ioutil.ReadFile(tokenFile)
+	token, err = os.ReadFile(tokenFile)
 	if err != nil {
 		return nil, err
 	}
