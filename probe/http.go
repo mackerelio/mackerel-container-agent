@@ -53,6 +53,9 @@ func (p *probeHTTP) Check(ctx context.Context) error {
 		method = "GET"
 	}
 	req, err := http.NewRequest(method, u.String(), nil)
+	if err != nil {
+		return err
+	}
 	for _, h := range p.Headers {
 		if strings.ToLower(h.Name) == "host" {
 			req.Host = h.Value

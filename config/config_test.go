@@ -32,14 +32,10 @@ func TestLoadDefault(t *testing.T) {
 }
 
 func TestLoadFile(t *testing.T) {
-	file, err := newConfigFile(`
+	file := newConfigFile(t, `
 apikey: 'DUMMY APIKEY'
 root: '/tmp/mackerel-container-agent'
 `)
-	if err != nil {
-		t.Errorf("should not raise error: %v", err)
-	}
-	defer os.Remove(file.Name())
 
 	expect := &Config{
 		Apibase: "",
@@ -47,7 +43,7 @@ root: '/tmp/mackerel-container-agent'
 		Root:    "/tmp/mackerel-container-agent",
 	}
 
-	conf, err := load(context.Background(), file.Name())
+	conf, err := load(context.Background(), file)
 	if err != nil {
 		t.Errorf("should not raise error: %v", err)
 	}
@@ -57,9 +53,7 @@ root: '/tmp/mackerel-container-agent'
 }
 
 func TestLoadHTTP(t *testing.T) {
-	ts := newHTTPServer(sampleConfig)
-	defer ts.Close()
-
+	ts := newHTTPServer(t, sampleConfig)
 	expect := &Config{
 		Apibase: "",
 		Apikey:  "DUMMY APIKEY",
@@ -98,14 +92,10 @@ func TestLoadS3(t *testing.T) {
 }
 
 func TestLoadWithEnv(t *testing.T) {
-	conf, err := newConfigFile(`
+	conf := newConfigFile(t, `
 apibase: http://localhost:8080
 apikey: 'DUMMY APIKEY'
 `)
-	if err != nil {
-		t.Errorf("should not raise error: %v", err)
-	}
-	defer os.Remove(conf.Name())
 
 	os.Setenv("MACKEREL_APIKEY", "ENV APIKEY")
 	defer os.Unsetenv("MACKEREL_APIKEY")
@@ -128,7 +118,7 @@ apikey: 'DUMMY APIKEY'
 		},
 		{
 			name:     "config",
-			location: conf.Name(),
+			location: conf,
 			expect: &Config{
 				Apibase: "http://localhost:8080",
 				Apikey:  "DUMMY APIKEY",
@@ -151,15 +141,11 @@ apikey: 'DUMMY APIKEY'
 }
 
 func TestRoles(t *testing.T) {
-	conf, err := newConfigFile(`
+	conf := newConfigFile(t, `
 roles:
   - My-Service:app
   - Another-Service:db
 `)
-	if err != nil {
-		t.Errorf("should not raise error: %v", err)
-	}
-	defer os.Remove(conf.Name())
 
 	os.Setenv("MACKEREL_ROLES", "Foo:xxx, Bar:yyy, Buz:zzz")
 	defer os.Unsetenv("MACKEREL_ROLES")
@@ -171,7 +157,7 @@ roles:
 	}{
 		{
 			name:     "config",
-			location: conf.Name(),
+			location: conf,
 			expect: &Config{
 				Root:  defaultRoot,
 				Roles: []string{"My-Service:app", "Another-Service:db"},
@@ -201,13 +187,9 @@ roles:
 }
 
 func TestIgnoreContainer(t *testing.T) {
-	conf, err := newConfigFile(`
+	conf := newConfigFile(t, `
 ignoreContainer: "^mackerel-.+$"
 `)
-	if err != nil {
-		t.Errorf("should not raise error: %v", err)
-	}
-	defer os.Remove(conf.Name())
 
 	os.Setenv("MACKEREL_IGNORE_CONTAINER", "^mackerel-.+$")
 	defer os.Unsetenv("MACKEREL_IGNORE_CONTAINER")
@@ -221,7 +203,7 @@ ignoreContainer: "^mackerel-.+$"
 	}{
 		{
 			name:     "config",
-			location: conf.Name(),
+			location: conf,
 			expect: &Config{
 				Root:            defaultRoot,
 				IgnoreContainer: Regexpwrapper{r},
@@ -251,7 +233,7 @@ ignoreContainer: "^mackerel-.+$"
 }
 
 func TestMetricPlugins(t *testing.T) {
-	file, err := newConfigFile(`
+	file := newConfigFile(t, `
 plugin:
   metrics:
     mysql:
@@ -284,10 +266,6 @@ plugin:
       timeoutSeconds: 45
       memo: "check procs memo"
 `)
-	if err != nil {
-		t.Errorf("should not raise error: %v", err)
-	}
-	defer os.Remove(file.Name())
 
 	expect := &Config{
 		Apibase: "",
@@ -326,7 +304,7 @@ plugin:
 		},
 	}
 
-	conf, err := load(context.Background(), file.Name())
+	conf, err := load(context.Background(), file)
 	if err != nil {
 		t.Errorf("should not raise error: %v", err)
 	}
@@ -560,13 +538,9 @@ readinessProbe:
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			file, err := newConfigFile(tc.config)
-			if err != nil {
-				t.Fatalf("should not raise error: %v", err)
-			}
-			defer os.Remove(file.Name())
+			file := newConfigFile(t, tc.config)
 
-			conf, err := load(context.Background(), file.Name())
+			conf, err := load(context.Background(), file)
 			if err != nil && !tc.shouldErr {
 				t.Fatalf("should not raise error: %v", err)
 			}
@@ -667,13 +641,9 @@ hostStatusOnStart: working
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			os.Setenv("MACKEREL_HOST_STATUS_ON_START", tc.env)
-			file, err := newConfigFile(tc.config)
-			if err != nil {
-				t.Fatalf("should not raise error: %v", err)
-			}
-			defer os.Remove(file.Name())
+			file := newConfigFile(t, tc.config)
 
-			conf, err := load(context.Background(), file.Name())
+			conf, err := load(context.Background(), file)
 			if err != nil && !tc.shouldErr {
 				t.Fatalf("should not raise error: %v", err)
 			}
@@ -688,25 +658,37 @@ hostStatusOnStart: working
 	os.Unsetenv("MACKEREL_HOST_STATUS_ON_START")
 }
 
-func newHTTPServer(content string) *httptest.Server {
+func newHTTPServer(t testing.TB, content string) *httptest.Server {
+	t.Helper()
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte(content))
+		if _, err := w.Write([]byte(content)); err != nil {
+			t.Fatal(err)
+		}
 	})
-	return httptest.NewServer(handler)
+	ts := httptest.NewServer(handler)
+	t.Cleanup(ts.Close)
+	return ts
 }
 
-func newConfigFile(content string) (*os.File, error) {
+func newConfigFile(t testing.TB, content string) string {
+	t.Helper()
 	temp, err := os.CreateTemp("", "mackerel-config-test")
 	if err != nil {
-		return nil, err
+		t.Fatalf("should not raise error: %v", err)
 	}
+	defer temp.Close()
+
+	name := temp.Name()
+	t.Cleanup(func() {
+		os.Remove(name)
+	})
 	if _, err := temp.WriteString(content); err != nil {
-		os.Remove(temp.Name())
-		return nil, err
+		t.Fatalf("should not raise error: %v", err)
 	}
-	temp.Sync()
-	temp.Close()
-	return temp, nil
+	if err := temp.Sync(); err != nil {
+		t.Fatalf("should not raise error: %v", err)
+	}
+	return name
 }
 
 type mockS3Downloader struct {

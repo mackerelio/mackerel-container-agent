@@ -98,7 +98,10 @@ func TestProbe_Wait(t *testing.T) {
 			p := newMockProbe(tc.results, tc.initialDelay, tc.period)
 			ctx, cancel := context.WithTimeout(context.Background(), tc.duration)
 			defer cancel()
-			Wait(ctx, p)
+
+			// Below writing a content sometimes expects returning an error.
+			// The ctx may timeout while p waits to ready.
+			Wait(ctx, p) // nolint
 
 			// This test is flaky so we should check the count with an accuracy.
 			if p.count < tc.count-tc.accuracy || p.count > tc.count+tc.accuracy {

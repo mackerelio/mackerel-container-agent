@@ -2,7 +2,9 @@ package taskmetadata
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -130,7 +132,9 @@ func TestErrorMessage(t *testing.T) {
 
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(body))
+		if _, err := w.Write([]byte(body)); err != nil {
+			t.Fatal(err)
+		}
 	})
 	ts := httptest.NewServer(handler)
 
@@ -184,7 +188,10 @@ func TestNoProxy(t *testing.T) {
 	ts := httptest.NewServer(th)
 
 	c, _ := NewClient(ts.URL, nil)
-	c.GetTaskMetadata(context.Background())
+	_, err := c.GetTaskMetadata(context.Background())
+	if err != nil && !errors.Is(err, io.EOF) {
+		t.Fatal(err)
+	}
 
 	if useProxy == true {
 		t.Error("proxy should not be used")

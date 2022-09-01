@@ -11,14 +11,10 @@ import (
 )
 
 func TestLoaderLoad(t *testing.T) {
-	file, err := newConfigFile(`
+	file := newConfigFile(t, `
 apikey: 'DUMMY APIKEY'
 root: '/tmp/mackerel-container-agent'
 `)
-	if err != nil {
-		t.Fatalf("should not raise error: %v", err)
-	}
-	defer os.Remove(file.Name())
 
 	expect := &Config{
 		Apibase: "",
@@ -29,7 +25,7 @@ root: '/tmp/mackerel-container-agent'
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	confLoader := NewLoader(file.Name(), 0)
+	confLoader := NewLoader(file, 0)
 	conf, err := confLoader.Load(ctx)
 	if err != nil {
 		t.Fatalf("should not raise error: %v", err)
@@ -44,14 +40,10 @@ root: '/tmp/mackerel-container-agent'
 }
 
 func TestLoaderStart(t *testing.T) {
-	file, err := newConfigFile(`
+	file := newConfigFile(t, `
 apikey: 'DUMMY APIKEY'
 root: '/tmp/mackerel-container-agent'
 `)
-	if err != nil {
-		t.Fatalf("should not raise error: %v", err)
-	}
-	defer os.Remove(file.Name())
 
 	expect := &Config{
 		Apibase: "",
@@ -62,7 +54,7 @@ root: '/tmp/mackerel-container-agent'
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	confLoader := NewLoader(file.Name(), 300*time.Millisecond)
+	confLoader := NewLoader(file, 300*time.Millisecond)
 	conf, err := confLoader.Load(ctx)
 	if err != nil {
 		t.Fatalf("should not raise error: %v", err)
@@ -87,7 +79,7 @@ root: '/tmp/mackerel-container-agent'
 	errCh := make(chan error)
 	go func() {
 		time.Sleep(800 * time.Millisecond)
-		errCh <- os.WriteFile(file.Name(), []byte(`
+		errCh <- os.WriteFile(file, []byte(`
 apikey: 'DUMMY APIKEY 2'
 root: '/tmp/mackerel-container-agent'
 plugin:
@@ -124,14 +116,10 @@ plugin:
 }
 
 func TestLoaderStartCancel(t *testing.T) {
-	file, err := newConfigFile(`
+	file := newConfigFile(t, `
 apikey: 'DUMMY APIKEY'
 root: '/tmp/mackerel-container-agent'
 `)
-	if err != nil {
-		t.Fatalf("should not raise error: %v", err)
-	}
-	defer os.Remove(file.Name())
 
 	expect := &Config{
 		Apibase: "",
@@ -142,7 +130,7 @@ root: '/tmp/mackerel-container-agent'
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	confLoader := NewLoader(file.Name(), 300*time.Millisecond)
+	confLoader := NewLoader(file, 300*time.Millisecond)
 	conf, err := confLoader.Load(ctx)
 	if err != nil {
 		t.Fatalf("should not raise error: %v", err)

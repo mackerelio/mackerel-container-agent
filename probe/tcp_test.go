@@ -33,7 +33,6 @@ func TestProbeTCP_Check(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			ts := newHTTPServer(t, "ok", nil, "GET", "/", 0, http.StatusOK)
-			defer ts.Close()
 			u, _ := url.Parse(ts.URL)
 
 			port := u.Port()
