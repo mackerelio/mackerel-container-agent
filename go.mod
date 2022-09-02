@@ -1,6 +1,6 @@
 module github.com/mackerelio/mackerel-container-agent
 
-go 1.17
+go 1.18
 
 require (
 	github.com/Songmu/retry v0.1.0
