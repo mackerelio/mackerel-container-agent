@@ -97,10 +97,8 @@ apibase: http://localhost:8080
 apikey: 'DUMMY APIKEY'
 `)
 
-	os.Setenv("MACKEREL_APIKEY", "ENV APIKEY")
-	defer os.Unsetenv("MACKEREL_APIKEY")
-	os.Setenv("MACKEREL_APIBASE", "http://127.0.0.1:9000")
-	defer os.Unsetenv("MACKEREL_APIBASE")
+	t.Setenv("MACKEREL_APIKEY", "ENV APIKEY")
+	t.Setenv("MACKEREL_APIBASE", "http://127.0.0.1:9000")
 
 	testCases := []struct {
 		name     string
@@ -147,8 +145,7 @@ roles:
   - Another-Service:db
 `)
 
-	os.Setenv("MACKEREL_ROLES", "Foo:xxx, Bar:yyy, Buz:zzz")
-	defer os.Unsetenv("MACKEREL_ROLES")
+	t.Setenv("MACKEREL_ROLES", "Foo:xxx, Bar:yyy, Buz:zzz")
 
 	testCases := []struct {
 		name     string
@@ -191,10 +188,8 @@ func TestIgnoreContainer(t *testing.T) {
 ignoreContainer: "^mackerel-.+$"
 `)
 
-	os.Setenv("MACKEREL_IGNORE_CONTAINER", "^mackerel-.+$")
-	defer os.Unsetenv("MACKEREL_IGNORE_CONTAINER")
-
-	r, _ := regexp.Compile("^mackerel-.+$")
+	t.Setenv("MACKEREL_IGNORE_CONTAINER", "^mackerel-.+$")
+	r := regexp.MustCompile("^mackerel-.+$")
 
 	testCases := []struct {
 		name     string
@@ -640,7 +635,7 @@ hostStatusOnStart: working
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			os.Setenv("MACKEREL_HOST_STATUS_ON_START", tc.env)
+			t.Setenv("MACKEREL_HOST_STATUS_ON_START", tc.env)
 			file := newConfigFile(t, tc.config)
 
 			conf, err := load(context.Background(), file)
@@ -655,7 +650,6 @@ hostStatusOnStart: working
 			}
 		})
 	}
-	os.Unsetenv("MACKEREL_HOST_STATUS_ON_START")
 }
 
 func newHTTPServer(t testing.TB, content string) *httptest.Server {
