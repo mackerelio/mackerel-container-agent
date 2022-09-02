@@ -25,11 +25,11 @@ jobs:
         go: ['1.19.x', '1.18.x']
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/setup-go@v2
+    - uses: actions/setup-go@v3
       with:
         go-version: ${{ matrix.go }}
-    - uses: actions/checkout@v2
-    - uses: actions/cache@v2
+    - uses: actions/checkout@v3
+    - uses: actions/cache@v3
       with:
         path: ~/go/pkg/mod
         key: go-${{ hashFiles('**/go.sum') }}
@@ -42,10 +42,10 @@ jobs:
     needs: [test]
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - uses: docker/setup-qemu-action@v1
-    - uses: docker/setup-buildx-action@v1
-    - uses: docker/login-action@v1
+    - uses: actions/checkout@v3
+    - uses: docker/setup-qemu-action@v2
+    - uses: docker/setup-buildx-action@v2
+    - uses: docker/login-action@v2
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -57,7 +57,7 @@ jobs:
         role-session-name: "mackerel-container-agent-${{ github.run_id }}-${{ github.run_number }}"
         aws-region: ap-northeast-1
     - name: Login to Public ECR
-      uses: docker/login-action@v1
+      uses: docker/login-action@v2
       with:
         registry: public.ecr.aws
       env:
@@ -68,7 +68,7 @@ jobs:
       run: echo "::set-output name=VERSION::${GITHUB_HEAD_REF/bump-version-/v}"
 
     - name: Build and push alpha image
-      uses: docker/build-push-action@v2
+      uses: docker/build-push-action@v3
       with:
         context: .
         file: Dockerfile
@@ -82,7 +82,7 @@ jobs:
           public.ecr.aws/mackerel/mackerel-container-agent:${{ steps.get_alpha_version.outputs.VERSION }}-alpha
 
     - name: Build and push alpha image with plugins
-      uses: docker/build-push-action@v2
+      uses: docker/build-push-action@v3
       with:
         context: .
         file: Dockerfile
@@ -100,10 +100,10 @@ jobs:
     needs: [test]
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - uses: docker/setup-qemu-action@v1
-    - uses: docker/setup-buildx-action@v1
-    - uses: docker/login-action@v1
+    - uses: actions/checkout@v3
+    - uses: docker/setup-qemu-action@v2
+    - uses: docker/setup-buildx-action@v2
+    - uses: docker/login-action@v2
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -115,7 +115,7 @@ jobs:
         role-session-name: "mackerel-container-agent-${{ github.run_id }}-${{ github.run_number }}"
         aws-region: ap-northeast-1
     - name: Login to Public ECR
-      uses: docker/login-action@v1
+      uses: docker/login-action@v2
       with:
         registry: public.ecr.aws
       env:
@@ -126,7 +126,7 @@ jobs:
       run: echo "::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}"
 
     - name: Build and push release image
-      uses: docker/build-push-action@v2
+      uses: docker/build-push-action@v3
       with:
         context: .
         file: Dockerfile
@@ -142,7 +142,7 @@ jobs:
           public.ecr.aws/mackerel/mackerel-container-agent:${{ steps.get_version.outputs.VERSION }}
 
     - name: Build and push release image with plugins
-      uses: docker/build-push-action@v2
+      uses: docker/build-push-action@v3
       with:
         context: .
         file: Dockerfile
