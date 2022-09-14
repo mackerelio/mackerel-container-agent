@@ -8,7 +8,7 @@ require (
 	github.com/aws/aws-sdk-go v1.44.58
 	github.com/docker/docker v20.10.17+incompatible
 	github.com/go-yaml/yaml v2.1.0+incompatible
-	github.com/mackerelio/go-osstat v0.2.2
+	github.com/mackerelio/go-osstat v0.2.3
 	github.com/mackerelio/golib v1.2.1
 	github.com/mackerelio/mackerel-client-go v0.21.2
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
