@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.7.2 (2022-09-14)
+
+* enable dependabot for github-actions ecosystem #213 (lufia)
+* use golangci lint #212 (lufia)
+* refactor: handle errors #211 (lufia)
+* refactor: replace ioutil functions #210 (lufia)
+* upgrade Go: 1.17 -> 1.19 #209 (lufia)
+* Bump github.com/mackerelio/mackerel-client-go from 0.21.1 to 0.21.2 #207 (dependabot[bot])
+
+
 ## 0.7.1 (2022-08-04)
 
 * refactoring agent/platform.go #194 (yseto)
