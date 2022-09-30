@@ -2,7 +2,6 @@ package agent
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"os"
 	"regexp"
@@ -16,7 +15,10 @@ import (
 
 // NewPlatform creates a new container platform
 func NewPlatform(ctx context.Context, ignoreContainer *regexp.Regexp) (platform.Platform, error) {
-	p := os.Getenv("MACKEREL_CONTAINER_PLATFORM")
+	p, err := getEnvValue("MACKEREL_CONTAINER_PLATFORM")
+	if err != nil {
+		return nil, err
+	}
 
 	switch platform.Type(p) {
 
@@ -101,7 +103,7 @@ func NewPlatform(ctx context.Context, ignoreContainer *regexp.Regexp) (platform.
 		return none.NewNonePlatform()
 
 	default:
-		return nil, errors.New("platform not specified")
+		return nil, fmt.Errorf("%q platform is invalid. please check your MACKEREL_CONTAINER_PLATFORM", p)
 	}
 }
 
