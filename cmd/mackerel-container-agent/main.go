@@ -15,6 +15,7 @@ var version, revision string
 var logger = logging.GetLogger("main")
 
 func main() {
+	logging.SetLogLevel(logging.DEBUG)
 	os.Exit(run(os.Args[1:]))
 }
 
