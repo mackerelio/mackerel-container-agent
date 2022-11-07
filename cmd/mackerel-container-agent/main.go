@@ -15,7 +15,22 @@ var version, revision string
 var logger = logging.GetLogger("main")
 
 func main() {
-	logging.SetLogLevel(logging.DEBUG)
+	logLevel := os.Getenv("MACKEREL_LOG_LEVEL")
+	switch logLevel {
+	case "TRACE":
+		logging.SetLogLevel(logging.TRACE)
+	case "DEBUG":
+		logging.SetLogLevel(logging.DEBUG)
+	case "INFO":
+		logging.SetLogLevel(logging.INFO)
+	case "WARNING":
+		logging.SetLogLevel(logging.WARNING)
+	case "ERROR":
+		logging.SetLogLevel(logging.ERROR)
+	case "CRITICAL":
+		logging.SetLogLevel(logging.CRITICAL)
+	}
+
 	os.Exit(run(os.Args[1:]))
 }
 
