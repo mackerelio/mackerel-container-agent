@@ -29,6 +29,8 @@ func main() {
 		logging.SetLogLevel(logging.ERROR)
 	case "CRITICAL":
 		logging.SetLogLevel(logging.CRITICAL)
+	default:
+		logging.SetLogLevel(logging.INFO)
 	}
 
 	os.Exit(run(os.Args[1:]))
