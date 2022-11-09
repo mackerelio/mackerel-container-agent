@@ -31,6 +31,8 @@ func NewPluginGenerator(p *config.MetricPlugin) Generator {
 // Generate generates metric values
 func (g *pluginGenerator) Generate(ctx context.Context) (Values, error) {
 	env := append(g.Env, pluginMetaEnvName+"=")
+	mackerel_env := config.FilterMackerelEnv(env)
+	logger.Debugf("plugin %s command: %s env: %+v", g.Name, g.Command, mackerel_env)
 	stdout, stderr, _, err := cmdutil.RunCommand(ctx, g.Command, g.User, env, g.Timeout)
 
 	if stderr != "" {

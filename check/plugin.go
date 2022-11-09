@@ -28,6 +28,8 @@ func (g *pluginGenerator) Config() mackerel.CheckConfig {
 // Generate generates check report
 func (g *pluginGenerator) Generate(ctx context.Context) (*Result, error) {
 	now := time.Now()
+	mackerel_env := config.FilterMackerelEnv(g.Env)
+	logger.Debugf("plugin %s command: %s env: %+v", g.Name, g.Command, mackerel_env)
 	stdout, stderr, exitCode, err := cmdutil.RunCommand(ctx, g.Command, g.User, g.Env, g.Timeout)
 
 	if stderr != "" {

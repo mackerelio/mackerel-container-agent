@@ -34,6 +34,10 @@ linux:
 docker:
 	docker build -t $(BIN) -t $(BIN):$(VERSION) --target container-agent .
 
+.PHONY: docker-with-plugins
+docker-with-plugins:
+	docker build -t $(BIN) -t $(BIN):$(VERSION) --target container-agent-with-plugins .
+
 .PHONY: version
 version:
 	echo $(VERSION)

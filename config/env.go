@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"regexp"
 	"sort"
 	"strings"
 )
@@ -38,4 +39,16 @@ func buildEnv(envMap map[string]string) ([]string, error) {
 	}
 	sort.Strings(env)
 	return env, nil
+}
+
+// Return env starting with "MACKEREL"
+func FilterMackerelEnv(env Env) Env {
+	var mackerel_env []string
+	r := regexp.MustCompile(`^MACKEREL`)
+	for _, v := range env {
+		if r.MatchString(v) {
+			mackerel_env = append(mackerel_env, v)
+		}
+	}
+	return mackerel_env
 }
