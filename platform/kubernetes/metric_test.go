@@ -66,8 +66,8 @@ func TestGenerateStats(t *testing.T) {
 		"container.cpu.nginx.usage":                       0.0, // Result is 0 because use the same data.
 		"container.cpu.mackerel-container-agent.limit":    25.0,
 		"container.cpu.nginx.limit":                       800.0, // mockCpuCores * 100
-		"container.memory.mackerel-container-agent.usage": 2.6529792e+07,
-		"container.memory.nginx.usage":                    1.949696e+06,
+		"container.memory.mackerel-container-agent.usage": 1.8608128e+07,
+		"container.memory.nginx.usage":                    1.941504e+06,
 		"container.memory.mackerel-container-agent.limit": 134217728.0,  // 128MiB
 		"container.memory.nginx.limit":                    3876802560.0, // mockMemTotal
 	}
