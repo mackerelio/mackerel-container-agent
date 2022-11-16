@@ -68,7 +68,9 @@ func (g *metricGenerator) Generate(ctx context.Context) (metric.Values, error) {
 			if currContainer.Name == prevContainer.Name {
 				name := metric.SanitizeMetricKey(currContainer.Name)
 				metrics["container.cpu."+name+".usage"] = calculateCPUMetrics(&prevContainer, &currContainer, delta)
-				metrics["container.memory."+name+".usage"] = float64(*currContainer.Memory.UsageBytes)
+				if currContainer.Memory.WorkingSetBytes != nil {
+					metrics["container.memory."+name+".usage"] = float64(*currContainer.Memory.WorkingSetBytes)
+				}
 				for _, c := range pod.Spec.Containers {
 					if c.Name == currContainer.Name {
 						metrics["container.cpu."+name+".limit"] = g.getCPULimit(&c)
