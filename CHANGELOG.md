@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.8.0 (2022-11-16)
+
+* container.memory.<name>.usage is WorkingSetBytes #253 (yseto)
+* Update k8s.io/api, k8s.io/apimachinery, k8s.io/kubelet #240 (yseto)
+* Enable to set LogLevel by environment variable #237 (wafuwafu13)
+* Bump github.com/mackerelio/mackerel-client-go from 0.21.2 to 0.22.0 #231 (dependabot[bot])
+* Improve `NewPlatform` error messages #227 (wafuwafu13)
+* Bump github.com/mackerelio/go-osstat from 0.2.2 to 0.2.3 #203 (dependabot[bot])
+
+
 ## 0.7.2 (2022-09-14)
 
 * enable dependabot for github-actions ecosystem #213 (lufia)
