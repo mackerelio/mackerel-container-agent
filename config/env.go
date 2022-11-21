@@ -2,7 +2,6 @@ package config
 
 import (
 	"fmt"
-	"regexp"
 	"sort"
 	"strings"
 )
@@ -41,14 +40,11 @@ func buildEnv(envMap map[string]string) ([]string, error) {
 	return env, nil
 }
 
-// Return env starting with "MACKEREL"
-func FilterMackerelEnv(env Env) Env {
-	var mackerel_env []string
-	r := regexp.MustCompile(`^MACKEREL`)
-	for _, v := range env {
-		if r.MatchString(v) {
-			mackerel_env = append(mackerel_env, v)
-		}
+// MaskEnvValue return masked env value ex) FOOBARBAZ -> FOOB***
+func MaskEnvValue(s string) string {
+	if len(s) < 4 {
+		return s
+	} else {
+		return s[:4] + "***"
 	}
-	return mackerel_env
 }

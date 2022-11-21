@@ -4,13 +4,28 @@ import (
 	"testing"
 )
 
-func TestFilterMackerelEnv(t *testing.T) {
-	env := []string{"FOO", "MACKEREL_FOO", "FOO_MACKEREL_BAR"}
-	mackerel_env := FilterMackerelEnv(env)
-	if len(mackerel_env) != 1 {
-		t.Error("length of mackerel_env should be 1")
+func TestMaskEnvValue(t *testing.T) {
+	testCases := []struct {
+		envValue string
+		expect   string
+	}{
+		{
+			envValue: "AAA",
+			expect:   "AAA",
+		},
+		{
+			envValue: "BBBBBBBBBBB",
+			expect:   "BBBB***",
+		},
+		{
+			envValue: "CCC CC",
+			expect:   "CCC ***",
+		},
 	}
-	if mackerel_env[0] != "MACKEREL_FOO" {
-		t.Error("MACKEREL_FOO should be mackerel_env")
+
+	for _, tc := range testCases {
+		if MaskEnvValue(tc.envValue) != tc.expect {
+			t.Fatalf("expect %s, actual %s", tc.expect, MaskEnvValue(tc.envValue))
+		}
 	}
 }
