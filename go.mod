@@ -12,8 +12,8 @@ require (
 	github.com/mackerelio/golib v1.2.1
 	github.com/mackerelio/mackerel-client-go v0.22.0
 	golang.org/x/sync v0.0.0-20220722155255-886fb9371eb4
-	k8s.io/api v0.25.3
-	k8s.io/apimachinery v0.25.3
+	k8s.io/api v0.25.4
+	k8s.io/apimachinery v0.25.4
 )
 
 require k8s.io/kubelet v0.25.3
