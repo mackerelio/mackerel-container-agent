@@ -2,6 +2,7 @@ package check
 
 import (
 	"context"
+	"strings"
 	"time"
 
 	mackerel "github.com/mackerelio/mackerel-client-go"
@@ -28,6 +29,13 @@ func (g *pluginGenerator) Config() mackerel.CheckConfig {
 // Generate generates check report
 func (g *pluginGenerator) Generate(ctx context.Context) (*Result, error) {
 	now := time.Now()
+	var masked_env []string
+	for _, v := range g.Env {
+		key := strings.Split(v, "=")[0]
+		value := strings.Split(v, "=")[1]
+		masked_env = append(masked_env, key+"="+config.MaskEnvValue(value))
+	}
+	logger.Debugf("plugin %s command: %s env: %+v", g.Name, g.Command, masked_env)
 	stdout, stderr, exitCode, err := cmdutil.RunCommand(ctx, g.Command, g.User, g.Env, g.Timeout)
 
 	if stderr != "" {

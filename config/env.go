@@ -39,3 +39,12 @@ func buildEnv(envMap map[string]string) ([]string, error) {
 	sort.Strings(env)
 	return env, nil
 }
+
+// MaskEnvValue return masked env value ex) FOOBARBAZ -> FOOB***
+func MaskEnvValue(s string) string {
+	if len(s) < 4 {
+		return s
+	} else {
+		return s[:4] + "***"
+	}
+}

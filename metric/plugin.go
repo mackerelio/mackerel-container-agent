@@ -31,6 +31,13 @@ func NewPluginGenerator(p *config.MetricPlugin) Generator {
 // Generate generates metric values
 func (g *pluginGenerator) Generate(ctx context.Context) (Values, error) {
 	env := append(g.Env, pluginMetaEnvName+"=")
+	var masked_env []string
+	for _, v := range env {
+		key := strings.Split(v, "=")[0]
+		value := strings.Split(v, "=")[1]
+		masked_env = append(masked_env, key+"="+config.MaskEnvValue(value))
+	}
+	logger.Debugf("plugin %s command: %s env: %+v", g.Name, g.Command, masked_env)
 	stdout, stderr, _, err := cmdutil.RunCommand(ctx, g.Command, g.User, env, g.Timeout)
 
 	if stderr != "" {
