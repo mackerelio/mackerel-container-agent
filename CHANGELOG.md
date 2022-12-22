@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.9.0 (2022-12-14)
+
+* fix vulnerbilities CVE-2022-27664,CVE-2022-32149 #257 (pyama86)
+* Enable to debug env #246 (wafuwafu13)
+
+
 ## 0.8.0 (2022-11-16)
 
 * container.memory.<name>.usage is WorkingSetBytes #253 (yseto)
