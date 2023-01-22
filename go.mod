@@ -6,7 +6,7 @@ require (
 	github.com/Songmu/retry v0.1.0
 	github.com/Songmu/timeout v0.4.0
 	github.com/aws/aws-sdk-go v1.44.58
-	github.com/docker/docker v20.10.17+incompatible
+	github.com/docker/docker v20.10.23+incompatible
 	github.com/go-yaml/yaml v2.1.0+incompatible
 	github.com/mackerelio/go-osstat v0.2.3
 	github.com/mackerelio/golib v1.2.1
