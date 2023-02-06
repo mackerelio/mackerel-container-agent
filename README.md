@@ -12,7 +12,7 @@ Please refer to [Monitoring Containers](https://mackerel.io/docs/entry/howto/con
 ## LICENSE
 
 ```plaintext
-Copyright 2018-2020 Hatena Co., Ltd.
+Copyright 2018 Hatena Co., Ltd.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
