@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.9.1 (2023-02-08)
+
+* Remove last year from license header #283 (Arthur1)
+* Bump github.com/docker/docker from 20.10.17+incompatible to 20.10.23+incompatible #276 (dependabot[bot])
+
+
 ## 0.9.0 (2022-12-14)
 
 * fix vulnerbilities CVE-2022-27664,CVE-2022-32149 #257 (pyama86)
