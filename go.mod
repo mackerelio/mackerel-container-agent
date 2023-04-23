@@ -6,7 +6,7 @@ require (
 	github.com/Songmu/retry v0.1.0
 	github.com/Songmu/timeout v0.4.0
 	github.com/aws/aws-sdk-go v1.44.58
-	github.com/docker/docker v20.10.23+incompatible
+	github.com/docker/docker v23.0.4+incompatible
 	github.com/go-yaml/yaml v2.1.0+incompatible
 	github.com/mackerelio/go-osstat v0.2.3
 	github.com/mackerelio/golib v1.2.1
@@ -31,6 +31,7 @@ require (
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opencontainers/image-spec v1.0.2 // indirect
+	github.com/pkg/errors v0.9.1 // indirect
 	golang.org/x/net v0.2.0 // indirect
 	golang.org/x/sys v0.2.0 // indirect
 	golang.org/x/text v0.4.0 // indirect
