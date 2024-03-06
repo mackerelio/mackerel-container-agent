@@ -8,7 +8,7 @@ import (
 
 // Generator interface generates spec information
 type Generator interface {
-	Generate(context.Context) (interface{}, error)
+	Generate(context.Context) (any, error)
 }
 
 // CloudHostname has mackerel.Cloud and host name

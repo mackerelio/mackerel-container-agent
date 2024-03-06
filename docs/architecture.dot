@@ -27,7 +27,7 @@ digraph {
   subgraph spec {
     label="spec";
     "spec.Manager" -> "spec.collector" [dir=back label="mackerel.HostMeta"];
-    "spec.collector" -> "[]spec.Generator" [dir=back label="interface{}"];
+    "spec.collector" -> "[]spec.Generator" [dir=back label="any"];
     "spec.Manager" -> "spec.sender" [label="*mackerel.UpdateHostParam"];
   }
 

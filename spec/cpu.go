@@ -17,11 +17,11 @@ type CPUGenerator struct {
 
 var cpuLogger = logging.GetLogger("spec.cpu")
 
-func (g *CPUGenerator) generate(file io.Reader) (interface{}, error) {
+func (g *CPUGenerator) generate(file io.Reader) (any, error) {
 	scanner := bufio.NewScanner(file)
 
 	var results mackerel.CPU
-	var cpuinfo map[string]interface{}
+	var cpuinfo map[string]any
 	var modelName string
 
 	for scanner.Scan() {
@@ -35,7 +35,7 @@ func (g *CPUGenerator) generate(file io.Reader) (interface{}, error) {
 
 		switch key {
 		case "processor":
-			cpuinfo = make(map[string]interface{})
+			cpuinfo = make(map[string]any)
 			if modelName != "" {
 				cpuinfo["model_name"] = modelName
 			}
@@ -62,7 +62,7 @@ func (g *CPUGenerator) generate(file io.Reader) (interface{}, error) {
 
 	// Old kernels with CONFIG_SMP disabled has no "processor: " line
 	if len(results) == 0 && modelName != "" {
-		cpuinfo = make(map[string]interface{})
+		cpuinfo = make(map[string]any)
 		cpuinfo["model_name"] = modelName
 		results = append(results, cpuinfo)
 	}
@@ -71,7 +71,7 @@ func (g *CPUGenerator) generate(file io.Reader) (interface{}, error) {
 }
 
 // Generate CPU specs
-func (g *CPUGenerator) Generate(ctx context.Context) (interface{}, error) {
+func (g *CPUGenerator) Generate(ctx context.Context) (any, error) {
 	file, err := os.Open("/proc/cpuinfo")
 	if err != nil {
 		// Don't return error to prevent stop agent

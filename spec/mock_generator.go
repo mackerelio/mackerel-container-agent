@@ -4,16 +4,16 @@ import "context"
 
 // MockGenerator represents a mock spec generator
 type MockGenerator struct {
-	value    interface{}
+	value    any
 	errValue error
 }
 
 // NewMockGenerator creates a new mock spec generator
-func NewMockGenerator(value interface{}, errValue error) Generator {
+func NewMockGenerator(value any, errValue error) Generator {
 	return &MockGenerator{value, errValue}
 }
 
 // Generate generates spec values
-func (g *MockGenerator) Generate(context.Context) (interface{}, error) {
+func (g *MockGenerator) Generate(context.Context) (any, error) {
 	return g.value, g.errValue
 }
