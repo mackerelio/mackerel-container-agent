@@ -1,14 +1,13 @@
 package spec
 
 import (
-	"bufio"
 	"context"
-	"io"
-	"os"
-	"strings"
+	"fmt"
+	"strconv"
 
 	"github.com/mackerelio/golib/logging"
 	mackerel "github.com/mackerelio/mackerel-client-go"
+	"github.com/shirou/gopsutil/v3/cpu"
 )
 
 // CPUGenerator collects CPU specs
@@ -17,69 +16,29 @@ type CPUGenerator struct {
 
 var cpuLogger = logging.GetLogger("spec.cpu")
 
-func (g *CPUGenerator) generate(file io.Reader) (any, error) {
-	scanner := bufio.NewScanner(file)
-
-	var results mackerel.CPU
-	var cpuinfo map[string]any
-	var modelName string
-
-	for scanner.Scan() {
-		line := scanner.Text()
-		kv := strings.SplitN(line, ":", 2)
-		if len(kv) < 2 {
-			continue
-		}
-		key := strings.TrimSpace(kv[0])
-		val := strings.TrimSpace(kv[1])
-
-		switch key {
-		case "processor":
-			cpuinfo = make(map[string]any)
-			if modelName != "" {
-				cpuinfo["model_name"] = modelName
-			}
-			results = append(results, cpuinfo)
-		case "Processor", "system type":
-			modelName = val
-		case "vendor_id", "model", "stepping", "physical id", "core id", "model name", "cache size":
-			cpuinfo[strings.Replace(key, " ", "_", -1)] = val
-		case "cpu family":
-			cpuinfo["family"] = val
-		case "cpu cores":
-			cpuinfo["cores"] = val
-		case "cpu MHz":
-			cpuinfo["mhz"] = val
-		}
+// Generate CPU specs
+func (g *CPUGenerator) Generate(ctx context.Context) (any, error) {
+	infoStats, err := cpu.Info()
+	if err != nil {
+		cpuLogger.Errorf("Failed (skip this spec): %s", err)
+		return nil, err
 	}
-
-	if err := scanner.Err(); err != nil {
-		// Don't return error to prevent stop agent
-		// caused by failing on scanning /proc/cpuinfo
-		cpuLogger.Errorf("failed (on scanning /proc/cpuinfo): %s", err)
-		return nil, nil
-	}
-
-	// Old kernels with CONFIG_SMP disabled has no "processor: " line
-	if len(results) == 0 && modelName != "" {
-		cpuinfo = make(map[string]any)
-		cpuinfo["model_name"] = modelName
-		results = append(results, cpuinfo)
+	results := make(mackerel.CPU, 0, len(infoStats))
+	for _, infoStat := range infoStats {
+		result := map[string]any{
+			"vendor_id":   infoStat.VendorID,
+			"model":       infoStat.Model,
+			"stepping":    strconv.Itoa(int(infoStat.Stepping)),
+			"physical_id": infoStat.PhysicalID,
+			"core_id":     infoStat.CoreID,
+			"cache_size":  fmt.Sprintf("%d KB", infoStat.CacheSize),
+			"model_name":  infoStat.ModelName,
+			"family":      infoStat.Family,
+			"cores":       strconv.Itoa(int(infoStat.Cores)),
+			"mhz":         strconv.FormatFloat(infoStat.Mhz, 'f', -1, 64),
+		}
+		results = append(results, result)
 	}
 
 	return results, nil
-}
-
-// Generate CPU specs
-func (g *CPUGenerator) Generate(ctx context.Context) (any, error) {
-	file, err := os.Open("/proc/cpuinfo")
-	if err != nil {
-		// Don't return error to prevent stop agent
-		// caused by failing on opening /proc/cpuinfo
-		cpuLogger.Errorf("failed (skip this spec): %s", err)
-		return nil, nil
-	}
-	defer file.Close()
-
-	return g.generate(file)
 }
