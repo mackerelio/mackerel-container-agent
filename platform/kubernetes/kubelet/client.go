@@ -148,7 +148,7 @@ func (c *client) newRequest(endpoint string) (*http.Request, error) {
 	return req, nil
 }
 
-func decodeBody(resp *http.Response, out interface{}) error {
+func decodeBody(resp *http.Response, out any) error {
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(resp.Body)

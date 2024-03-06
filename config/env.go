@@ -10,7 +10,7 @@ import (
 type Env []string
 
 // UnmarshalYAML defines unmarshaler from YAML
-func (env *Env) UnmarshalYAML(unmarshal func(v interface{}) error) (err error) {
+func (env *Env) UnmarshalYAML(unmarshal func(v any) error) (err error) {
 	var envMap map[string]string
 	if err = unmarshal(&envMap); err != nil {
 		return err

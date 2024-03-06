@@ -81,7 +81,7 @@ func newSpecGenerator(client kubelet.Client) *specGenerator {
 		client: client,
 	}
 }
-func (g *specGenerator) Generate(ctx context.Context) (interface{}, error) {
+func (g *specGenerator) Generate(ctx context.Context) (any, error) {
 	p, err := g.client.GetPod(ctx)
 	if err != nil {
 		return nil, err

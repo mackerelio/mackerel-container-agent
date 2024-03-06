@@ -580,7 +580,7 @@ type mockSpecGeneratorStatus struct {
 	pform *mockPlatformStatusRunning
 }
 
-func (g *mockSpecGeneratorStatus) Generate(context.Context) (interface{}, error) {
+func (g *mockSpecGeneratorStatus) Generate(context.Context) (any, error) {
 	return &mackerel.Cloud{
 		MetaData: map[string]string{"status": g.pform.Status()},
 	}, nil

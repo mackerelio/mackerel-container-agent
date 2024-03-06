@@ -289,7 +289,7 @@
 <title>spec.collector&#45;&gt;[]spec.Generator</title>
 <path fill="none" stroke="#000000" d="M605.3968,-399C655.1222,-399 721.9055,-399 771.6803,-399"/>
 <polygon fill="#000000" stroke="#000000" points="605.3735,-395.5001 595.3735,-399 605.3735,-402.5001 605.3735,-395.5001"/>
-<text text-anchor="middle" x="687.431" y="-401.8" font-family="Times,serif" font-size="14.00" fill="#000000">interface{}</text>
+<text text-anchor="middle" x="687.431" y="-401.8" font-family="Times,serif" font-size="14.00" fill="#000000">any</text>
 </g>
 <!-- spec.sender&#45;&gt;api.Client -->
 <g id="edge26" class="edge">

@@ -29,7 +29,7 @@ func newSpecGenerator(client TaskMetadataGetter, provider provider) *specGenerat
 	}
 }
 
-func (g *specGenerator) Generate(ctx context.Context) (interface{}, error) {
+func (g *specGenerator) Generate(ctx context.Context) (any, error) {
 	meta, err := g.client.GetTaskMetadata(ctx)
 	if err != nil {
 		return nil, err

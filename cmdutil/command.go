@@ -8,11 +8,11 @@ import (
 
 // Command represents a plugin/probe command to allow string and []string.
 type Command struct {
-	command interface{}
+	command any
 }
 
 // UnmarshalYAML defines unmarshaler from YAML.
-func (c *Command) UnmarshalYAML(unmarshal func(v interface{}) error) (err error) {
+func (c *Command) UnmarshalYAML(unmarshal func(v any) error) (err error) {
 	var s string
 	if err := unmarshal(&s); err == nil {
 		c.command = s
