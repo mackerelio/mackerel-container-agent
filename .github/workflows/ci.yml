@@ -9,154 +9,153 @@ on:
   pull_request: {}
   push:
     branches:
-    - master
+      - master
     tags:
-    - v*
+      - v*
 
 jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-go@v3
-      with:
-        go-version-file: go.mod
-    - uses: golangci/golangci-lint-action@v3
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
+        with:
+          go-version: 1.22.x
+      - uses: golangci/golangci-lint-action@v3
   test:
     strategy:
       matrix:
-        go: ['1.19.x', '1.18.x']
+        go: ["1.22.x", "1.21.x"]
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/setup-go@v3
-      with:
-        go-version: ${{ matrix.go }}
-    - uses: actions/checkout@v3
-    - uses: actions/cache@v3
-      with:
-        path: ~/go/pkg/mod
-        key: go-${{ hashFiles('**/go.sum') }}
-        restore-keys: |
-          go-
-    - run: make test
+      - uses: actions/setup-go@v3
+        with:
+          go-version: ${{ matrix.go }}
+      - uses: actions/checkout@v3
+      - uses: actions/cache@v3
+        with:
+          path: ~/go/pkg/mod
+          key: go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            go-
+      - run: make test
 
   build-and-push-alpha:
     if: startsWith(github.head_ref, 'bump-version-')
     needs: [test]
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - uses: docker/setup-qemu-action@v2
-    - uses: docker/setup-buildx-action@v2
-    - uses: docker/login-action@v2
-      with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - uses: actions/checkout@v3
+      - uses: docker/setup-qemu-action@v2
+      - uses: docker/setup-buildx-action@v2
+      - uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-    - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        role-to-assume: ${{ secrets.ROLE_TO_ASSUME }}
-        role-session-name: "mackerel-container-agent-${{ github.run_id }}-${{ github.run_number }}"
-        aws-region: ap-northeast-1
-    - name: Login to Public ECR
-      uses: docker/login-action@v2
-      with:
-        registry: public.ecr.aws
-      env:
-        AWS_REGION: us-east-1
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: ${{ secrets.ROLE_TO_ASSUME }}
+          role-session-name: "mackerel-container-agent-${{ github.run_id }}-${{ github.run_number }}"
+          aws-region: ap-northeast-1
+      - name: Login to Public ECR
+        uses: docker/login-action@v2
+        with:
+          registry: public.ecr.aws
+        env:
+          AWS_REGION: us-east-1
 
-    - name: Get alpha version from branch name
-      id: get_alpha_version
-      run: echo "::set-output name=VERSION::${GITHUB_HEAD_REF/bump-version-/v}"
+      - name: Get alpha version from branch name
+        id: get_alpha_version
+        run: echo "::set-output name=VERSION::${GITHUB_HEAD_REF/bump-version-/v}"
 
-    - name: Build and push alpha image
-      uses: docker/build-push-action@v3
-      with:
-        context: .
-        file: Dockerfile
-        target: container-agent
-        platforms: |
-          linux/amd64
-          linux/arm64
-        push: true
-        tags: |
-          mackerel/mackerel-container-agent:${{ steps.get_alpha_version.outputs.VERSION }}-alpha
-          public.ecr.aws/mackerel/mackerel-container-agent:${{ steps.get_alpha_version.outputs.VERSION }}-alpha
+      - name: Build and push alpha image
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: Dockerfile
+          target: container-agent
+          platforms: |
+            linux/amd64
+            linux/arm64
+          push: true
+          tags: |
+            mackerel/mackerel-container-agent:${{ steps.get_alpha_version.outputs.VERSION }}-alpha
+            public.ecr.aws/mackerel/mackerel-container-agent:${{ steps.get_alpha_version.outputs.VERSION }}-alpha
 
-    - name: Build and push alpha image with plugins
-      uses: docker/build-push-action@v3
-      with:
-        context: .
-        file: Dockerfile
-        target: container-agent-with-plugins
-        platforms: |
-          linux/amd64
-          linux/arm64
-        push: true
-        tags: |
-          mackerel/mackerel-container-agent:${{ steps.get_alpha_version.outputs.VERSION }}-plugins-alpha
-          public.ecr.aws/mackerel/mackerel-container-agent:${{ steps.get_alpha_version.outputs.VERSION }}-plugins-alpha
+      - name: Build and push alpha image with plugins
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: Dockerfile
+          target: container-agent-with-plugins
+          platforms: |
+            linux/amd64
+            linux/arm64
+          push: true
+          tags: |
+            mackerel/mackerel-container-agent:${{ steps.get_alpha_version.outputs.VERSION }}-plugins-alpha
+            public.ecr.aws/mackerel/mackerel-container-agent:${{ steps.get_alpha_version.outputs.VERSION }}-plugins-alpha
 
   build-and-push-release:
     if: startsWith(github.ref, 'refs/tags/v')
     needs: [test]
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - uses: docker/setup-qemu-action@v2
-    - uses: docker/setup-buildx-action@v2
-    - uses: docker/login-action@v2
-      with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - uses: actions/checkout@v3
+      - uses: docker/setup-qemu-action@v2
+      - uses: docker/setup-buildx-action@v2
+      - uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-    - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        role-to-assume: ${{ secrets.ROLE_TO_ASSUME }}
-        role-session-name: "mackerel-container-agent-${{ github.run_id }}-${{ github.run_number }}"
-        aws-region: ap-northeast-1
-    - name: Login to Public ECR
-      uses: docker/login-action@v2
-      with:
-        registry: public.ecr.aws
-      env:
-        AWS_REGION: us-east-1
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: ${{ secrets.ROLE_TO_ASSUME }}
+          role-session-name: "mackerel-container-agent-${{ github.run_id }}-${{ github.run_number }}"
+          aws-region: ap-northeast-1
+      - name: Login to Public ECR
+        uses: docker/login-action@v2
+        with:
+          registry: public.ecr.aws
+        env:
+          AWS_REGION: us-east-1
 
-    - name: Get version from tag
-      id: get_version
-      run: echo "::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}"
+      - name: Get version from tag
+        id: get_version
+        run: echo "::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}"
 
-    - name: Build and push release image
-      uses: docker/build-push-action@v3
-      with:
-        context: .
-        file: Dockerfile
-        target: container-agent
-        platforms: |
-          linux/amd64
-          linux/arm64
-        push: true
-        tags: |
-          mackerel/mackerel-container-agent:latest
-          mackerel/mackerel-container-agent:${{ steps.get_version.outputs.VERSION }}
-          public.ecr.aws/mackerel/mackerel-container-agent:latest
-          public.ecr.aws/mackerel/mackerel-container-agent:${{ steps.get_version.outputs.VERSION }}
+      - name: Build and push release image
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: Dockerfile
+          target: container-agent
+          platforms: |
+            linux/amd64
+            linux/arm64
+          push: true
+          tags: |
+            mackerel/mackerel-container-agent:latest
+            mackerel/mackerel-container-agent:${{ steps.get_version.outputs.VERSION }}
+            public.ecr.aws/mackerel/mackerel-container-agent:latest
+            public.ecr.aws/mackerel/mackerel-container-agent:${{ steps.get_version.outputs.VERSION }}
 
-    - name: Build and push release image with plugins
-      uses: docker/build-push-action@v3
-      with:
-        context: .
-        file: Dockerfile
-        target: container-agent-with-plugins
-        platforms: |
-          linux/amd64
-          linux/arm64
-        push: true
-        tags: |
-          mackerel/mackerel-container-agent:plugins
-          mackerel/mackerel-container-agent:${{ steps.get_version.outputs.VERSION }}-plugins
-          public.ecr.aws/mackerel/mackerel-container-agent:plugins
-          public.ecr.aws/mackerel/mackerel-container-agent:${{ steps.get_version.outputs.VERSION }}-plugins
-
+      - name: Build and push release image with plugins
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: Dockerfile
+          target: container-agent-with-plugins
+          platforms: |
+            linux/amd64
+            linux/arm64
+          push: true
+          tags: |
+            mackerel/mackerel-container-agent:plugins
+            mackerel/mackerel-container-agent:${{ steps.get_version.outputs.VERSION }}-plugins
+            public.ecr.aws/mackerel/mackerel-container-agent:plugins
+            public.ecr.aws/mackerel/mackerel-container-agent:${{ steps.get_version.outputs.VERSION }}-plugins
