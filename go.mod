@@ -5,7 +5,7 @@ go 1.18
 require (
 	github.com/Songmu/retry v0.1.0
 	github.com/Songmu/timeout v0.4.0
-	github.com/aws/aws-sdk-go v1.44.58
+	github.com/aws/aws-sdk-go v1.50.33
 	github.com/docker/docker v20.10.23+incompatible
 	github.com/go-yaml/yaml v2.1.0+incompatible
 	github.com/mackerelio/go-osstat v0.2.3
@@ -38,9 +38,9 @@ require (
 	github.com/tklauser/go-sysconf v0.3.12 // indirect
 	github.com/tklauser/numcpus v0.6.1 // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
-	golang.org/x/net v0.2.0 // indirect
+	golang.org/x/net v0.17.0 // indirect
 	golang.org/x/sys v0.17.0 // indirect
-	golang.org/x/text v0.4.0 // indirect
+	golang.org/x/text v0.13.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gotest.tools/v3 v3.4.0 // indirect
