@@ -71,7 +71,7 @@ jobs:
         run: echo "::set-output name=VERSION::${GITHUB_HEAD_REF/bump-version-/v}"
 
       - name: Build and push alpha image
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v5
         with:
           context: .
           file: Dockerfile
@@ -85,7 +85,7 @@ jobs:
             public.ecr.aws/mackerel/mackerel-container-agent:${{ steps.get_alpha_version.outputs.VERSION }}-alpha
 
       - name: Build and push alpha image with plugins
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v5
         with:
           context: .
           file: Dockerfile
@@ -129,7 +129,7 @@ jobs:
         run: echo "::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}"
 
       - name: Build and push release image
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v5
         with:
           context: .
           file: Dockerfile
@@ -145,7 +145,7 @@ jobs:
             public.ecr.aws/mackerel/mackerel-container-agent:${{ steps.get_version.outputs.VERSION }}
 
       - name: Build and push release image with plugins
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v5
         with:
           context: .
           file: Dockerfile
