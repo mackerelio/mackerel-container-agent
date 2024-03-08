@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.10.0 (2024-03-08)
+
+* Bump docker/build-push-action from 3 to 5 #335 (dependabot[bot])
+* Bump aws-actions/configure-aws-credentials from 1 to 4 #334 (dependabot[bot])
+* Bump actions/setup-go from 3 to 5 #333 (dependabot[bot])
+* Use Go 1.22 #332 (Arthur1)
+* Bump golang.org/x/net from 0.2.0 to 0.17.0 #331 (dependabot[bot])
+* Use shirou/gopsutil for getting CPU information #330 (Arthur1)
+* Replace interface{} to any #329 (Arthur1)
+* Bump github.com/mackerelio/mackerel-client-go from 0.22.0 to 0.24.0 #269 (dependabot[bot])
+
+
 ## 0.9.1 (2023-02-08)
 
 * Remove last year from license header #283 (Arthur1)
