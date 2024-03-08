@@ -1,5 +1,5 @@
 BIN := mackerel-container-agent
-VERSION := 0.9.1
+VERSION := 0.10.0
 REVISION := $(shell git rev-parse --short HEAD)
 
 .PHONY: all
