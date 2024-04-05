@@ -183,6 +183,92 @@ roles:
 	}
 }
 
+func TestDisplayName(t *testing.T) {
+	conf := newConfigFile(t, `
+displayName: foo
+`)
+
+	t.Setenv("MACKEREL_DISPLAY_NAME", "bar")
+
+	testCases := []struct {
+		name     string
+		location string
+		expect   *Config
+	}{
+		{
+			name:     "config",
+			location: conf,
+			expect: &Config{
+				Root:        defaultRoot,
+				DisplayName: "foo",
+			},
+		},
+		{
+			name:     "env",
+			location: "",
+			expect: &Config{
+				Root:        defaultRoot,
+				DisplayName: "bar",
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			conf, err := load(context.Background(), tc.location)
+			if err != nil {
+				t.Errorf("should not raise error: %v", err)
+			}
+			if !reflect.DeepEqual(conf, tc.expect) {
+				t.Errorf("expect %#v, got %#v", tc.expect, conf)
+			}
+		})
+	}
+}
+
+func TestMemo(t *testing.T) {
+	conf := newConfigFile(t, `
+memo: foo
+`)
+
+	t.Setenv("MACKEREL_MEMO", "bar")
+
+	testCases := []struct {
+		name     string
+		location string
+		expect   *Config
+	}{
+		{
+			name:     "config",
+			location: conf,
+			expect: &Config{
+				Root: defaultRoot,
+				Memo: "foo",
+			},
+		},
+		{
+			name:     "env",
+			location: "",
+			expect: &Config{
+				Root: defaultRoot,
+				Memo: "bar",
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			conf, err := load(context.Background(), tc.location)
+			if err != nil {
+				t.Errorf("should not raise error: %v", err)
+			}
+			if !reflect.DeepEqual(conf, tc.expect) {
+				t.Errorf("expect %#v, got %#v", tc.expect, conf)
+			}
+		})
+	}
+}
+
 func TestIgnoreContainer(t *testing.T) {
 	conf := newConfigFile(t, `
 ignoreContainer: "^mackerel-.+$"

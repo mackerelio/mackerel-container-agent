@@ -31,6 +31,8 @@ type Config struct {
 	Apikey            string        `yaml:"apikey"`
 	Root              string        `yaml:"root"`
 	Roles             []string      `yaml:"roles"`
+	DisplayName       string        `yaml:"displayName"`
+	Memo              string        `yaml:"memo"`
 	IgnoreContainer   Regexpwrapper `yaml:"ignoreContainer"`
 	ReadinessProbe    *Probe        `yaml:"readinessProbe"`
 	HostStatusOnStart HostStatus    `yaml:"hostStatusOnStart"`
@@ -148,6 +150,14 @@ func load(ctx context.Context, location string) (*Config, error) {
 
 	if v, ok := os.LookupEnv("MACKEREL_ROLES"); len(conf.Roles) == 0 && ok {
 		conf.Roles = parseRoles(v)
+	}
+
+	if conf.DisplayName == "" {
+		conf.DisplayName = os.Getenv("MACKEREL_DISPLAY_NAME")
+	}
+
+	if conf.Memo == "" {
+		conf.Memo = os.Getenv("MACKEREL_MEMO")
 	}
 
 	if conf.IgnoreContainer.Regexp == nil {

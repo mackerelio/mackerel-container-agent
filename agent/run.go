@@ -67,6 +67,8 @@ func run(
 			return err
 		}
 		hostParam.RoleFullnames = conf.Roles
+		hostParam.DisplayName = conf.DisplayName
+		hostParam.Memo = conf.Memo
 		hostParam.Checks = checkManager.Configs()
 
 		duration = hostIDInitialRetryInterval
