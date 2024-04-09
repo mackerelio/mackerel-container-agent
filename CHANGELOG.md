@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.11.0 (2024-04-09)
+
+* Set `displayName`, `memo` via agent #354 (mkadokawa-idcf)
+
+
 ## 0.10.0 (2024-03-08)
 
 * Bump docker/build-push-action from 3 to 5 #335 (dependabot[bot])
