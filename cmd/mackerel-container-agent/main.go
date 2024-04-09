@@ -51,6 +51,8 @@ func main() {
 		"MACKEREL_KUBERNETES_POD_NAME",
 		"MACKEREL_LOG_LEVEL",
 		"MACKEREL_ROLES",
+		"MACKEREL_DISPLAY_NAME",
+		"MACKEREL_MEMO",
 	}
 	for _, v := range env {
 		logger.Debugf("%s=%s", v, os.Getenv(v))
