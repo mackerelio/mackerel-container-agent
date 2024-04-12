@@ -1,4 +1,4 @@
-FROM golang:1.22-bullseye AS builder
+FROM golang:1.22-bookworm AS builder
 
 WORKDIR /go/src/app
 
@@ -8,7 +8,7 @@ RUN go mod download
 COPY . .
 RUN make build
 
-FROM debian:bullseye-slim AS container-agent
+FROM debian:bookworm-slim AS container-agent
 
 ENV DEBIAN_FRONTEND noninteractive
 ENV GODEBUG http2client=0
