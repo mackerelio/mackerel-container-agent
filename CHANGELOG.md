@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.11.1 (2024-04-23)
+
+* Bump github.com/aws/aws-sdk-go from 1.44.58 to 1.51.26 #371 (dependabot[bot])
+* Bump github.com/docker/docker from 24.0.9+incompatible to 26.1.0+incompatible #370 (dependabot[bot])
+* Bump golang.org/x/net from 0.17.0 to 0.23.0 #364 (dependabot[bot])
+* Update base image, some libraries. #360 (yseto)
+* Bump golang.org/x/sync from 0.0.0-20220722155255-886fb9371eb4 to 0.7.0 #357 (dependabot[bot])
+* Bump github.com/shirou/gopsutil/v3 from 3.24.2 to 3.24.3 #355 (dependabot[bot])
+* Bump github.com/docker/docker from 20.10.23+incompatible to 24.0.9+incompatible #350 (dependabot[bot])
+* Bump actions/cache from 3 to 4 #342 (dependabot[bot])
+* Bump actions/checkout from 3 to 4 #341 (dependabot[bot])
+* Bump docker/login-action from 2 to 3 #340 (dependabot[bot])
+* Bump docker/setup-qemu-action from 2 to 3 #339 (dependabot[bot])
+* Bump golangci/golangci-lint-action from 3 to 4 #338 (dependabot[bot])
+* Bump github.com/mackerelio/go-osstat from 0.2.3 to 0.2.4 #299 (dependabot[bot])
+
+
 ## 0.11.0 (2024-04-09)
 
 * Set `displayName`, `memo` via agent #354 (mkadokawa-idcf)
