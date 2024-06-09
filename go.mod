@@ -8,7 +8,7 @@ require (
 	github.com/aws/aws-sdk-go v1.51.26
 	github.com/docker/docker v26.1.0+incompatible
 	github.com/go-yaml/yaml v2.1.0+incompatible
-	github.com/mackerelio/go-osstat v0.2.4
+	github.com/mackerelio/go-osstat v0.2.5
 	github.com/mackerelio/golib v1.2.1
 	github.com/mackerelio/mackerel-client-go v0.31.0
 	github.com/shirou/gopsutil/v3 v3.24.3
@@ -41,7 +41,7 @@ require (
 	github.com/tklauser/numcpus v0.6.1 // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
 	golang.org/x/net v0.23.0 // indirect
-	golang.org/x/sys v0.18.0 // indirect
+	golang.org/x/sys v0.20.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
