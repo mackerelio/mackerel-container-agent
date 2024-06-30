@@ -29,8 +29,8 @@ ENV MKR_INSTALL_PLUGINS json
 
 RUN apt-get update -yq && \
     apt-get install -yq --no-install-recommends curl gnupg2
-RUN echo "deb [arch=amd64,arm64] http://apt.mackerel.io/v2/ mackerel contrib" > /etc/apt/sources.list.d/mackerel.list
-RUN curl -LfsS https://mackerel.io/file/cert/GPG-KEY-mackerel-v2 | apt-key add -
+RUN curl -sS https://mackerel.io/file/cert/GPG-KEY-mackerel-v2 | gpg --dearmor -o /etc/apt/keyrings/mackerel.gpg
+RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/mackerel.gpg] http://apt.mackerel.io/v2/ mackerel contrib" > /etc/apt/sources.list.d/mackerel.list
 
 RUN apt-get update -yq && \
     apt-get install -yq --no-install-recommends mackerel-agent-plugins mackerel-check-plugins mkr && \
