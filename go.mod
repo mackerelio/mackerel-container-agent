@@ -11,7 +11,7 @@ require (
 	github.com/mackerelio/go-osstat v0.2.5
 	github.com/mackerelio/golib v1.2.1
 	github.com/mackerelio/mackerel-client-go v0.34.0
-	github.com/shirou/gopsutil/v3 v3.24.3
+	github.com/shirou/gopsutil/v3 v3.24.5
 	golang.org/x/sync v0.7.0
 	k8s.io/api v0.25.3
 	k8s.io/apimachinery v0.25.3
