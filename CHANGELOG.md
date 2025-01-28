@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.11.2 (2025-01-28)
+
+* Bump github.com/docker/docker from 26.1.0+incompatible to 26.1.5+incompatible #414 (dependabot[bot])
+* Bump golang.org/x/net from 0.23.0 to 0.33.0 #413 (dependabot[bot])
+* Bump github.com/aws/aws-sdk-go from 1.51.26 to 1.54.20 #411 (dependabot[bot])
+* Bump github.com/mackerelio/mackerel-client-go from 0.31.0 to 0.34.0 #410 (dependabot[bot])
+* Bump docker/build-push-action from 5 to 6 #401 (dependabot[bot])
+* Bump github.com/mackerelio/go-osstat from 0.2.4 to 0.2.5 #393 (dependabot[bot])
+* Bump github.com/shirou/gopsutil/v3 from 3.24.3 to 3.24.5 #391 (dependabot[bot])
+* Bump golangci/golangci-lint-action from 4 to 6 #382 (dependabot[bot])
+* replace deprecated apt-key command on Dockerfile #379 (Arthur1)
+* Bump docker/setup-buildx-action from 2 to 3 #375 (dependabot[bot])
+
+
 ## 0.11.1 (2024-04-23)
 
 * Bump github.com/aws/aws-sdk-go from 1.44.58 to 1.51.26 #371 (dependabot[bot])
