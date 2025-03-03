@@ -4,6 +4,7 @@ name: ci/cd
 permissions:
   contents: read
   id-token: write
+  packages: write
 
 on:
   pull_request: {}
@@ -48,7 +49,9 @@ jobs:
       - uses: actions/checkout@v4
       - uses: docker/setup-qemu-action@v3
       - uses: docker/setup-buildx-action@v3
-      - uses: docker/login-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -65,6 +68,13 @@ jobs:
           registry: public.ecr.aws
         env:
           AWS_REGION: us-east-1
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Get alpha version from branch name
         id: get_alpha_version
@@ -83,6 +93,7 @@ jobs:
           tags: |
             mackerel/mackerel-container-agent:${{ steps.get_alpha_version.outputs.VERSION }}-alpha
             public.ecr.aws/mackerel/mackerel-container-agent:${{ steps.get_alpha_version.outputs.VERSION }}-alpha
+            ghcr.io/${{ github.repository_owner }}/mackerel-container-agent:${{ steps.get_alpha_version.outputs.VERSION }}-alpha
 
       - name: Build and push alpha image with plugins
         uses: docker/build-push-action@v6
@@ -97,6 +108,7 @@ jobs:
           tags: |
             mackerel/mackerel-container-agent:${{ steps.get_alpha_version.outputs.VERSION }}-plugins-alpha
             public.ecr.aws/mackerel/mackerel-container-agent:${{ steps.get_alpha_version.outputs.VERSION }}-plugins-alpha
+            ghcr.io/${{ github.repository_owner }}/mackerel-container-agent:${{ steps.get_alpha_version.outputs.VERSION }}-plugins-alpha
 
   build-and-push-release:
     if: startsWith(github.ref, 'refs/tags/v')
@@ -106,7 +118,9 @@ jobs:
       - uses: actions/checkout@v4
       - uses: docker/setup-qemu-action@v3
       - uses: docker/setup-buildx-action@v3
-      - uses: docker/login-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -123,6 +137,13 @@ jobs:
           registry: public.ecr.aws
         env:
           AWS_REGION: us-east-1
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Get version from tag
         id: get_version
@@ -143,6 +164,8 @@ jobs:
             mackerel/mackerel-container-agent:${{ steps.get_version.outputs.VERSION }}
             public.ecr.aws/mackerel/mackerel-container-agent:latest
             public.ecr.aws/mackerel/mackerel-container-agent:${{ steps.get_version.outputs.VERSION }}
+            ghcr.io/${{ github.repository_owner }}/mackerel-container-agent:latest
+            ghcr.io/${{ github.repository_owner }}/mackerel-container-agent:${{ steps.get_version.outputs.VERSION }}
 
       - name: Build and push release image with plugins
         uses: docker/build-push-action@v6
@@ -159,3 +182,5 @@ jobs:
             mackerel/mackerel-container-agent:${{ steps.get_version.outputs.VERSION }}-plugins
             public.ecr.aws/mackerel/mackerel-container-agent:plugins
             public.ecr.aws/mackerel/mackerel-container-agent:${{ steps.get_version.outputs.VERSION }}-plugins
+            ghcr.io/${{ github.repository_owner }}/mackerel-container-agent:plugins
+            ghcr.io/${{ github.repository_owner }}/mackerel-container-agent:${{ steps.get_version.outputs.VERSION }}-plugins
