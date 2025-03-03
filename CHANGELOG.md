@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.11.3 (2025-03-03)
+
+* added container registry GHCR #429 (yseto)
+
+
 ## 0.11.2 (2025-01-28)
 
 * Bump github.com/docker/docker from 26.1.0+incompatible to 26.1.5+incompatible #414 (dependabot[bot])
