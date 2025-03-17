@@ -5,9 +5,10 @@ import (
 	"fmt"
 	"net/url"
 
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/feature/s3/manager"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 )
 
@@ -25,13 +26,16 @@ func (d s3Downloader) download(ctx context.Context, u *url.URL) ([]byte, error) 
 		key    = u.Path
 	)
 
-	sess := session.Must(session.NewSession())
+	cfg, err := config.LoadDefaultConfig(ctx, config.WithRegion(d.regionHint))
+	if err != nil {
+		return nil, err
+	}
 
-	r, err := s3manager.GetBucketRegion(ctx, sess, bucket, d.regionHint)
+	region, err := manager.GetBucketRegion(ctx, s3.NewFromConfig(cfg), bucket)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get bucket region for %s: %w", bucket, err)
 	}
-	sess.Config.Region = aws.String(r)
+	cfg.Region = region
 
 	downloader := s3manager.NewDownloader(sess)
 
