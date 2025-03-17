@@ -8,6 +8,7 @@ require (
 	github.com/Songmu/retry v0.1.0
 	github.com/Songmu/timeout v0.4.0
 	github.com/aws/aws-sdk-go v1.54.20
+	github.com/aws/aws-sdk-go-v2 v1.36.3
 	github.com/docker/docker v26.1.5+incompatible
 	github.com/go-yaml/yaml v2.1.0+incompatible
 	github.com/mackerelio/go-osstat v0.2.5
