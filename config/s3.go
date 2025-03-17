@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/url"
+	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
@@ -22,7 +23,7 @@ type s3Downloader struct {
 func (d s3Downloader) download(ctx context.Context, u *url.URL) ([]byte, error) {
 	var (
 		bucket = u.Host
-		key    = u.Path
+		key    = strings.TrimPrefix(u.Path, "/")
 	)
 
 	cfg, err := config.LoadDefaultConfig(ctx, config.WithRegion(d.regionHint))
