@@ -5,11 +5,10 @@ import (
 	"fmt"
 	"net/url"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/feature/s3/manager"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 )
 
 type downloader interface {
@@ -37,10 +36,10 @@ func (d s3Downloader) download(ctx context.Context, u *url.URL) ([]byte, error) 
 	}
 	cfg.Region = region
 
-	downloader := s3manager.NewDownloader(sess)
+	downloader := manager.NewDownloader(s3.NewFromConfig(cfg))
 
-	buf := &aws.WriteAtBuffer{}
-	_, err = downloader.DownloadWithContext(ctx, buf, &s3.GetObjectInput{
+	buf := manager.NewWriteAtBuffer([]byte{})
+	_, err = downloader.Download(ctx, buf, &s3.GetObjectInput{
 		Bucket: aws.String(bucket),
 		Key:    aws.String(key),
 	})
