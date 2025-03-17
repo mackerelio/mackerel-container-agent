@@ -20,11 +20,16 @@ type s3Downloader struct {
 }
 
 func (d s3Downloader) download(ctx context.Context, u *url.URL) ([]byte, error) {
+	var (
+		bucket = u.Host
+		key    = u.Path
+	)
+
 	sess := session.Must(session.NewSession())
 
-	r, err := s3manager.GetBucketRegion(ctx, sess, u.Host, d.regionHint)
+	r, err := s3manager.GetBucketRegion(ctx, sess, bucket, d.regionHint)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get bucket region for %s: %w", u.Host, err)
+		return nil, fmt.Errorf("failed to get bucket region for %s: %w", bucket, err)
 	}
 	sess.Config.Region = aws.String(r)
 
@@ -32,8 +37,8 @@ func (d s3Downloader) download(ctx context.Context, u *url.URL) ([]byte, error) 
 
 	buf := &aws.WriteAtBuffer{}
 	_, err = downloader.DownloadWithContext(ctx, buf, &s3.GetObjectInput{
-		Bucket: aws.String(u.Host),
-		Key:    aws.String(u.Path),
+		Bucket: aws.String(bucket),
+		Key:    aws.String(key),
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to download config from %s: %w", u, err)
