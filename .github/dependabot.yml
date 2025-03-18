@@ -14,6 +14,17 @@ updates:
     time: "01:00"
     timezone: Asia/Tokyo
   open-pull-requests-limit: 10
+  groups:
+    aws/aws-sdk-go-v2:
+      patterns:
+        - "github.com/aws/aws-sdk-go-v2"
+        - "github.com/aws/aws-sdk-go-v2/*"
+    mackerelio:
+      patterns:
+        - "github.com/mackerelio/*"
+    k8s:
+      patterns:
+        - "k8s.io/*"
 - package-ecosystem: github-actions
   directory: "/"
   schedule:
