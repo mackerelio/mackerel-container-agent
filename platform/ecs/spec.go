@@ -4,7 +4,7 @@ import (
 	"context"
 	"path"
 
-	"github.com/aws/aws-sdk-go/aws/arn"
+	"github.com/aws/aws-sdk-go-v2/aws/arn"
 	ecsTypes "github.com/mackerelio/mackerel-container-agent/internal/amazon-ecs-agent/agent/handlers/v2"
 
 	mackerel "github.com/mackerelio/mackerel-client-go"

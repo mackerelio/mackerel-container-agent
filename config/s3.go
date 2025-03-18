@@ -4,11 +4,12 @@ import (
 	"context"
 	"fmt"
 	"net/url"
+	"strings"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/s3"
-	"github.com/aws/aws-sdk-go/service/s3/s3manager"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/feature/s3/manager"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
 
 type downloader interface {
@@ -20,20 +21,28 @@ type s3Downloader struct {
 }
 
 func (d s3Downloader) download(ctx context.Context, u *url.URL) ([]byte, error) {
-	sess := session.Must(session.NewSession())
+	var (
+		bucket = u.Host
+		key    = strings.TrimPrefix(u.Path, "/")
+	)
 
-	r, err := s3manager.GetBucketRegion(ctx, sess, u.Host, d.regionHint)
+	cfg, err := config.LoadDefaultConfig(ctx, config.WithRegion(d.regionHint))
 	if err != nil {
-		return nil, fmt.Errorf("failed to get bucket region for %s: %w", u.Host, err)
+		return nil, err
 	}
-	sess.Config.Region = aws.String(r)
 
-	downloader := s3manager.NewDownloader(sess)
+	region, err := manager.GetBucketRegion(ctx, s3.NewFromConfig(cfg), bucket)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get bucket region for %s: %w", bucket, err)
+	}
+	cfg.Region = region
 
-	buf := &aws.WriteAtBuffer{}
-	_, err = downloader.DownloadWithContext(ctx, buf, &s3.GetObjectInput{
-		Bucket: aws.String(u.Host),
-		Key:    aws.String(u.Path),
+	downloader := manager.NewDownloader(s3.NewFromConfig(cfg))
+
+	buf := manager.NewWriteAtBuffer([]byte{})
+	_, err = downloader.Download(ctx, buf, &s3.GetObjectInput{
+		Bucket: aws.String(bucket),
+		Key:    aws.String(key),
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to download config from %s: %w", u, err)
