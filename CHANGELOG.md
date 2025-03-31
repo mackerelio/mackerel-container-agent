@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.11.4 (2025-03-31)
+
+* Bump the k8s group with 3 updates #439 (dependabot[bot])
+* [dependabot] some libraries as group #438 (yseto)
+* replace to aws-sdk-go-v2 #437 (yseto)
+* Bump golang.org/x/net from 0.33.0 to 0.36.0 #433 (dependabot[bot])
+* Bump golang.org/x/sync from 0.10.0 to 0.12.0 #432 (dependabot[bot])
+
+
 ## 0.11.3 (2025-03-03)
 
 * added container registry GHCR #429 (yseto)
