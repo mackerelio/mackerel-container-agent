@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.11.5 (2025-04-02)
+
+* Bump github.com/mackerelio/mackerel-client-go from 0.34.0 to 0.36.0 in the mackerelio group #442 (dependabot[bot])
+
+
 ## 0.11.4 (2025-03-31)
 
 * Bump the k8s group with 3 updates #439 (dependabot[bot])
