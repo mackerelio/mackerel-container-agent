@@ -13,7 +13,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/go-yaml/yaml"
+	"gopkg.in/yaml.v3"
 
 	mackerel "github.com/mackerelio/mackerel-client-go"
 
