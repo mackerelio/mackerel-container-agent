@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+	"runtime/debug"
 
 	"github.com/mackerelio/golib/logging"
 
@@ -10,8 +11,6 @@ import (
 )
 
 const cmdName = "mackerel-container-agent"
-
-var version, revision string
 
 var logger = logging.GetLogger("main")
 
@@ -62,10 +61,28 @@ func main() {
 }
 
 func run(args []string) int {
+	version, revision := fromVCS()
 	logger.Infof("starting %s (version:%s, revision:%s)", cmdName, version, revision)
 	if err := agent.NewAgent(version, revision).Run(args); err != nil {
 		logger.Errorf("%s", err)
 		return 1
 	}
 	return 0
+}
+
+func fromVCS() (version, rev string) {
+	version = "unknown"
+	rev = "unknown"
+	info, ok := debug.ReadBuildInfo()
+	if !ok {
+		return
+	}
+	version = info.Main.Version
+	for _, s := range info.Settings {
+		if s.Key == "vcs.revision" {
+			rev = s.Value
+			return
+		}
+	}
+	return
 }
