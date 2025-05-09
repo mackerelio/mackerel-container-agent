@@ -1,5 +1,4 @@
 BIN := mackerel-container-agent
-VERSION := 0.11.5
 
 .PHONY: all
 all: clean build
@@ -27,12 +26,8 @@ linux:
 
 .PHONY: docker
 docker:
-	docker build -t $(BIN) -t $(BIN):$(VERSION) --target container-agent .
+	docker build -t $(BIN) -t $(BIN):local --target container-agent .
 
 .PHONY: docker-with-plugins
 docker-with-plugins:
-	docker build -t $(BIN) -t $(BIN):$(VERSION) --target container-agent-with-plugins .
-
-.PHONY: version
-version:
-	echo $(VERSION)
+	docker build -t $(BIN) -t $(BIN):local --target container-agent-with-plugins .
