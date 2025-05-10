@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 	"runtime/debug"
+	"strings"
 
 	"github.com/mackerelio/golib/logging"
 
@@ -77,10 +78,19 @@ func fromVCS() (version, rev string) {
 	if !ok {
 		return
 	}
-	version = info.Main.Version
+	// trim a prefix `v`
+	version, _ = strings.CutPrefix(info.Main.Version, "v")
+
+	// strings like "v0.1.2-0.20060102150405-xxxxxxxxxxxx" are long, so they are cut out.
+	if strings.Contains(version, "-") {
+		index := strings.IndexRune(version, '-')
+		version = version[0:index]
+	}
+
 	for _, s := range info.Settings {
 		if s.Key == "vcs.revision" {
-			rev = s.Value
+			// emulate "git rev-parse --short HEAD"
+			rev = s.Value[0:min(len(s.Value), 7)]
 			return
 		}
 	}
