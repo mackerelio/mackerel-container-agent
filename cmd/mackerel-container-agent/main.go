@@ -2,6 +2,8 @@ package main
 
 import (
 	"os"
+	"runtime/debug"
+	"strings"
 
 	"github.com/mackerelio/golib/logging"
 
@@ -10,8 +12,6 @@ import (
 )
 
 const cmdName = "mackerel-container-agent"
-
-var version, revision string
 
 var logger = logging.GetLogger("main")
 
@@ -62,10 +62,37 @@ func main() {
 }
 
 func run(args []string) int {
+	version, revision := fromVCS()
 	logger.Infof("starting %s (version:%s, revision:%s)", cmdName, version, revision)
 	if err := agent.NewAgent(version, revision).Run(args); err != nil {
 		logger.Errorf("%s", err)
 		return 1
 	}
 	return 0
+}
+
+func fromVCS() (version, rev string) {
+	version = "unknown"
+	rev = "unknown"
+	info, ok := debug.ReadBuildInfo()
+	if !ok {
+		return
+	}
+	// trim a prefix `v`
+	version, _ = strings.CutPrefix(info.Main.Version, "v")
+
+	// strings like "v0.1.2-0.20060102150405-xxxxxxxxxxxx" are long, so they are cut out.
+	if strings.Contains(version, "-") {
+		index := strings.IndexRune(version, '-')
+		version = version[0:index]
+	}
+
+	for _, s := range info.Settings {
+		if s.Key == "vcs.revision" {
+			// emulate "git rev-parse --short HEAD"
+			rev = s.Value[0:min(len(s.Value), 7)]
+			return
+		}
+	}
+	return
 }

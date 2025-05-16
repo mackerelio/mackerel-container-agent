@@ -1,17 +1,11 @@
 BIN := mackerel-container-agent
-VERSION := 0.11.5
-REVISION := $(shell git rev-parse --short HEAD)
 
 .PHONY: all
 all: clean build
 
-BUILD_LDFLAGS := "\
-	-X main.version=$(VERSION) \
-	-X main.revision=$(REVISION)"
-
 .PHONY: build
 build:
-	go build -ldflags=$(BUILD_LDFLAGS) -o build/$(BIN) ./cmd/$(BIN)/...
+	go build -o build/$(BIN) ./cmd/$(BIN)/...
 
 .PHONY: test
 test:
@@ -28,16 +22,12 @@ clean:
 
 .PHONY: linux
 linux:
-	GOOS=linux go build -ldflags=$(BUILD_LDFLAGS) -o build/$(BIN) ./cmd/$(BIN)/...
+	GOOS=linux go build -o build/$(BIN) ./cmd/$(BIN)/...
 
 .PHONY: docker
 docker:
-	docker build -t $(BIN) -t $(BIN):$(VERSION) --target container-agent .
+	docker build -t $(BIN) -t $(BIN):local --target container-agent .
 
 .PHONY: docker-with-plugins
 docker-with-plugins:
-	docker build -t $(BIN) -t $(BIN):$(VERSION) --target container-agent-with-plugins .
-
-.PHONY: version
-version:
-	echo $(VERSION)
+	docker build -t $(BIN) -t $(BIN):local --target container-agent-with-plugins .
