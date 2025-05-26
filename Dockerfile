@@ -10,8 +10,8 @@ RUN make build
 
 FROM debian:bookworm-slim AS container-agent
 
-ENV DEBIAN_FRONTEND noninteractive
-ENV GODEBUG http2client=0
+ENV DEBIAN_FRONTEND=noninteractive
+ENV GODEBUG=http2client=0
 
 RUN apt-get update -yq && \
     apt-get install -yq --no-install-recommends ca-certificates sudo && \
@@ -21,24 +21,26 @@ COPY --from=builder /go/src/app/build/mackerel-container-agent /usr/local/bin/
 
 ENTRYPOINT ["/usr/local/bin/mackerel-container-agent"]
 
+FROM golang:1.24-bookworm AS plugins-builder
+
+COPY plugins/go.sum plugins/go.mod ./
+RUN go mod download
+
+RUN go install \
+    github.com/mackerelio/go-check-plugins \
+    github.com/mackerelio/mackerel-agent-plugins \
+    github.com/mackerelio/mackerel-plugin-json \
+    github.com/mackerelio/mkr
+
 FROM container-agent AS container-agent-with-plugins
 
-ENV BUNDLE_AGENT_PLUGINS apache2|elasticsearch|fluentd|gostats|haproxy|jmx-jolokia|memcached|mysql|nginx|php-apc|php-fpm|php-opcache|plack|postgres|redis|sidekiq|snmp|squid|uwsgi-vassal
-ENV BUNDLE_CHECK_PLUGINS cert-file|elasticsearch|file-age|file-size|http|jmx-jolokia|log|memcached|mysql|postgresql|redis|ssh|ssl-cert|tcp
-ENV MKR_INSTALL_PLUGINS json
+# for compat. deb packages installed path.
+COPY --from=plugins-builder /go/bin/go-check-plugins /usr/bin/mackerel-check
+COPY --from=plugins-builder /go/bin/mackerel-agent-plugins /usr/bin/mackerel-plugin
+COPY --from=plugins-builder /go/bin/mackerel-plugin-json /opt/mackerel-agent/plugins/bin/mackerel-plugin-json
+COPY --from=plugins-builder /go/bin/mkr /usr/bin/mkr
 
-RUN apt-get update -yq && \
-    apt-get install -yq --no-install-recommends curl gnupg2
-RUN curl -sS https://mackerel.io/file/cert/GPG-KEY-mackerel-v2 | gpg --dearmor -o /etc/apt/keyrings/mackerel.gpg
-RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/mackerel.gpg] http://apt.mackerel.io/v2/ mackerel contrib" > /etc/apt/sources.list.d/mackerel.list
+ENV PATH=$PATH:/opt/mackerel-agent/plugins/bin
 
-RUN apt-get update -yq && \
-    apt-get install -yq --no-install-recommends mackerel-agent-plugins mackerel-check-plugins mkr && \
-    rm -rf /var/lib/apt/lists
-
-RUN find /usr/bin/ -type l -regextype posix-egrep -name 'mackerel-plugin-*' -a ! -regex ".*mackerel-plugin-(${BUNDLE_AGENT_PLUGINS})" -delete
-RUN find /usr/bin/ -type l -regextype posix-egrep -name 'check-*' -a ! -regex ".*check-(${BUNDLE_CHECK_PLUGINS})" -delete
-
-RUN echo ${MKR_INSTALL_PLUGINS} | tr ' ' '\n' | xargs -I@ mkr plugin install mackerel-plugin-@
-ENV PATH $PATH:/opt/mackerel-agent/plugins/bin
-
+RUN /bin/bash -c 'cd /usr/bin; for i in apache2 elasticsearch fluentd gostats haproxy jmx-jolokia memcached mysql nginx php-apc php-fpm php-opcache plack postgres redis sidekiq snmp squid uwsgi-vassal;do ln -s ./mackerel-plugin mackerel-plugin-$i; done'
+RUN /bin/bash -c 'cd /usr/bin; for i in cert-file elasticsearch file-age file-size http jmx-jolokia log memcached mysql postgresql redis ssh ssl-cert tcp;do ln -s ./mackerel-check check-$i; done'
