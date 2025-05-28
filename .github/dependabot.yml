@@ -25,6 +25,17 @@ updates:
     k8s:
       patterns:
         - "k8s.io/*"
+- package-ecosystem: gomod
+  directory: "/plugins"
+  schedule:
+    interval: daily
+    time: "17:00"
+    timezone: Asia/Tokyo
+  open-pull-requests-limit: 10
+  groups:
+    mackerelio:
+      patterns:
+        - "github.com/mackerelio/*"
 - package-ecosystem: github-actions
   directory: "/"
   schedule:
