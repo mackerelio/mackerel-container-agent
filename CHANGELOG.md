@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.11.6 (2025-07-31)
+
+* Bump golang.org/x/sync from 0.12.0 to 0.16.0 #466 (dependabot[bot])
+* Bump the aws-aws-sdk-go-v2 group across 1 directory with 4 updates #463 (dependabot[bot])
+* Bump the mackerelio group across 1 directory with 2 updates #462 (dependabot[bot])
+* added dependabot entry #458 (yseto)
+* build a plugins from direct vcs. #457 (yseto)
+* Version info from vcs #454 (yseto)
+* Update lib, Go #452 (yseto)
+* Bump the k8s group with 3 updates #451 (dependabot[bot])
+* Bump golang.org/x/net from 0.36.0 to 0.38.0 #449 (dependabot[bot])
+
+
 ## 0.11.5 (2025-04-02)
 
 * Bump github.com/mackerelio/mackerel-client-go from 0.34.0 to 0.36.0 in the mackerelio group #442 (dependabot[bot])
