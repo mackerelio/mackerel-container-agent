@@ -8,7 +8,7 @@ import (
 	"reflect"
 	"testing"
 
-	dockerTypes "github.com/docker/docker/api/types"
+	dockerTypes "github.com/docker/docker/api/types/container"
 	ecsTypes "github.com/mackerelio/mackerel-container-agent/internal/amazon-ecs-agent/agent/handlers/v2"
 
 	"github.com/mackerelio/mackerel-container-agent/metric"
@@ -33,14 +33,14 @@ func (m *mockTaskMetadataEndpointClient) GetTaskMetadata(ctx context.Context) (*
 	return &res, nil
 }
 
-func (m *mockTaskMetadataEndpointClient) GetTaskStats(ctx context.Context) (map[string]*dockerTypes.StatsJSON, error) {
+func (m *mockTaskMetadataEndpointClient) GetTaskStats(ctx context.Context) (map[string]*dockerTypes.StatsResponse, error) {
 	f, err := os.Open(m.statsPath)
 	if err != nil {
 		return nil, err
 	}
 	defer f.Close()
 
-	var res map[string]*dockerTypes.StatsJSON
+	var res map[string]*dockerTypes.StatsResponse
 	if err := json.NewDecoder(f).Decode(&res); err != nil {
 		return nil, err
 	}

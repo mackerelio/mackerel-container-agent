@@ -11,7 +11,7 @@ import (
 	"regexp"
 	"time"
 
-	dockerTypes "github.com/docker/docker/api/types"
+	dockerTypes "github.com/docker/docker/api/types/container"
 	ecsTypes "github.com/mackerelio/mackerel-container-agent/internal/amazon-ecs-agent/agent/handlers/v2"
 )
 
@@ -82,7 +82,7 @@ func (c *Client) GetTaskMetadata(ctx context.Context) (*ecsTypes.TaskResponse, e
 }
 
 // GetTaskStats gets task stats
-func (c *Client) GetTaskStats(ctx context.Context) (map[string]*dockerTypes.StatsJSON, error) {
+func (c *Client) GetTaskStats(ctx context.Context) (map[string]*dockerTypes.StatsResponse, error) {
 	req, err := c.newRequest(statsPath)
 	if err != nil {
 		return nil, err
@@ -91,7 +91,7 @@ func (c *Client) GetTaskStats(ctx context.Context) (map[string]*dockerTypes.Stat
 	if err != nil {
 		return nil, err
 	}
-	var all map[string]*dockerTypes.StatsJSON
+	var all map[string]*dockerTypes.StatsResponse
 	if err = decodeBody(resp, &all); err != nil {
 		return nil, err
 	}
@@ -101,7 +101,7 @@ func (c *Client) GetTaskStats(ctx context.Context) (map[string]*dockerTypes.Stat
 		return nil, err
 	}
 
-	res := make(map[string]*dockerTypes.StatsJSON)
+	res := make(map[string]*dockerTypes.StatsResponse)
 
 	for _, container := range meta.Containers {
 		if v, ok := all[container.ID]; ok {

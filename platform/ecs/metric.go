@@ -4,7 +4,8 @@ import (
 	"context"
 	"time"
 
-	dockerTypes "github.com/docker/docker/api/types"
+	dockerTypes "github.com/docker/docker/api/types/container"
+
 	ecsTypes "github.com/mackerelio/mackerel-container-agent/internal/amazon-ecs-agent/agent/handlers/v2"
 
 	mackerel "github.com/mackerelio/mackerel-client-go"
@@ -15,7 +16,7 @@ import (
 
 // TaskStatsGetter interface fetch ECS task stats
 type TaskStatsGetter interface {
-	GetTaskStats(context.Context) (map[string]*dockerTypes.StatsJSON, error)
+	GetTaskStats(context.Context) (map[string]*dockerTypes.StatsResponse, error)
 }
 
 type metricGenerator struct {
@@ -23,7 +24,7 @@ type metricGenerator struct {
 	hostInfoGenerator hostinfo.Generator
 	hostMemTotal      *float64
 	hostNumCores      *float64
-	prevStats         map[string]*dockerTypes.StatsJSON
+	prevStats         map[string]*dockerTypes.StatsResponse
 	prevTime          time.Time
 }
 
@@ -115,16 +116,16 @@ func (g *metricGenerator) getCPULimit(meta *ecsTypes.TaskResponse) float64 {
 	return *g.hostNumCores * 100
 }
 
-func calculateCPUMetrics(prev, curr *dockerTypes.StatsJSON, timeDelta time.Duration) float64 {
+func calculateCPUMetrics(prev, curr *dockerTypes.StatsResponse, timeDelta time.Duration) float64 {
 	// calculate used cpu cores. (1core == 100.0)
 	return float64(curr.CPUStats.CPUUsage.TotalUsage-prev.CPUStats.CPUUsage.TotalUsage) / float64(timeDelta.Nanoseconds()) * 100
 }
 
-func calculateMemoryMetrics(stats *dockerTypes.StatsJSON) float64 {
+func calculateMemoryMetrics(stats *dockerTypes.StatsResponse) float64 {
 	return float64(stats.MemoryStats.Usage - stats.MemoryStats.Stats["cache"])
 }
 
-func calculateInterfaceMetrics(name string, prev, curr *dockerTypes.StatsJSON, timeDelta time.Duration, metricValues metric.Values) {
+func calculateInterfaceMetrics(name string, prev, curr *dockerTypes.StatsResponse, timeDelta time.Duration, metricValues metric.Values) {
 	for ifn, pv := range prev.Networks {
 		cv, ok := curr.Networks[ifn]
 		if !ok {
