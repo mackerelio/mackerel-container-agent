@@ -6,3 +6,5 @@ import (
 	_ "github.com/mackerelio/mackerel-plugin-json"
 	_ "github.com/mackerelio/mkr"
 )
+
+// see https://github.com/mackerelio/mackerel-container-agent/pull/471
