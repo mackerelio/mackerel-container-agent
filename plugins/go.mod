@@ -5,6 +5,13 @@ go 1.24.0
 toolchain go1.24.3
 
 require (
+	github.com/mackerelio/go-check-plugins v0.49.0
+	github.com/mackerelio/mackerel-agent-plugins v0.88.2
+	github.com/mackerelio/mackerel-plugin-json v1.2.6
+	github.com/mackerelio/mkr v0.61.0
+)
+
+require (
 	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/Azure/go-ansiterm v0.0.0-20250102033503-faa5f7b0171c // indirect
 	github.com/Azure/go-ntlmssp v0.0.0-20221128193559-754e69321358 // indirect
@@ -81,18 +88,14 @@ require (
 	github.com/kr/pretty v0.3.1 // indirect
 	github.com/lib/pq v1.10.9 // indirect
 	github.com/mackerelio/checkers v0.2.0 // indirect
-	github.com/mackerelio/go-check-plugins v0.49.0 // indirect
 	github.com/mackerelio/go-mackerel-plugin v0.1.5 // indirect
 	github.com/mackerelio/go-mackerel-plugin-helper v0.1.3 // indirect
 	github.com/mackerelio/go-osstat v0.2.5 // indirect
 	github.com/mackerelio/golib v1.2.1 // indirect
 	github.com/mackerelio/mackerel-agent v0.84.3 // indirect
-	github.com/mackerelio/mackerel-agent-plugins v0.88.2 // indirect
 	github.com/mackerelio/mackerel-client-go v0.37.0 // indirect
-	github.com/mackerelio/mackerel-plugin-json v1.2.6 // indirect
 	github.com/mackerelio/mackerel-plugin-mongodb v1.1.1 // indirect
 	github.com/mackerelio/mackerel-plugin-mysql v1.3.0 // indirect
-	github.com/mackerelio/mkr v0.61.0 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-encoding v0.0.2 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
@@ -156,11 +159,4 @@ require (
 	golang.org/x/tools v0.33.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
-)
-
-tool (
-	github.com/mackerelio/go-check-plugins
-	github.com/mackerelio/mackerel-agent-plugins
-	github.com/mackerelio/mackerel-plugin-json
-	github.com/mackerelio/mkr
 )
