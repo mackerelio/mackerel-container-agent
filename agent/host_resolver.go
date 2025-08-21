@@ -10,6 +10,7 @@ import (
 	mackerel "github.com/mackerelio/mackerel-client-go"
 
 	"github.com/mackerelio/mackerel-container-agent/api"
+	"github.com/mackerelio/mackerel-container-agent/config"
 )
 
 type hostIDStore interface {
@@ -23,10 +24,20 @@ type hostResolver struct {
 	hostIDStore hostIDStore
 }
 
-func newHostResolver(client api.Client, root string) *hostResolver {
+func newHostResolver(client api.Client, hostIdStore config.HostIDStore, root string) *hostResolver {
+	var store hostIDStore
+	switch hostIdStore {
+	case config.HostIDStoreMemory:
+		store = &hostIDMemoryStore{}
+	case config.HostIDStoreFile:
+		fallthrough
+	default:
+		store = &hostIDFileStore{path: filepath.Join(root, "id")}
+	}
+
 	return &hostResolver{
 		client:      client,
-		hostIDStore: &hostIDFileStore{path: filepath.Join(root, "id")},
+		hostIDStore: store,
 	}
 }
 
