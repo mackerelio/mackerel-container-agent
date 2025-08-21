@@ -36,6 +36,7 @@ type Config struct {
 	IgnoreContainer   Regexpwrapper `yaml:"ignoreContainer"`
 	ReadinessProbe    *Probe        `yaml:"readinessProbe"`
 	HostStatusOnStart HostStatus    `yaml:"hostStatusOnStart"`
+	HostIDStore       HostIDStore   `yaml:"hostIdStore"`
 	MetricPlugins     []*MetricPlugin
 	CheckPlugins      []*CheckPlugin
 }
@@ -65,6 +66,25 @@ func (s *HostStatus) UnmarshalText(text []byte) error {
 		return fmt.Errorf("invalid host status: %q", status)
 	}
 	*s = HostStatus(status)
+	return nil
+}
+
+// HostIDStore represents host id store
+type HostIDStore string
+
+const (
+	HostIDStoreFile   HostIDStore = "file"
+	HostIDStoreMemory HostIDStore = "memory"
+)
+
+// UnmarshalText decodes HostIDStore string
+func (s *HostIDStore) UnmarshalText(text []byte) error {
+	status := string(text)
+	if status != string(HostIDStoreFile) &&
+		status != string(HostIDStoreMemory) {
+		return fmt.Errorf("invalid HostIDStore: %q", status)
+	}
+	*s = HostIDStore(status)
 	return nil
 }
 
@@ -171,6 +191,14 @@ func load(ctx context.Context, location string) (*Config, error) {
 	if conf.HostStatusOnStart == "" {
 		if s := os.Getenv("MACKEREL_HOST_STATUS_ON_START"); s != "" {
 			if err := conf.HostStatusOnStart.UnmarshalText([]byte(s)); err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	if conf.HostIDStore == "" {
+		if s := os.Getenv("MACKEREL_HOST_ID_STORE"); s != "" {
+			if err := conf.HostIDStore.UnmarshalText([]byte(s)); err != nil {
 				return nil, err
 			}
 		}
