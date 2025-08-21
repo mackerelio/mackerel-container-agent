@@ -124,3 +124,43 @@ func (r *hostResolver) saveHostID(id string) error {
 func (r *hostResolver) removeHostID() error {
 	return os.Remove(r.path)
 }
+
+type hostIDFileStore struct {
+	path string
+}
+
+func (r *hostIDFileStore) load() (string, bool, error) {
+	content, err := os.ReadFile(r.path)
+	if err != nil {
+		return "", os.IsNotExist(err), err
+	}
+	hostID := strings.TrimRight(string(content), "\r\n")
+	if hostID == "" {
+		return "", false, fmt.Errorf("host id file %s found but the content is empty", r.path)
+	}
+	return hostID, false, nil
+}
+
+func (r *hostIDFileStore) save(id string) error {
+	err := os.MkdirAll(filepath.Dir(r.path), 0755)
+	if err != nil {
+		return err
+	}
+
+	file, err := os.Create(r.path)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	_, err = file.Write([]byte(id))
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *hostIDFileStore) remove() error {
+	return os.Remove(r.path)
+}
