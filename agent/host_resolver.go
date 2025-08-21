@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 
 	mackerel "github.com/mackerelio/mackerel-client-go"
 
@@ -145,4 +146,42 @@ func (r *hostIDFileStore) save(id string) error {
 
 func (r *hostIDFileStore) remove() error {
 	return os.Remove(r.path)
+}
+
+type hostIDMemoryStore struct {
+	mu sync.Mutex
+
+	id    string
+	exist bool
+}
+
+func (r *hostIDMemoryStore) load() (string, bool, error) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	if r.exist {
+		return r.id, false, nil
+	} else {
+		return "", true, fmt.Errorf("not initialized")
+	}
+}
+
+func (r *hostIDMemoryStore) save(id string) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	r.id = id
+	r.exist = true
+
+	return nil
+}
+
+func (r *hostIDMemoryStore) remove() error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	r.id = ""
+	r.exist = false
+
+	return nil
 }
