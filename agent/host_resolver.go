@@ -11,15 +11,21 @@ import (
 	"github.com/mackerelio/mackerel-container-agent/api"
 )
 
+type hostIDStore interface {
+	load() (string, bool, error)
+	remove() error
+	save(id string) error
+}
+
 type hostResolver struct {
-	path   string
-	client api.Client
+	client      api.Client
+	hostIDStore hostIDStore
 }
 
 func newHostResolver(client api.Client, root string) *hostResolver {
 	return &hostResolver{
-		path:   filepath.Join(root, "id"),
-		client: client,
+		client:      client,
+		hostIDStore: &hostIDFileStore{path: filepath.Join(root, "id")},
 	}
 }
 
@@ -80,15 +86,7 @@ func (r *hostResolver) getHost(hostParam *mackerel.CreateHostParam) (*mackerel.H
 }
 
 func (r *hostResolver) getLocalHostID() (string, bool, error) {
-	content, err := os.ReadFile(r.path)
-	if err != nil {
-		return "", os.IsNotExist(err), err
-	}
-	hostID := strings.TrimRight(string(content), "\r\n")
-	if hostID == "" {
-		return "", false, fmt.Errorf("host id file %s found but the content is empty", r.path)
-	}
-	return hostID, false, nil
+	return r.hostIDStore.load()
 }
 
 func retryFromError(err error) bool {
@@ -102,27 +100,11 @@ func retryFromError(err error) bool {
 }
 
 func (r *hostResolver) saveHostID(id string) error {
-	err := os.MkdirAll(filepath.Dir(r.path), 0755)
-	if err != nil {
-		return err
-	}
-
-	file, err := os.Create(r.path)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-
-	_, err = file.Write([]byte(id))
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return r.hostIDStore.save(id)
 }
 
 func (r *hostResolver) removeHostID() error {
-	return os.Remove(r.path)
+	return r.hostIDStore.remove()
 }
 
 type hostIDFileStore struct {
