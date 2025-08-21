@@ -25,9 +25,9 @@ func newHostResolver(client api.Client, root string) *hostResolver {
 
 func (r *hostResolver) getHost(hostParam *mackerel.CreateHostParam) (*mackerel.Host, bool, error) {
 	var host *mackerel.Host
-	content, err := os.ReadFile(r.path)
+	hostID, notExist, err := r.getLocalHostID()
 	if err != nil {
-		if os.IsNotExist(err) {
+		if notExist {
 			// host id file not found
 			if hostParam.CustomIdentifier != "" {
 				// find host from custom identifier
@@ -68,10 +68,6 @@ func (r *hostResolver) getHost(hostParam *mackerel.CreateHostParam) (*mackerel.H
 		}
 		return nil, false, err
 	}
-	hostID := strings.TrimRight(string(content), "\r\n")
-	if hostID == "" {
-		return nil, false, fmt.Errorf("host id file %s found but the content is empty", r.path)
-	}
 	host, err = r.client.FindHost(hostID)
 	if err != nil {
 		return nil, retryFromError(err), fmt.Errorf("failed to find host for id = %s: %w", hostID, err)
@@ -83,16 +79,16 @@ func (r *hostResolver) getHost(hostParam *mackerel.CreateHostParam) (*mackerel.H
 	return host, false, nil
 }
 
-func (r *hostResolver) getLocalHostID() (string, error) {
+func (r *hostResolver) getLocalHostID() (string, bool, error) {
 	content, err := os.ReadFile(r.path)
 	if err != nil {
-		return "", err
+		return "", os.IsNotExist(err), err
 	}
 	hostID := strings.TrimRight(string(content), "\r\n")
 	if hostID == "" {
-		return "", fmt.Errorf("host id file found but the content is empty")
+		return "", false, fmt.Errorf("host id file %s found but the content is empty", r.path)
 	}
-	return hostID, nil
+	return hostID, false, nil
 }
 
 func retryFromError(err error) bool {

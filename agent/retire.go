@@ -1,7 +1,6 @@
 package agent
 
 import (
-	"os"
 	"time"
 
 	"github.com/Songmu/retry"
@@ -10,9 +9,9 @@ import (
 )
 
 func retire(client api.Client, hostResolver *hostResolver) error {
-	hostID, err := hostResolver.getLocalHostID()
+	hostID, notExist, err := hostResolver.getLocalHostID()
 	if err != nil {
-		if os.IsNotExist(err) { // ignore error when the host is not created yet
+		if notExist { // ignore error when the host is not created yet
 			return nil
 		}
 		return err
