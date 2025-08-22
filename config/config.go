@@ -79,12 +79,12 @@ const (
 
 // UnmarshalText decodes HostIDStore string
 func (s *HostIDStore) UnmarshalText(text []byte) error {
-	status := string(text)
-	if status != string(HostIDStoreFile) &&
-		status != string(HostIDStoreMemory) {
-		return fmt.Errorf("invalid HostIDStore: %q", status)
+	storeType := string(text)
+	if storeType != string(HostIDStoreFile) &&
+		storeType != string(HostIDStoreMemory) {
+		return fmt.Errorf("invalid HostIDStore: %q", storeType)
 	}
-	*s = HostIDStore(status)
+	*s = HostIDStore(storeType)
 	return nil
 }
 
