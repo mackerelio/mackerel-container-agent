@@ -37,7 +37,7 @@ func run(
 	specManager.SetChecks(checkManager.Configs())
 	eg, ctx := errgroup.WithContext(ctx)
 
-	hostResolver := newHostResolver(client, conf.Root)
+	hostResolver := newHostResolver(client, conf.HostIDStore, conf.Root)
 	eg.Go(func() error {
 		var duration time.Duration
 	loop:

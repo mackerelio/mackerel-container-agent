@@ -5,29 +5,47 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 
 	mackerel "github.com/mackerelio/mackerel-client-go"
 
 	"github.com/mackerelio/mackerel-container-agent/api"
+	"github.com/mackerelio/mackerel-container-agent/config"
 )
 
-type hostResolver struct {
-	path   string
-	client api.Client
+type hostIDStore interface {
+	load() (string, bool, error)
+	remove() error
+	save(id string) error
 }
 
-func newHostResolver(client api.Client, root string) *hostResolver {
+type hostResolver struct {
+	client      api.Client
+	hostIDStore hostIDStore
+}
+
+func newHostResolver(client api.Client, hostIdStore config.HostIDStore, root string) *hostResolver {
+	var store hostIDStore
+	switch hostIdStore {
+	case config.HostIDStoreMemory:
+		store = &hostIDMemoryStore{}
+	case config.HostIDStoreFile:
+		fallthrough
+	default:
+		store = &hostIDFileStore{path: filepath.Join(root, "id")}
+	}
+
 	return &hostResolver{
-		path:   filepath.Join(root, "id"),
-		client: client,
+		client:      client,
+		hostIDStore: store,
 	}
 }
 
 func (r *hostResolver) getHost(hostParam *mackerel.CreateHostParam) (*mackerel.Host, bool, error) {
 	var host *mackerel.Host
-	content, err := os.ReadFile(r.path)
+	hostID, notExist, err := r.getLocalHostID()
 	if err != nil {
-		if os.IsNotExist(err) {
+		if notExist {
 			// host id file not found
 			if hostParam.CustomIdentifier != "" {
 				// find host from custom identifier
@@ -68,10 +86,6 @@ func (r *hostResolver) getHost(hostParam *mackerel.CreateHostParam) (*mackerel.H
 		}
 		return nil, false, err
 	}
-	hostID := strings.TrimRight(string(content), "\r\n")
-	if hostID == "" {
-		return nil, false, fmt.Errorf("host id file %s found but the content is empty", r.path)
-	}
 	host, err = r.client.FindHost(hostID)
 	if err != nil {
 		return nil, retryFromError(err), fmt.Errorf("failed to find host for id = %s: %w", hostID, err)
@@ -83,16 +97,8 @@ func (r *hostResolver) getHost(hostParam *mackerel.CreateHostParam) (*mackerel.H
 	return host, false, nil
 }
 
-func (r *hostResolver) getLocalHostID() (string, error) {
-	content, err := os.ReadFile(r.path)
-	if err != nil {
-		return "", err
-	}
-	hostID := strings.TrimRight(string(content), "\r\n")
-	if hostID == "" {
-		return "", fmt.Errorf("host id file found but the content is empty")
-	}
-	return hostID, nil
+func (r *hostResolver) getLocalHostID() (string, bool, error) {
+	return r.hostIDStore.load()
 }
 
 func retryFromError(err error) bool {
@@ -106,6 +112,30 @@ func retryFromError(err error) bool {
 }
 
 func (r *hostResolver) saveHostID(id string) error {
+	return r.hostIDStore.save(id)
+}
+
+func (r *hostResolver) removeHostID() error {
+	return r.hostIDStore.remove()
+}
+
+type hostIDFileStore struct {
+	path string
+}
+
+func (r *hostIDFileStore) load() (string, bool, error) {
+	content, err := os.ReadFile(r.path)
+	if err != nil {
+		return "", os.IsNotExist(err), err
+	}
+	hostID := strings.TrimRight(string(content), "\r\n")
+	if hostID == "" {
+		return "", false, fmt.Errorf("host id file %s found but the content is empty", r.path)
+	}
+	return hostID, false, nil
+}
+
+func (r *hostIDFileStore) save(id string) error {
 	err := os.MkdirAll(filepath.Dir(r.path), 0755)
 	if err != nil {
 		return err
@@ -125,6 +155,44 @@ func (r *hostResolver) saveHostID(id string) error {
 	return nil
 }
 
-func (r *hostResolver) removeHostID() error {
+func (r *hostIDFileStore) remove() error {
 	return os.Remove(r.path)
+}
+
+type hostIDMemoryStore struct {
+	mu sync.Mutex
+
+	id    string
+	exist bool
+}
+
+func (r *hostIDMemoryStore) load() (string, bool, error) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	if r.exist {
+		return r.id, false, nil
+	} else {
+		return "", true, fmt.Errorf("not initialized")
+	}
+}
+
+func (r *hostIDMemoryStore) save(id string) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	r.id = id
+	r.exist = true
+
+	return nil
+}
+
+func (r *hostIDMemoryStore) remove() error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	r.id = ""
+	r.exist = false
+
+	return nil
 }
