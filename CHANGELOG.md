@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.12.0 (2025-08-27)
+
+* update to github.com/mackerelio/mackerel-client-go v0.37.3 #479 (yseto)
+* added HostID Store on memory. #476 (yseto)
+* fix plugins/ #471 (yseto)
+* update github.com/docker/docker #468 (yseto)
+
+
 ## 0.11.6 (2025-07-31)
 
 * Bump golang.org/x/sync from 0.12.0 to 0.16.0 #466 (dependabot[bot])
