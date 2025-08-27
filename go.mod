@@ -14,7 +14,7 @@ require (
 	github.com/docker/docker v28.3.3+incompatible
 	github.com/mackerelio/go-osstat v0.2.6
 	github.com/mackerelio/golib v1.2.1
-	github.com/mackerelio/mackerel-client-go v0.37.2
+	github.com/mackerelio/mackerel-client-go v0.37.3
 	github.com/shirou/gopsutil/v3 v3.24.5
 	golang.org/x/sync v0.16.0
 	gopkg.in/yaml.v3 v3.0.1
