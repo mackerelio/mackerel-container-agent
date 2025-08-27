@@ -6,9 +6,9 @@ toolchain go1.24.3
 
 require (
 	github.com/mackerelio/go-check-plugins v0.49.0
-	github.com/mackerelio/mackerel-agent-plugins v0.88.2
-	github.com/mackerelio/mackerel-plugin-json v1.2.6
-	github.com/mackerelio/mkr v0.61.0
+	github.com/mackerelio/mackerel-agent-plugins v0.88.3
+	github.com/mackerelio/mackerel-plugin-json v1.2.7
+	github.com/mackerelio/mkr v0.62.0
 )
 
 require (
@@ -29,22 +29,24 @@ require (
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/andybalholm/brotli v1.1.2-0.20250424173009-453214e765f3 // indirect
 	github.com/aws/aws-sdk-go v1.55.7 // indirect
-	github.com/aws/aws-sdk-go-v2 v1.36.3 // indirect
+	github.com/aws/aws-sdk-go-v2 v1.36.5 // indirect
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.6.10 // indirect
-	github.com/aws/aws-sdk-go-v2/config v1.29.14 // indirect
-	github.com/aws/aws-sdk-go-v2/credentials v1.17.67 // indirect
-	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.16.30 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/configsources v1.3.34 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.6.34 // indirect
+	github.com/aws/aws-sdk-go-v2/config v1.29.17 // indirect
+	github.com/aws/aws-sdk-go-v2/credentials v1.17.70 // indirect
+	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.16.32 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/configsources v1.3.36 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.6.36 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/ini v1.8.3 // indirect
+	github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.45.3 // indirect
 	github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.50.0 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.12.3 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.12.15 // indirect
+	github.com/aws/aws-sdk-go-v2/service/ec2 v1.227.0 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.12.4 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.12.17 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sqs v1.38.5 // indirect
-	github.com/aws/aws-sdk-go-v2/service/sso v1.25.3 // indirect
-	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.30.1 // indirect
-	github.com/aws/aws-sdk-go-v2/service/sts v1.33.19 // indirect
-	github.com/aws/smithy-go v1.22.3 // indirect
+	github.com/aws/aws-sdk-go-v2/service/sso v1.25.5 // indirect
+	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.30.3 // indirect
+	github.com/aws/aws-sdk-go-v2/service/sts v1.34.0 // indirect
+	github.com/aws/smithy-go v1.22.4 // indirect
 	github.com/beevik/ntp v1.4.3 // indirect
 	github.com/bodgit/plumbing v1.3.0 // indirect
 	github.com/bodgit/sevenzip v1.6.1 // indirect
@@ -92,8 +94,8 @@ require (
 	github.com/mackerelio/go-mackerel-plugin-helper v0.1.3 // indirect
 	github.com/mackerelio/go-osstat v0.2.5 // indirect
 	github.com/mackerelio/golib v1.2.1 // indirect
-	github.com/mackerelio/mackerel-agent v0.84.3 // indirect
-	github.com/mackerelio/mackerel-client-go v0.37.0 // indirect
+	github.com/mackerelio/mackerel-agent v0.85.0 // indirect
+	github.com/mackerelio/mackerel-client-go v0.37.2 // indirect
 	github.com/mackerelio/mackerel-plugin-mongodb v1.1.1 // indirect
 	github.com/mackerelio/mackerel-plugin-mysql v1.3.0 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect
@@ -102,9 +104,10 @@ require (
 	github.com/mattn/go-pipeline v0.0.0-20190323144519-32d779b32768 // indirect
 	github.com/mattn/go-treasuredata v0.0.0-20170920030233-31758907cfc4 // indirect
 	github.com/mattn/go-zglob v0.0.6 // indirect
-	github.com/mholt/archives v0.1.2 // indirect
+	github.com/mholt/archives v0.1.3 // indirect
 	github.com/michaelklishin/rabbit-hole v1.5.0 // indirect
 	github.com/miekg/dns v1.1.66 // indirect
+	github.com/mikelolasagasti/xz v1.0.1 // indirect
 	github.com/minio/minlz v1.0.1 // indirect
 	github.com/moby/docker-image-spec v1.3.1 // indirect
 	github.com/moby/go-archive v0.1.0 // indirect
@@ -135,10 +138,9 @@ require (
 	github.com/spf13/afero v1.14.0 // indirect
 	github.com/tatsushid/go-fastping v0.0.0-20160109021039-d7bb493dee3e // indirect
 	github.com/tcnksm/go-gitconfig v0.1.2 // indirect
-	github.com/therootcompany/xz v1.0.1 // indirect
 	github.com/tomasen/fcgi_client v0.0.0-20180423082037-2bb3d819fd19 // indirect
 	github.com/ulikunitz/xz v0.5.12 // indirect
-	github.com/urfave/cli v1.22.16 // indirect
+	github.com/urfave/cli v1.22.17 // indirect
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
 	github.com/xdg-go/scram v1.1.2 // indirect
 	github.com/xdg-go/stringprep v1.0.4 // indirect
@@ -152,7 +154,7 @@ require (
 	golang.org/x/mod v0.24.0 // indirect
 	golang.org/x/net v0.40.0 // indirect
 	golang.org/x/oauth2 v0.30.0 // indirect
-	golang.org/x/sync v0.14.0 // indirect
+	golang.org/x/sync v0.16.0 // indirect
 	golang.org/x/sys v0.33.0 // indirect
 	golang.org/x/term v0.32.0 // indirect
 	golang.org/x/text v0.25.0 // indirect
