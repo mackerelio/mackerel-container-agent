@@ -3,14 +3,14 @@ updates:
 - package-ecosystem: docker
   directory: "/"
   schedule:
-    interval: weekly
+    interval: daily
     time: "01:00"
     timezone: Asia/Tokyo
   open-pull-requests-limit: 10
 - package-ecosystem: gomod
   directory: "/"
   schedule:
-    interval: weekly
+    interval: daily
     time: "01:00"
     timezone: Asia/Tokyo
   open-pull-requests-limit: 10
@@ -25,6 +25,15 @@ updates:
     k8s:
       patterns:
         - "k8s.io/*"
+  cooldown:
+    default-days: 5
+    include:
+      - "*"
+    exclude:
+      - "github.com/mackerelio/*"
+      - "github.com/aws/aws-sdk-go-v2"
+      - "github.com/aws/aws-sdk-go-v2/*"
+      - "k8s.io/*"
 - package-ecosystem: gomod
   directory: "/plugins"
   schedule:
@@ -36,9 +45,19 @@ updates:
     mackerelio:
       patterns:
         - "github.com/mackerelio/*"
+  cooldown:
+    default-days: 5
+    include:
+      - "*"
+    exclude:
+      - "github.com/mackerelio/*"
 - package-ecosystem: github-actions
   directory: "/"
   schedule:
-    interval: weekly
+    interval: daily
     time: "01:00"
     timezone: Asia/Tokyo
+  cooldown:
+    default-days: 5
+    include:
+      - "*"
