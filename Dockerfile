@@ -1,4 +1,4 @@
-FROM golang:1.24-bookworm AS builder
+FROM golang:1.25.0-bookworm AS builder
 
 WORKDIR /go/src/app
 
@@ -21,7 +21,7 @@ COPY --from=builder /go/src/app/build/mackerel-container-agent /usr/local/bin/
 
 ENTRYPOINT ["/usr/local/bin/mackerel-container-agent"]
 
-FROM golang:1.24-bookworm AS plugins-builder
+FROM golang:1.25.0-bookworm AS plugins-builder
 
 COPY plugins/go.sum plugins/go.mod ./
 RUN go mod download
