@@ -37,7 +37,6 @@ updates:
       - "github.com/mackerelio/*"
       - "github.com/aws/aws-sdk-go-v2"
       - "github.com/aws/aws-sdk-go-v2/*"
-      - "k8s.io/*"
 - package-ecosystem: gomod
   directory: "/plugins"
   schedule:
