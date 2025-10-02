@@ -8,7 +8,7 @@ require (
 	github.com/mackerelio/go-check-plugins v0.50.0
 	github.com/mackerelio/mackerel-agent-plugins v0.89.1
 	github.com/mackerelio/mackerel-plugin-json v1.2.7
-	github.com/mackerelio/mkr v0.62.1
+	github.com/mackerelio/mkr v0.62.2
 )
 
 require (
@@ -27,7 +27,7 @@ require (
 	github.com/Songmu/wrapcommander v0.1.0 // indirect
 	github.com/StackExchange/wmi v1.2.1 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
-	github.com/andybalholm/brotli v1.1.2-0.20250424173009-453214e765f3 // indirect
+	github.com/andybalholm/brotli v1.2.0 // indirect
 	github.com/aws/aws-sdk-go-v2 v1.36.5 // indirect
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.6.10 // indirect
 	github.com/aws/aws-sdk-go-v2/config v1.29.17 // indirect
@@ -92,8 +92,8 @@ require (
 	github.com/mackerelio/go-mackerel-plugin-helper v0.1.3 // indirect
 	github.com/mackerelio/go-osstat v0.2.6 // indirect
 	github.com/mackerelio/golib v1.2.1 // indirect
-	github.com/mackerelio/mackerel-agent v0.85.0 // indirect
-	github.com/mackerelio/mackerel-client-go v0.37.2 // indirect
+	github.com/mackerelio/mackerel-agent v0.85.2 // indirect
+	github.com/mackerelio/mackerel-client-go v0.37.3 // indirect
 	github.com/mackerelio/mackerel-plugin-mongodb v1.1.2 // indirect
 	github.com/mackerelio/mackerel-plugin-mysql v1.3.2 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect
@@ -102,7 +102,7 @@ require (
 	github.com/mattn/go-pipeline v0.0.0-20190323144519-32d779b32768 // indirect
 	github.com/mattn/go-treasuredata v0.0.0-20170920030233-31758907cfc4 // indirect
 	github.com/mattn/go-zglob v0.0.6 // indirect
-	github.com/mholt/archives v0.1.3 // indirect
+	github.com/mholt/archives v0.1.4 // indirect
 	github.com/michaelklishin/rabbit-hole v1.5.0 // indirect
 	github.com/miekg/dns v1.1.66 // indirect
 	github.com/mikelolasagasti/xz v1.0.1 // indirect
@@ -132,12 +132,12 @@ require (
 	github.com/sergi/go-diff v1.3.1 // indirect
 	github.com/shirou/gopsutil/v3 v3.24.5 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
-	github.com/sorairolake/lzip-go v0.3.7 // indirect
+	github.com/sorairolake/lzip-go v0.3.8 // indirect
 	github.com/spf13/afero v1.14.0 // indirect
 	github.com/tatsushid/go-fastping v0.0.0-20160109021039-d7bb493dee3e // indirect
 	github.com/tcnksm/go-gitconfig v0.1.2 // indirect
 	github.com/tomasen/fcgi_client v0.0.0-20180423082037-2bb3d819fd19 // indirect
-	github.com/ulikunitz/xz v0.5.12 // indirect
+	github.com/ulikunitz/xz v0.5.15 // indirect
 	github.com/urfave/cli v1.22.17 // indirect
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
 	github.com/xdg-go/scram v1.1.2 // indirect
@@ -151,7 +151,7 @@ require (
 	golang.org/x/crypto v0.41.0 // indirect
 	golang.org/x/mod v0.27.0 // indirect
 	golang.org/x/net v0.43.0 // indirect
-	golang.org/x/oauth2 v0.30.0 // indirect
+	golang.org/x/oauth2 v0.31.0 // indirect
 	golang.org/x/sync v0.17.0 // indirect
 	golang.org/x/sys v0.35.0 // indirect
 	golang.org/x/term v0.34.0 // indirect
