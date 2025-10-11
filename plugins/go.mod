@@ -118,7 +118,7 @@ require (
 	github.com/morikuni/aec v1.0.0 // indirect
 	github.com/motemen/go-colorine v0.0.0-20180816141035-45d19169413a // indirect
 	github.com/natefinch/atomic v1.0.1 // indirect
-	github.com/nwaples/rardecode/v2 v2.1.1 // indirect
+	github.com/nwaples/rardecode/v2 v2.2.0 // indirect
 	github.com/nxadm/tail v1.4.8 // indirect
 	github.com/onsi/gomega v1.35.1 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
