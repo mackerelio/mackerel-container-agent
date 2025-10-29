@@ -72,7 +72,7 @@ func (c *client) GetPod(ctx context.Context) (*kubernetesTypes.Pod, error) {
 
 	var pod *kubernetesTypes.Pod
 	for _, p := range podList.Items {
-		if p.ObjectMeta.Namespace == c.namespace && p.ObjectMeta.Name == c.name {
+		if p.Namespace == c.namespace && p.Name == c.name {
 			pod = &p
 			break
 		}

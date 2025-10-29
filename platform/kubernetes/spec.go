@@ -88,16 +88,16 @@ func (g *specGenerator) Generate(ctx context.Context) (any, error) {
 	}
 
 	var spec = &podSpec{
-		Namespace:      p.ObjectMeta.Namespace,
-		Name:           p.ObjectMeta.Name,
-		UID:            string(p.ObjectMeta.UID),
-		ResouceVersion: p.ObjectMeta.ResourceVersion,
-		Labels:         p.ObjectMeta.Labels,
+		Namespace:      p.Namespace,
+		Name:           p.Name,
+		UID:            string(p.UID),
+		ResouceVersion: p.ResourceVersion,
+		Labels:         p.Labels,
 	}
-	if p.ObjectMeta.OwnerReferences != nil {
-		ownerRefs := make([]ownerReference, len(p.ObjectMeta.OwnerReferences))
+	if p.OwnerReferences != nil {
+		ownerRefs := make([]ownerReference, len(p.OwnerReferences))
 		spec.OwnerReferences = ownerRefs
-		for i, r := range p.ObjectMeta.OwnerReferences {
+		for i, r := range p.OwnerReferences {
 			ownerRefs[i] = ownerReference{
 				Kind: r.Kind,
 				Name: r.Name,

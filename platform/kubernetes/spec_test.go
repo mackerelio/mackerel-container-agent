@@ -29,7 +29,7 @@ func TestGenerateSpec(t *testing.T) {
 				return nil, err
 			}
 			for _, pod := range podList.Items {
-				if pod.ObjectMeta.Namespace == "default" && pod.ObjectMeta.Name == "myapp" {
+				if pod.Namespace == "default" && pod.Name == "myapp" {
 					return &pod, nil
 				}
 			}

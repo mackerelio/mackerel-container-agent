@@ -135,7 +135,7 @@ func (p *kubernetesPlatform) GetCustomIdentifier(ctx context.Context) (string, e
 	if err != nil {
 		return "", err
 	}
-	return string(pod.ObjectMeta.UID) + ".kubernetes", nil
+	return string(pod.UID) + ".kubernetes", nil
 }
 
 // StatusRunning reports p status is running
