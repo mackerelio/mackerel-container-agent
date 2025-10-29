@@ -71,7 +71,7 @@ func (p *probeHTTP) Check(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("http probe failed (%s %s): %w", method, u, err)
 	}
-	defer res.Body.Close()
+	defer res.Body.Close() // nolint
 
 	if res.StatusCode < http.StatusOK || http.StatusBadRequest <= res.StatusCode {
 		return fmt.Errorf("http probe failed (%s %s): %s", method, u, res.Status)

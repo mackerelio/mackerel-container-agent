@@ -242,7 +242,7 @@ func fetchHTTP(ctx context.Context, u *url.URL) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer resp.Body.Close() // nolint
 	return io.ReadAll(resp.Body)
 }
 

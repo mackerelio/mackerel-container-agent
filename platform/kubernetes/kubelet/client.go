@@ -149,7 +149,7 @@ func (c *client) newRequest(endpoint string) (*http.Request, error) {
 }
 
 func decodeBody(resp *http.Response, out any) error {
-	defer resp.Body.Close()
+	defer resp.Body.Close() // nolint
 	if resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(resp.Body)
 		return fmt.Errorf("got status code %d (url: %s, body: %q)", resp.StatusCode, resp.Request.URL, body)

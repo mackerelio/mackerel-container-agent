@@ -31,7 +31,7 @@ func TestGenerateSpec(t *testing.T) {
 				if err != nil {
 					return nil, err
 				}
-				defer f.Close()
+				defer f.Close() // nolint
 				var res ecsTypes.TaskResponse
 				if err := json.NewDecoder(f).Decode(&res); err != nil {
 					return nil, err

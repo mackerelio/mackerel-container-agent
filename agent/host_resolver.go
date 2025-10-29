@@ -145,7 +145,7 @@ func (r *hostIDFileStore) save(id string) error {
 	if err != nil {
 		return err
 	}
-	defer file.Close()
+	defer file.Close() // nolint
 
 	_, err = file.Write([]byte(id))
 	if err != nil {

@@ -756,11 +756,11 @@ func newConfigFile(t testing.TB, content string) string {
 	if err != nil {
 		t.Fatalf("should not raise error: %v", err)
 	}
-	defer temp.Close()
+	defer temp.Close() // nolint
 
 	name := temp.Name()
 	t.Cleanup(func() {
-		os.Remove(name)
+		os.Remove(name) // nolint
 	})
 	if _, err := temp.WriteString(content); err != nil {
 		t.Fatalf("should not raise error: %v", err)

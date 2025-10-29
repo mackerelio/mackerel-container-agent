@@ -78,7 +78,7 @@ func TestCreateHTTPClient(t *testing.T) {
 			t.Errorf("Get() does not expected benavior: %v", err)
 		}
 		if resp != nil {
-			resp.Body.Close()
+			resp.Body.Close() // nolint
 		}
 		if client.Transport.(*http.Transport).Proxy != nil {
 			t.Error("proxy should not be used")
