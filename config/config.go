@@ -107,7 +107,7 @@ func parseConfig(data []byte) (*Config, error) {
 		if plugin.Command.IsEmpty() {
 			return nil, errors.New("specify command of metric plugin")
 		}
-		conf.Config.MetricPlugins = append(conf.Config.MetricPlugins, &MetricPlugin{
+		conf.MetricPlugins = append(conf.MetricPlugins, &MetricPlugin{
 			Name: name, Command: plugin.Command, User: plugin.User, Env: plugin.Env,
 			Timeout: time.Duration(plugin.TimeoutSeconds) * time.Second,
 		})
@@ -116,19 +116,19 @@ func parseConfig(data []byte) (*Config, error) {
 		if plugin.Command.IsEmpty() {
 			return nil, errors.New("specify command of check plugin")
 		}
-		conf.Config.CheckPlugins = append(conf.Config.CheckPlugins, &CheckPlugin{
+		conf.CheckPlugins = append(conf.CheckPlugins, &CheckPlugin{
 			Name: name, Command: plugin.Command, User: plugin.User, Env: plugin.Env,
 			Timeout: time.Duration(plugin.TimeoutSeconds) * time.Second,
 			Memo:    plugin.Memo,
 		})
 	}
 
-	sort.Slice(conf.Config.MetricPlugins, func(i, j int) bool {
-		return conf.Config.MetricPlugins[i].Name < conf.Config.MetricPlugins[j].Name
+	sort.Slice(conf.MetricPlugins, func(i, j int) bool {
+		return conf.MetricPlugins[i].Name < conf.MetricPlugins[j].Name
 	})
 
-	sort.Slice(conf.Config.CheckPlugins, func(i, j int) bool {
-		return conf.Config.CheckPlugins[i].Name < conf.Config.CheckPlugins[j].Name
+	sort.Slice(conf.CheckPlugins, func(i, j int) bool {
+		return conf.CheckPlugins[i].Name < conf.CheckPlugins[j].Name
 	})
 
 	if conf.ReadinessProbe != nil {
@@ -242,7 +242,7 @@ func fetchHTTP(ctx context.Context, u *url.URL) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer resp.Body.Close() // nolint
 	return io.ReadAll(resp.Body)
 }
 

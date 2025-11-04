@@ -32,7 +32,7 @@ func (p *probeTCP) Check(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("tcp probe failed (%s): %w", addr, err)
 	}
-	defer conn.Close()
+	defer conn.Close() // nolint
 
 	logger.Infof("tcp probe success (%s)", addr)
 	return nil
