@@ -21,6 +21,7 @@ import (
 const (
 	executionEnvFargate = "AWS_ECS_FARGATE"
 	executionEnvEC2     = "AWS_ECS_EC2"
+	executionEnvManaged = "AWS_ECS_MANAGED_INSTANCES"
 
 	// ExecutionEnvECSExternal : (experimental) It is a definition that is handled internally, not an environment variable.
 	ExecutionEnvECSExternal = "ECS_EXTERNAL"
@@ -126,6 +127,8 @@ func resolveProvider(executionEnv string) (provider, error) {
 		return fargateProvider, nil
 	case executionEnvEC2:
 		return ecsProvider, nil
+	case executionEnvManaged:
+		return ecsManagedProvider, nil
 	case ExecutionEnvECSExternal:
 		return ecsAnywhereProvider, nil
 	default:
