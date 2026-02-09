@@ -3,12 +3,14 @@ package config
 import (
 	"context"
 	"fmt"
+	"io"
 	"net/url"
 	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/feature/s3/manager"
+	"github.com/aws/aws-sdk-go-v2/feature/s3/transfermanager"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
 
@@ -37,10 +39,9 @@ func (d s3Downloader) download(ctx context.Context, u *url.URL) ([]byte, error) 
 	}
 	cfg.Region = region
 
-	downloader := manager.NewDownloader(s3.NewFromConfig(cfg))
+	downloader := transfermanager.New(s3.NewFromConfig(cfg))
 
-	buf := manager.NewWriteAtBuffer([]byte{})
-	_, err = downloader.Download(ctx, buf, &s3.GetObjectInput{
+	out, err := downloader.GetObject(ctx, &transfermanager.GetObjectInput{
 		Bucket: aws.String(bucket),
 		Key:    aws.String(key),
 	})
@@ -48,7 +49,7 @@ func (d s3Downloader) download(ctx context.Context, u *url.URL) ([]byte, error) 
 		return nil, fmt.Errorf("failed to download config from %s: %w", u, err)
 	}
 
-	return buf.Bytes(), nil
+	return io.ReadAll(out.Body)
 }
 
 var s3downloader downloader = s3Downloader{
