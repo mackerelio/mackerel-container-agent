@@ -80,7 +80,7 @@ jobs:
         run: echo "::set-output name=VERSION::${GITHUB_HEAD_REF/bump-version-/v}"
 
       - name: Build and push alpha image
-        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6.19.2
         with:
           context: .
           file: Dockerfile
@@ -95,7 +95,7 @@ jobs:
             ghcr.io/${{ github.repository_owner }}/mackerel-container-agent:${{ steps.get_alpha_version.outputs.VERSION }}-alpha
 
       - name: Build and push alpha image with plugins
-        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6.19.2
         with:
           context: .
           file: Dockerfile
@@ -151,7 +151,7 @@ jobs:
         run: echo "::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}"
 
       - name: Build and push release image
-        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6.19.2
         with:
           context: .
           file: Dockerfile
@@ -169,7 +169,7 @@ jobs:
             ghcr.io/${{ github.repository_owner }}/mackerel-container-agent:${{ steps.get_version.outputs.VERSION }}
 
       - name: Build and push release image with plugins
-        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6.19.2
         with:
           context: .
           file: Dockerfile
