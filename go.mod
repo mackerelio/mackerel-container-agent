@@ -1,8 +1,6 @@
 module github.com/mackerelio/mackerel-container-agent
 
-go 1.24.0
-
-toolchain go1.24.3
+go 1.25.0
 
 require (
 	github.com/Songmu/retry v0.1.0
@@ -13,7 +11,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/feature/s3/transfermanager v0.1.13
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.98.0
 	github.com/docker/docker v28.5.2+incompatible
-	github.com/mackerelio/go-osstat v0.2.6
+	github.com/mackerelio/go-osstat v0.2.7
 	github.com/mackerelio/golib v1.2.1
 	github.com/mackerelio/mackerel-client-go v0.40.0
 	github.com/shirou/gopsutil/v3 v3.24.5
@@ -64,7 +62,7 @@ require (
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
 	go.yaml.in/yaml/v2 v2.4.2 // indirect
 	golang.org/x/net v0.38.0 // indirect
-	golang.org/x/sys v0.33.0 // indirect
+	golang.org/x/sys v0.42.0 // indirect
 	golang.org/x/text v0.23.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gotest.tools/v3 v3.4.0 // indirect
