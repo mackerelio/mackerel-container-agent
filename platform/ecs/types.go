@@ -14,7 +14,7 @@ type taskSpec struct {
 	PullStartedAt      *time.Time      `json:"pull_started_at,omitempty"`
 	PullStoppedAt      *time.Time      `json:"pull_stopped_at,omitempty"`
 	ExecutionStoppedAt *time.Time      `json:"execution_stopped_at,omitempty"`
-	Limits             limitSpec       `json:"limits,omitempty"`
+	Limits             limitSpec       `json:"limits"`
 }
 
 type containerSpec struct {
@@ -28,7 +28,7 @@ type containerSpec struct {
 	DesiredStatus string            `json:"desired_status,omitempty"`
 	KnownStatus   string            `json:"known_status,omitempty"`
 	ExitCode      *int              `json:"exit_code,omitempty"`
-	Limits        limitSpec         `json:"limits,omitempty"`
+	Limits        limitSpec         `json:"limits"`
 	CreatedAt     *time.Time        `json:"created_at,omitempty"`
 	StartedAt     *time.Time        `json:"started_at,omitempty"`
 	FinishedAt    *time.Time        `json:"finished_at,omitempty"`

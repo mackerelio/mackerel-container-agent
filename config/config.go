@@ -248,7 +248,7 @@ func fetchHTTP(ctx context.Context, u *url.URL) ([]byte, error) {
 
 func parseRoles(value string) []string {
 	var roles []string
-	for _, v := range strings.Split(value, ",") {
+	for v := range strings.SplitSeq(value, ",") {
 		roles = append(roles, strings.Trim(v, " "))
 	}
 	return roles

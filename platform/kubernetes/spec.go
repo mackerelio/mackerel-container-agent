@@ -50,7 +50,7 @@ type container struct {
 	Image     string               `json:"image,omitempty"`
 	Command   []string             `json:"command,omitempty"`
 	Args      []string             `json:"args,omitempty"`
-	Resources resourceRequirements `json:"resources,omitempty"`
+	Resources resourceRequirements `json:"resources"`
 	Ports     []containerPort      `json:"ports,omitempty"`
 
 	// Status

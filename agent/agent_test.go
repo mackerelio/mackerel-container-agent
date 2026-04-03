@@ -204,8 +204,7 @@ func TestAgentRun_NoRetryBadRequest(t *testing.T) {
 	conf := &config.Config{Root: dir}
 	hostID := "abcde"
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := t.Context()
 	client := api.NewMockClient(
 		api.MockCreateHost(func(param *mackerel.CreateHostParam) (string, error) {
 			return "", &mackerel.APIError{StatusCode: http.StatusBadRequest}
