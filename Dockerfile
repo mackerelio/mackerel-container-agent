@@ -1,4 +1,4 @@
-FROM golang:1.24-bookworm AS builder
+FROM golang:1.26-trixie AS builder
 
 WORKDIR /go/src/app
 
@@ -8,7 +8,7 @@ RUN go mod download
 COPY . .
 RUN make build
 
-FROM debian:bookworm-slim AS container-agent
+FROM debian:trixie-slim AS container-agent
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV GODEBUG=http2client=0
@@ -21,7 +21,7 @@ COPY --from=builder /go/src/app/build/mackerel-container-agent /usr/local/bin/
 
 ENTRYPOINT ["/usr/local/bin/mackerel-container-agent"]
 
-FROM golang:1.24-bookworm AS plugins-builder
+FROM golang:1.26-trixie AS plugins-builder
 
 COPY plugins/go.sum plugins/go.mod ./
 RUN go mod download
