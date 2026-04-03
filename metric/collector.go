@@ -2,6 +2,7 @@ package metric
 
 import (
 	"context"
+	"maps"
 	"sync"
 
 	mackerel "github.com/mackerelio/mackerel-client-go"
@@ -32,9 +33,7 @@ func (c *collector) collect(ctx context.Context) (Values, error) {
 			}
 			mu.Lock()
 			defer mu.Unlock()
-			for key, value := range vs {
-				values[key] = value
-			}
+			maps.Copy(values, vs)
 		}(g)
 	}
 	wg.Wait()

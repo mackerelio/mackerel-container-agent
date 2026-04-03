@@ -89,7 +89,7 @@ func TestManagerRun_Retry(t *testing.T) {
 
 	// This test is flaky so we should sometimes retry.
 	expectedNums := []int{4}
-	for i := 0; i < 3; i++ {
+	for range 3 {
 		ctx, cancel := context.WithTimeout(context.Background(), 190*time.Millisecond)
 		err := manager.Run(ctx, 50*time.Millisecond)
 		cancel()
