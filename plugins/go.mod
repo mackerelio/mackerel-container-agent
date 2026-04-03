@@ -1,8 +1,6 @@
 module github.com/mackerelio/mackerel-container-agent/plugins
 
-go 1.24.0
-
-toolchain go1.24.3
+go 1.25.0
 
 require (
 	github.com/mackerelio/go-check-plugins v0.52.0
