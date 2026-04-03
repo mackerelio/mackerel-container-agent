@@ -2,7 +2,7 @@ module github.com/mackerelio/mackerel-container-agent
 
 go 1.24.0
 
-toolchain go1.24.3
+toolchain go1.26.1
 
 require (
 	github.com/Songmu/retry v0.1.0
