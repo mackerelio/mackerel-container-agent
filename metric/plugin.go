@@ -48,7 +48,7 @@ func (g *pluginGenerator) Generate(ctx context.Context) (Values, error) {
 	}
 
 	values := make(Values)
-	for _, line := range strings.Split(stdout, "\n") {
+	for line := range strings.SplitSeq(stdout, "\n") {
 		// key, value, timestamp
 		xs := strings.Fields(line)
 		if len(xs) < 3 {
