@@ -14,8 +14,8 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.99.0
 	github.com/docker/docker v28.5.2+incompatible
 	github.com/mackerelio/go-osstat v0.2.7
-	github.com/mackerelio/golib v1.2.1
-	github.com/mackerelio/mackerel-client-go v0.40.0
+	github.com/mackerelio/golib v1.2.2
+	github.com/mackerelio/mackerel-client-go v0.41.0
 	github.com/shirou/gopsutil/v3 v3.24.5
 	golang.org/x/sync v0.20.0
 	gopkg.in/yaml.v3 v3.0.1
