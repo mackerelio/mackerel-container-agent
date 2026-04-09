@@ -7,15 +7,15 @@ toolchain go1.26.1
 require (
 	github.com/mackerelio/go-check-plugins v0.52.0
 	github.com/mackerelio/mackerel-agent-plugins v0.90.0
-	github.com/mackerelio/mackerel-plugin-json v1.2.7
-	github.com/mackerelio/mkr v0.63.0
+	github.com/mackerelio/mackerel-plugin-json v1.2.8
+	github.com/mackerelio/mkr v0.64.0
 )
 
 require (
 	filippo.io/edwards25519 v1.1.1 // indirect
 	github.com/Azure/go-ansiterm v0.0.0-20250102033503-faa5f7b0171c // indirect
 	github.com/Azure/go-ntlmssp v0.0.0-20221128193559-754e69321358 // indirect
-	github.com/BurntSushi/toml v1.5.0 // indirect
+	github.com/BurntSushi/toml v1.6.0 // indirect
 	github.com/Microsoft/go-winio v0.6.2 // indirect
 	github.com/STARRY-S/zip v0.2.3 // indirect
 	github.com/Songmu/axslogparser v1.4.0 // indirect
@@ -62,7 +62,7 @@ require (
 	github.com/docker/go-connections v0.5.0 // indirect
 	github.com/docker/go-units v0.5.0 // indirect
 	github.com/dsnet/compress v0.0.2-0.20230904184137-39efe44ab707 // indirect
-	github.com/fatih/color v1.18.0 // indirect
+	github.com/fatih/color v1.19.0 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/fsouza/go-dockerclient v1.12.3 // indirect
 	github.com/fukata/golang-stats-api-handler v1.0.0 // indirect
@@ -77,8 +77,8 @@ require (
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/gosnmp/gosnmp v1.42.1 // indirect
 	github.com/hashicorp/golang-lru/v2 v2.0.7 // indirect
-	github.com/itchyny/gojq v0.12.18 // indirect
-	github.com/itchyny/timefmt-go v0.1.7 // indirect
+	github.com/itchyny/gojq v0.12.19 // indirect
+	github.com/itchyny/timefmt-go v0.1.8 // indirect
 	github.com/jessevdk/go-flags v1.6.1 // indirect
 	github.com/jmoiron/sqlx v1.4.0 // indirect
 	github.com/jpillora/backoff v1.0.0 // indirect
@@ -86,13 +86,13 @@ require (
 	github.com/klauspost/pgzip v1.2.6 // indirect
 	github.com/kr/pretty v0.3.1 // indirect
 	github.com/lib/pq v1.10.9 // indirect
-	github.com/mackerelio/checkers v0.2.0 // indirect
+	github.com/mackerelio/checkers v0.2.1 // indirect
 	github.com/mackerelio/go-mackerel-plugin v0.1.5 // indirect
 	github.com/mackerelio/go-mackerel-plugin-helper v0.1.4 // indirect
 	github.com/mackerelio/go-osstat v0.2.6 // indirect
-	github.com/mackerelio/golib v1.2.1 // indirect
-	github.com/mackerelio/mackerel-agent v0.85.3 // indirect
-	github.com/mackerelio/mackerel-client-go v0.38.0 // indirect
+	github.com/mackerelio/golib v1.2.2 // indirect
+	github.com/mackerelio/mackerel-agent v0.86.1 // indirect
+	github.com/mackerelio/mackerel-client-go v0.40.0 // indirect
 	github.com/mackerelio/mackerel-plugin-mongodb v1.1.3 // indirect
 	github.com/mackerelio/mackerel-plugin-mysql v1.3.3 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect
@@ -138,6 +138,7 @@ require (
 	github.com/tomasen/fcgi_client v0.0.0-20180423082037-2bb3d819fd19 // indirect
 	github.com/ulikunitz/xz v0.5.15 // indirect
 	github.com/urfave/cli v1.22.17 // indirect
+	github.com/urfave/cli/v3 v3.8.0 // indirect
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
 	github.com/xdg-go/scram v1.1.2 // indirect
 	github.com/xdg-go/stringprep v1.0.4 // indirect
@@ -147,15 +148,15 @@ require (
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
 	go.mongodb.org/mongo-driver v1.17.6 // indirect
 	go4.org v0.0.0-20230225012048-214862532bf5 // indirect
-	golang.org/x/crypto v0.47.0 // indirect
-	golang.org/x/mod v0.31.0 // indirect
-	golang.org/x/net v0.48.0 // indirect
-	golang.org/x/oauth2 v0.34.0 // indirect
-	golang.org/x/sync v0.19.0 // indirect
-	golang.org/x/sys v0.40.0 // indirect
-	golang.org/x/term v0.39.0 // indirect
-	golang.org/x/text v0.33.0 // indirect
-	golang.org/x/tools v0.40.0 // indirect
+	golang.org/x/crypto v0.48.0 // indirect
+	golang.org/x/mod v0.33.0 // indirect
+	golang.org/x/net v0.50.0 // indirect
+	golang.org/x/oauth2 v0.36.0 // indirect
+	golang.org/x/sync v0.20.0 // indirect
+	golang.org/x/sys v0.42.0 // indirect
+	golang.org/x/term v0.40.0 // indirect
+	golang.org/x/text v0.35.0 // indirect
+	golang.org/x/tools v0.42.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
