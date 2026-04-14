@@ -80,26 +80,40 @@ jobs:
         run: echo "::set-output name=VERSION::${GITHUB_HEAD_REF/bump-version-/v}"
 
       - uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        id: apt-cache
         with:
           path: |
-            go-mod-cache
-            go-build-cache
             var-cache-apt
             var-lib-apt
-          key: build-${{ hashFiles('**/go.sum') }}
+          key: apt-cache-${{ hashFiles('Dockerfile') }}
+      - uses: reproducible-containers/buildkit-cache-dance@1b8ab18fbda5ad3646e3fcc9ed9dd41ce2f297b4 # v3.3.2
+        with:
+          cache-map: |
+            {
+              "var-cache-apt": "/var/cache/apt",
+              "var-lib-apt": "/var/lib/apt"
+            }
+          skip-extraction: ${{ steps.apt-cache.outputs.cache-hit }}
+
+      - uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        id: go-build-cache
+        with:
+          path: go-build-cache
+          key: go-build-cache
       - uses: reproducible-containers/buildkit-cache-dance@1b8ab18fbda5ad3646e3fcc9ed9dd41ce2f297b4 # v3.3.2
         with:
           cache-map: |
             {
               "go-mod-cache": "/go/pkg/mod",
-              "go-build-cache": "/root/.cache/go-build",
-              "var-cache-apt": "/var/cache/apt",
-              "var-lib-apt": "/var/lib/apt"
+              "go-build-cache": "/root/.cache/go-build"
             }
+          skip-extraction: ${{ steps.go-build-cache.outputs.cache-hit }}
 
       - name: Build and push alpha image
         uses: docker/build-push-action@d08e5c354a6adb9ed34480a06d141179aa583294 # v7.0.0
         with:
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           context: .
           file: Dockerfile
           target: container-agent
@@ -115,6 +129,8 @@ jobs:
       - name: Build and push alpha image with plugins
         uses: docker/build-push-action@d08e5c354a6adb9ed34480a06d141179aa583294 # v7.0.0
         with:
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           context: .
           file: Dockerfile
           target: container-agent-with-plugins
