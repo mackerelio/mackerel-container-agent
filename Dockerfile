@@ -2,31 +2,44 @@ FROM golang:1.26-trixie AS builder
 
 WORKDIR /go/src/app
 
-COPY go.sum go.mod ./
-RUN go mod download
+RUN --mount=type=cache,target=/go/pkg/mod/,sharing=locked \
+    --mount=type=cache,target=/root/.cache/go-build,sharing=locked \
+    --mount=type=bind,source=go.sum,target=go.sum \
+    --mount=type=bind,source=go.mod,target=go.mod \
+    go mod download
 
-COPY . .
-RUN make build
+RUN --mount=type=cache,target=/go/pkg/mod/,sharing=locked \
+    --mount=type=cache,target=/root/.cache/go-build,sharing=locked \
+    --mount=type=bind,target=. \
+    go build -o /usr/local/bin/mackerel-container-agent ./cmd/mackerel-container-agent/...
 
 FROM debian:trixie-slim AS container-agent
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV GODEBUG=http2client=0
 
-RUN apt-get update -yq && \
+RUN rm -f /etc/apt/apt.conf.d/docker-clean; echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update -yq && \
     apt-get install -yq --no-install-recommends ca-certificates sudo && \
     rm -rf /var/lib/apt/lists
 
-COPY --from=builder /go/src/app/build/mackerel-container-agent /usr/local/bin/
+COPY --from=builder /usr/local/bin/mackerel-container-agent /usr/local/bin/
 
 ENTRYPOINT ["/usr/local/bin/mackerel-container-agent"]
 
 FROM golang:1.26-trixie AS plugins-builder
 
-COPY plugins/go.sum plugins/go.mod ./
-RUN go mod download
+RUN --mount=type=cache,target=/go/pkg/mod/,sharing=locked \
+    --mount=type=bind,source=plugins/go.sum,target=go.sum \
+    --mount=type=bind,source=plugins/go.mod,target=go.mod \
+    go mod download
 
-RUN go install \
+RUN --mount=type=cache,target=/go/pkg/mod/,sharing=locked \
+    --mount=type=bind,source=plugins/go.mod,target=go.mod \
+    --mount=type=bind,source=plugins/go.sum,target=go.sum \
+    go install \
     github.com/mackerelio/go-check-plugins \
     github.com/mackerelio/mackerel-agent-plugins \
     github.com/mackerelio/mackerel-plugin-json \
