@@ -22,8 +22,7 @@ RUN rm -f /etc/apt/apt.conf.d/docker-clean; echo 'Binary::apt::APT::Keep-Downloa
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
     apt-get update -yq && \
-    apt-get install -yq --no-install-recommends ca-certificates sudo && \
-    rm -rf /var/lib/apt/lists
+    apt-get install -yq --no-install-recommends ca-certificates sudo
 
 COPY --from=builder /usr/local/bin/mackerel-container-agent /usr/local/bin/
 
