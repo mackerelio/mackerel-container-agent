@@ -9,9 +9,9 @@ require (
 	github.com/Songmu/timeout v0.4.0
 	github.com/aws/aws-sdk-go-v2 v1.41.6
 	github.com/aws/aws-sdk-go-v2/config v1.32.16
-	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.22.15
-	github.com/aws/aws-sdk-go-v2/feature/s3/transfermanager v0.1.17
-	github.com/aws/aws-sdk-go-v2/service/s3 v1.99.1
+	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.22.16
+	github.com/aws/aws-sdk-go-v2/feature/s3/transfermanager v0.1.18
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.100.0
 	github.com/docker/docker v28.5.2+incompatible
 	github.com/mackerelio/go-osstat v0.2.7
 	github.com/mackerelio/golib v1.2.2
