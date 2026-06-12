@@ -1,5 +1,34 @@
 # Changelog
 
+## 0.13.2 (2026-06-12)
+
+* bump golang.org/x/sync from 0.20.0 to 0.21.0 #609 (dependabot[bot])
+* Bump github.com/mackerelio/mackerel-client-go from 0.42.0 to 0.43.0 in the mackerelio group #608 (dependabot[bot])
+* Bump the mackerelio group in /plugins with 2 updates #607 (dependabot[bot])
+* Bump actions/checkout from 6.0.2 to 6.0.3 #606 (dependabot[bot])
+* Bump aws-actions/configure-aws-credentials from 6.1.3 to 6.2.0 #605 (dependabot[bot])
+* Bump docker/setup-qemu-action from 4.0.0 to 4.1.0 #603 (dependabot[bot])
+* Bump aws-actions/configure-aws-credentials from 6.1.1 to 6.1.3 #602 (dependabot[bot])
+* Bump the aws-aws-sdk-go-v2 group across 1 directory with 5 updates #601 (dependabot[bot])
+* Bump the aws-aws-sdk-go-v2 group with 3 updates #599 (dependabot[bot])
+* Bump docker/setup-buildx-action from 4.0.0 to 4.1.0 #598 (dependabot[bot])
+* Bump docker/login-action from 4.1.0 to 4.2.0 #597 (dependabot[bot])
+* Bump golangci/golangci-lint-action from 9.2.0 to 9.2.1 #596 (dependabot[bot])
+* Bump docker/build-push-action from 7.1.0 to 7.2.0 #595 (dependabot[bot])
+* Bump the aws-aws-sdk-go-v2 group with 3 updates #594 (dependabot[bot])
+* Bump github.com/mackerelio/mackerel-client-go from 0.41.0 to 0.42.0 in the mackerelio group #592 (dependabot[bot])
+* Bump aws-actions/configure-aws-credentials from 6.1.0 to 6.1.1 #591 (dependabot[bot])
+* Bump the aws-aws-sdk-go-v2 group across 1 directory with 5 updates #590 (dependabot[bot])
+* Bump the aws-aws-sdk-go-v2 group with 3 updates #588 (dependabot[bot])
+* Bump github.com/Azure/go-ntlmssp from 0.1.0 to 0.1.1 in /plugins #587 (dependabot[bot])
+* Bump the k8s group across 1 directory with 3 updates #586 (dependabot[bot])
+* Bump the aws-aws-sdk-go-v2 group with 5 updates #584 (dependabot[bot])
+* Bump actions/cache from 5.0.4 to 5.0.5 #583 (dependabot[bot])
+* Bump github.com/mackerelio/go-check-plugins from 0.52.1 to 0.52.2 in /plugins in the mackerelio group #582 (dependabot[bot])
+* Bump docker/build-push-action from 7.0.0 to 7.1.0 #581 (dependabot[bot])
+* Bump the mackerelio group across 1 directory with 2 updates #579 (dependabot[bot])
+
+
 ## 0.13.1 (2026-04-13)
 
 * Bump aws-actions/configure-aws-credentials from 6.0.0 to 6.1.0 #577 (dependabot[bot])
