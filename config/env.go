@@ -40,6 +40,19 @@ func buildEnv(envMap map[string]string) ([]string, error) {
 	return env, nil
 }
 
+// Masked returns the environment variables with their values masked for logging.
+func (env Env) Masked() []string {
+	if len(env) == 0 {
+		return nil
+	}
+	masked := make([]string, len(env))
+	for i, v := range env {
+		key, value, _ := strings.Cut(v, "=")
+		masked[i] = key + "=" + MaskEnvValue(value)
+	}
+	return masked
+}
+
 // MaskEnvValue return masked env value ex) FOOBARBAZ -> FOOB***
 func MaskEnvValue(s string) string {
 	if len(s) < 4 {
