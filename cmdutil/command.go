@@ -34,7 +34,7 @@ func (c Command) String() string {
 	case []string:
 		args := make([]string, len(cmd))
 		for i, arg := range cmd {
-			if strings.IndexFunc(arg, func(c rune) bool { return unicode.IsSpace(c) }) >= 0 {
+			if strings.IndexFunc(arg, unicode.IsSpace) >= 0 {
 				args[i] = fmt.Sprintf("%q", arg)
 				continue
 			}
