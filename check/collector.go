@@ -30,9 +30,7 @@ func (c *collector) collect(ctx context.Context) []*Result {
 	reports := make([]*Result, 0, len(c.generators))
 	mu := new(sync.Mutex)
 	for _, g := range c.generators {
-		wg.Add(1)
-		go func(g Generator) {
-			defer wg.Done()
+		wg.Go(func() {
 			r, err := g.Generate(ctx)
 			if err != nil {
 				logger.Errorf("%s", err)
@@ -43,7 +41,7 @@ func (c *collector) collect(ctx context.Context) []*Result {
 			if r != nil {
 				reports = append(reports, r)
 			}
-		}(g)
+		})
 	}
 	wg.Wait()
 	return reports

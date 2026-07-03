@@ -23,9 +23,7 @@ func (c *collector) collect(ctx context.Context) (Values, error) {
 	values := make(Values)
 	mu := new(sync.Mutex)
 	for _, g := range c.generators {
-		wg.Add(1)
-		go func(g Generator) {
-			defer wg.Done()
+		wg.Go(func() {
 			vs, err := g.Generate(ctx)
 			if err != nil {
 				logger.Errorf("%s", err)
@@ -34,7 +32,7 @@ func (c *collector) collect(ctx context.Context) (Values, error) {
 			mu.Lock()
 			defer mu.Unlock()
 			maps.Copy(values, vs)
-		}(g)
+		})
 	}
 	wg.Wait()
 	return values, nil
@@ -45,9 +43,7 @@ func (c *collector) collectGraphDefs(ctx context.Context) ([]*mackerel.GraphDefs
 	var graphDefs []*mackerel.GraphDefsParam
 	mu := new(sync.Mutex)
 	for _, g := range c.generators {
-		wg.Add(1)
-		go func(g Generator) {
-			defer wg.Done()
+		wg.Go(func() {
 			gs, err := g.GetGraphDefs(ctx)
 			if err != nil {
 				logger.Errorf("%s", err)
@@ -56,7 +52,7 @@ func (c *collector) collectGraphDefs(ctx context.Context) ([]*mackerel.GraphDefs
 			mu.Lock()
 			defer mu.Unlock()
 			graphDefs = append(graphDefs, gs...)
-		}(g)
+		})
 	}
 	wg.Wait()
 	return graphDefs, nil
