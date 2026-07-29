@@ -8,7 +8,7 @@ require (
 	github.com/mackerelio/go-check-plugins v0.52.4
 	github.com/mackerelio/mackerel-agent-plugins v0.91.0
 	github.com/mackerelio/mackerel-plugin-json v1.2.8
-	github.com/mackerelio/mkr v0.64.0
+	github.com/mackerelio/mkr v0.65.0
 )
 
 require (
@@ -85,8 +85,8 @@ require (
 	github.com/mackerelio/go-mackerel-plugin-helper v0.1.4 // indirect
 	github.com/mackerelio/go-osstat v0.2.8 // indirect
 	github.com/mackerelio/golib v1.2.2 // indirect
-	github.com/mackerelio/mackerel-agent v0.86.1 // indirect
-	github.com/mackerelio/mackerel-client-go v0.40.0 // indirect
+	github.com/mackerelio/mackerel-agent v0.87.0 // indirect
+	github.com/mackerelio/mackerel-client-go v0.45.0 // indirect
 	github.com/mackerelio/mackerel-plugin-mongodb v1.2.0 // indirect
 	github.com/mackerelio/mackerel-plugin-mysql v1.3.4 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect
@@ -131,7 +131,7 @@ require (
 	github.com/tomasen/fcgi_client v0.0.0-20180423082037-2bb3d819fd19 // indirect
 	github.com/ulikunitz/xz v0.5.15 // indirect
 	github.com/urfave/cli v1.22.17 // indirect
-	github.com/urfave/cli/v3 v3.8.0 // indirect
+	github.com/urfave/cli/v3 v3.10.1 // indirect
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
 	github.com/xdg-go/scram v1.2.0 // indirect
 	github.com/xdg-go/stringprep v1.0.4 // indirect
