@@ -122,7 +122,18 @@ func calculateCPUMetrics(prev, curr *dockerTypes.StatsResponse, timeDelta time.D
 }
 
 func calculateMemoryMetrics(stats *dockerTypes.StatsResponse) float64 {
-	return float64(stats.MemoryStats.Usage - stats.MemoryStats.Stats["cache"])
+	// https://github.com/docker/cli/blob/bf6f62cc7cede71f83621b830d0c72e6fbaca9d6/docs/reference/commandline/container_stats.md
+	// cgroup v1
+	// The cache usage is defined as the value of total_inactive_file field in the memory.stat file on cgroup v1 hosts.
+	if v, isCgroup1 := stats.MemoryStats.Stats["total_inactive_file"]; isCgroup1 && v < stats.MemoryStats.Usage {
+		return float64(stats.MemoryStats.Usage - v)
+	}
+	// cgroup v2
+	// On cgroup v2 hosts, the cache usage is defined as the value of inactive_file field.
+	if v := stats.MemoryStats.Stats["inactive_file"]; v < stats.MemoryStats.Usage {
+		return float64(stats.MemoryStats.Usage - v)
+	}
+	return float64(stats.MemoryStats.Usage)
 }
 
 func calculateInterfaceMetrics(name string, prev, curr *dockerTypes.StatsResponse, timeDelta time.Duration, metricValues metric.Values) {
