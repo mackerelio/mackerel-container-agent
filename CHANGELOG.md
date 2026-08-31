@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.13.4 (2026-08-31)
+
+* Bump the aws-aws-sdk-go-v2 group with 5 updates #666 (dependabot[bot])
+* Fixed the method for calculating memory usage. #665 (yseto)
+* Bump github.com/mackerelio/mkr from 0.65.0 to 0.66.0 in /plugins in the mackerelio group #664 (dependabot[bot])
+
+
 ## 0.13.3 (2026-08-25)
 
 * Bump the aws-aws-sdk-go-v2 group with 5 updates #662 (dependabot[bot])
