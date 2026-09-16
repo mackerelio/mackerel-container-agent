@@ -24,11 +24,14 @@ type hostResolver struct {
 	hostIDStore hostIDStore
 }
 
+// to preserve host ID across agent reloads when using memory storage
+var globalMemoryStore = &hostIDMemoryStore{}
+
 func newHostResolver(client api.Client, hostIdStore config.HostIDStore, root string) *hostResolver {
 	var store hostIDStore
 	switch hostIdStore {
 	case config.HostIDStoreMemory:
-		store = &hostIDMemoryStore{}
+		store = globalMemoryStore
 	case config.HostIDStoreFile:
 		fallthrough
 	default:
