@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.13.4 (2026-09-17)
+
+*  preserve host ID across agent reloads when using memory storage #679 (heleeen)
+* Bump the aws-aws-sdk-go-v2 group with 3 updates #678 (dependabot[bot])
+* Bump the aws-aws-sdk-go-v2 group with 3 updates #677 (dependabot[bot])
+* Bump the aws-aws-sdk-go-v2 group with 5 updates #676 (dependabot[bot])
+* Bump the aws-aws-sdk-go-v2 group with 3 updates #675 (dependabot[bot])
+* Bump the aws-aws-sdk-go-v2 group with 5 updates #673 (dependabot[bot])
+* Bump aws-actions/configure-aws-credentials from 6.2.3 to 6.2.4 #672 (dependabot[bot])
+* Bump docker/setup-qemu-action from 4.2.0 to 4.3.0 #671 (dependabot[bot])
+* Bump the aws-aws-sdk-go-v2 group with 4 updates #670 (dependabot[bot])
+* Bump the aws-aws-sdk-go-v2 group with 5 updates #669 (dependabot[bot])
+* Bump the aws-aws-sdk-go-v2 group with 5 updates #666 (dependabot[bot])
+* Bump github.com/mackerelio/mkr from 0.65.0 to 0.66.0 in /plugins in the mackerelio group #664 (dependabot[bot])
+
+
 ## 0.13.3 (2026-08-25)
 
 * Bump the aws-aws-sdk-go-v2 group with 5 updates #662 (dependabot[bot])
