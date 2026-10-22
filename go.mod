@@ -9,9 +9,9 @@ require (
 	github.com/Songmu/timeout v0.4.0
 	github.com/aws/aws-sdk-go-v2 v1.47.3
 	github.com/aws/aws-sdk-go-v2/config v1.33.9
-	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.23.14
-	github.com/aws/aws-sdk-go-v2/feature/s3/transfermanager v0.4.17
-	github.com/aws/aws-sdk-go-v2/service/s3 v1.114.3
+	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.23.15
+	github.com/aws/aws-sdk-go-v2/feature/s3/transfermanager v0.4.18
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.114.4
 	github.com/docker/docker v28.5.2+incompatible
 	github.com/mackerelio/go-osstat v0.2.8
 	github.com/mackerelio/golib v1.2.2
@@ -26,7 +26,7 @@ require (
 
 require (
 	github.com/Songmu/wrapcommander v0.1.0 // indirect
-	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.7.22 // indirect
+	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.7.23 // indirect
 	github.com/aws/aws-sdk-go-v2/credentials v1.20.9 // indirect
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.20.3 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/configsources v1.5.6 // indirect
