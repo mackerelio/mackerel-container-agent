@@ -1,8 +1,6 @@
 module github.com/mackerelio/mackerel-container-agent
 
-go 1.25.0
-
-toolchain go1.26.1
+go 1.26.10
 
 require (
 	github.com/Songmu/retry v0.1.0
@@ -15,7 +13,7 @@ require (
 	github.com/docker/docker v28.5.2+incompatible
 	github.com/mackerelio/go-osstat v0.2.8
 	github.com/mackerelio/golib v1.2.2
-	github.com/mackerelio/mackerel-client-go v0.47.0
+	github.com/mackerelio/mackerel-client-go v0.48.0
 	github.com/shirou/gopsutil/v3 v3.24.5
 	golang.org/x/sync v0.22.0
 	gopkg.in/yaml.v3 v3.0.1
