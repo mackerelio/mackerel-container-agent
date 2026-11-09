@@ -15,7 +15,7 @@ require (
 	github.com/mackerelio/golib v1.2.2
 	github.com/mackerelio/mackerel-client-go v0.48.0
 	github.com/shirou/gopsutil/v3 v3.24.5
-	golang.org/x/sync v0.22.0
+	golang.org/x/sync v0.24.0
 	gopkg.in/yaml.v3 v3.0.1
 	k8s.io/api v0.35.4
 	k8s.io/apimachinery v0.35.4
